@@ -1,0 +1,151 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+        <item name="snackbarStyle">@style/MySnackBar</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <!-- Customize your theme here. -->
+        <!--        <item name="android:windowBackground">@drawable/splash_theme</item>-->
+    </style>
+
+
+    <style name="RoundedCornersDialog" parent="@style/Theme.MaterialComponents.Light.Dialog">
+        <item name="dialogCornerRadius">8dp</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_orange</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/CustomBottomSheetCorners</item>
+    </style>
+
+    <style name="CustomBottomSheetCorners" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="SplashScreenTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_img_green</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.KotlinSwachBharat.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.KotlinSwachBharat.PopupOverlay" parent="Theme.AppCompat.NoActionBar" />
+
+    <style name="MyTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/_5sdp</item>
+        <item name="android:textSize">@dimen/_24ssp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--    <style name="MyEditTextStyleLight" parent="ThemeOverlay.Material3.TextInputEditText">-->
+    <!--        <item name="android:layout_width">match_parent</item>-->
+    <!--        <item name="android:textSize">@dimen/dim_14_sp</item>-->
+    <!--        <item name="android:layout_height">wrap_content</item>-->
+    <!--        <item name="android:textCursorDrawable">@drawable/cursor_orange</item>-->
+    <!--        &lt;!&ndash;<item name="android:background">@drawable/rounded_corners_text_view</item>&ndash;&gt;-->
+    <!--        <item name="android:layout_marginTop">@dimen/dim_10_dp</item>-->
+    <!--        <item name="android:backgroundTint">@color/white</item>-->
+    <!--        <item name="android:paddingBottom">@dimen/dim_10_dp</item>-->
+    <!--        <item name="android:maxLines">1</item>-->
+    <!--    </style>-->
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="TextLabel2" parent="AppTheme">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:backgroundTint">@android:color/white</item>
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@android:color/white</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="MyButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/rounded_primary_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="dialog_animation_fade">
+        <item name="android:windowEnterAnimation">@anim/down_to_up</item>
+        <item name="android:windowExitAnimation">@anim/up_to_down</item>
+    </style>
+
+    <style name="CustomEditTextStyleLight" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:textSize">@dimen/dim_14_sp</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_orange</item>
+        <!--<item name="android:background">@drawable/rounded_corners_text_view</item>-->
+        <item name="android:layout_marginTop">@dimen/dim_10_dp</item>
+        <item name="android:backgroundTint">@color/colorDefault</item>
+        <item name="android:paddingBottom">@dimen/dim_10_dp</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+
+    <style name="MyEditTextStyleLight" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">@dimen/dim_14_sp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_orange</item>
+        <!--<item name="android:background">@drawable/rounded_corners_text_view</item>-->
+        <item name="android:layout_marginTop">@dimen/dim_10_dp</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:paddingBottom">@dimen/dim_10_dp</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="MySnackBar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_margin">@null</item>
+        <item name="android:layout_marginLeft">@dimen/dim_8_dp</item>
+        <item name="android:layout_marginRight">@dimen/dim_8_dp</item>
+        <item name="android:layout_marginBottom">@dimen/dim_24_dp</item>
+    </style>
+
+    <style name="MyEditTextStylelight.Dark" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textSize">@dimen/dim_14_sp</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_orange</item>
+        <item name="android:backgroundTint">@android:color/white</item>
+        <item name="android:paddingBottom">@dimen/dim_10_dp</item>
+    </style>
+
+
+    <style name="TextLabel" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">@dimen/_9ssp</item>
+    </style>
+
+    <style name="MacroHorizontalProgressBarStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">10dp</item>
+        <item name="android:max">100</item>
+    </style>
+
+</resources>

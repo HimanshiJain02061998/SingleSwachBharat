@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/dim_16_dp">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/history_details_time"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dim_20_dp"
+        android:layout_weight="0.3"
+        android:background="@drawable/rounded_blue_button"
+        android:gravity="center"
+        android:padding="0dp"
+        android:text="@string/hyphen"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dim_12_sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="0.7"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/history_details_area"
+        app:layout_constraintStart_toEndOf="@+id/history_details_time"
+        app:layout_constraintTop_toTopOf="@+id/history_details_time"
+        app:layout_constraintBottom_toBottomOf="@+id/history_details_time"
+        android:layout_marginStart="@dimen/dim_6_dp"
+        android:layout_marginEnd="@dimen/dim_5_dp">
+
+        <TextView
+            android:id="@+id/history_details_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hyphen"
+            android:textColor="@color/colorBlackGray"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/history_details_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hyphen"
+            android:textColor="@color/colorDefault"
+            android:textSize="@dimen/dim_10_sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/history_details_vehicle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hyphen"
+            android:visibility="gone"
+            android:textColor="@color/colorDefault"
+            android:textSize="@dimen/dim_10_sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/history_details_area"
+        android:layout_width="wrap_content"
+        android:layout_weight="0.3"
+        android:layout_height="wrap_content"
+        android:text="@string/hyphen"
+        android:textSize="@dimen/dim_10_sp"
+        android:layout_marginEnd="@dimen/dim_16_dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/colorDefault"
+        android:textStyle="bold"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

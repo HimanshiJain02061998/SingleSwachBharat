@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ghantagadi.ui.qrScanner.DumpYardWeightActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:text="@string/dump_yard_id_txt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_house_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_5_dp"
+            android:text="@string/hyphen"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/placeholder"
+            app:layout_constraintStart_toEndOf="@+id/placeholder"
+            app:layout_constraintTop_toTopOf="@id/placeholder" />
+
+        <View
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/placeholder" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/_8sdp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            android:layout_marginTop="@dimen/_8sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/border">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_8sdp">
+
+
+                <ImageView
+                    android:id="@+id/btn_take_dry_photo"
+                    android:layout_width="@dimen/dim_120_dp"
+                    android:layout_height="@dimen/dim_120_dp"
+                    android:background="@color/colorDivider"
+                    android:contentDescription="@string/qr_code_scanner_place_holder"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_photo_camera_light_gray_50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/label_dry_weight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/total_dry_weight"
+                    android:textSize="@dimen/dim_18_sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btn_take_dry_photo"
+                    app:layout_constraintTop_toTopOf="@+id/btn_take_dry_photo" />
+
+                <EditText
+                    android:id="@+id/txt_dry_weight"
+                    style="@style/CustomEditTextStyleLight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_8sdp"
+                    android:hint="@string/enter_dry_weight"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/dim_14_sp"
+                    app:layout_constraintEnd_toEndOf="@+id/label_dry_weight"
+                    app:layout_constraintStart_toStartOf="@+id/label_dry_weight"
+                    app:layout_constraintTop_toBottomOf="@+id/label_dry_weight" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/radio_dry_kg"
+                    android:layout_width="@dimen/_80sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@color/colorPrimary"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="@dimen/dim_2_dp"
+                    android:text="@string/unit_kg"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dim_18_sp"
+                    app:layout_constraintStart_toStartOf="@+id/txt_dry_weight"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_dry_weight" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/_8sdp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_8sdp">
+
+
+                <ImageView
+                    android:id="@+id/btn_take_wet_photo"
+                    android:layout_width="@dimen/dim_120_dp"
+                    android:layout_height="@dimen/dim_120_dp"
+                    android:background="@color/colorDivider"
+                    android:contentDescription="@string/qr_code_scanner_place_holder"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_photo_camera_light_gray_50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/label_wet_weight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/total_wet_weight"
+                    android:textSize="@dimen/dim_18_sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btn_take_wet_photo"
+                    app:layout_constraintTop_toTopOf="@+id/btn_take_wet_photo" />
+
+                <EditText
+                    android:id="@+id/txt_wet_weight"
+                    style="@style/CustomEditTextStyleLight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_8sdp"
+                    android:hint="@string/enter_wet_weight"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/dim_14_sp"
+                    app:layout_constraintEnd_toEndOf="@+id/label_wet_weight"
+                    app:layout_constraintStart_toStartOf="@+id/label_wet_weight"
+                    app:layout_constraintTop_toBottomOf="@+id/label_wet_weight" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/radio_wet_kg"
+                    android:layout_width="@dimen/_80sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@color/colorPrimary"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="@dimen/dim_2_dp"
+                    android:text="@string/unit_kg"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dim_18_sp"
+                    app:layout_constraintStart_toStartOf="@+id/txt_wet_weight"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_wet_weight" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/_8sdp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card2">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_12sdp">
+
+
+                <TextView
+                    android:id="@+id/label_total_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="@string/total_weight"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dim_15_sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/txt_total_weight"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
+
+                <TextView
+                    android:id="@+id/txt_total_weight"
+                    android:layout_width="@dimen/dim_100_dp"
+                    android:layout_height="@dimen/_32sdp"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:layout_marginEnd="@dimen/_5sdp"
+                    android:background="@drawable/weight_dump_tv_border"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dim_20_sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/total_weight_kg"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/label_total_weight"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/total_weight_kg"
+                    android:layout_width="@dimen/_70sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@color/colorPrimary"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="@dimen/dim_2_dp"
+                    android:text="@string/unit_kg"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dim_18_sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/txt_total_weight"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <Button
+            android:id="@+id/btn_submit_dump"
+            style="@style/MyButtonStyle"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="70dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="@dimen/_24sdp"
+            android:text="@string/submit_txt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card3" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

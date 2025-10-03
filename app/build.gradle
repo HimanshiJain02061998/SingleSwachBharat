@@ -1,0 +1,104 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.firebase.crashlytics'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    namespace 'com.appynitty.ghantagadi'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.appynitty.swachbharatabhiyanlibrary"
+        minSdk 24
+        targetSdk 33
+        versionCode 2
+        versionName '2.0'
+
+        buildConfigField 'int', 'VERSION_CODE', "${versionCode}"
+        buildConfigField("String","VERSION_NAME","\"${versionName}\"")
+        buildConfigField("String","PACKAGE_NAME","\"${applicationId}\"")
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            multiDexEnabled true
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
+
+}
+
+
+dependencies {
+
+    implementation project(':kotlinsbalibrary')
+
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    //Room Library
+    implementation "androidx.room:room-runtime:2.6.1"
+    implementation "androidx.room:room-ktx:2.6.1"
+    kapt "androidx.room:room-compiler:2.6.1"
+
+    //QR code scanner
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+
+    //multidex
+    implementation 'com.android.support:multidex:1.0.3'
+
+    //prefs temporary( till the di is integrated )
+    implementation 'com.pixplicity.easyprefs:EasyPrefs:1.10.0'
+    //sdp
+    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+    implementation 'com.intuit.ssp:ssp-android:1.1.0'
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:30.5.0')
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics'
+
+    // Dagger Hilt
+    implementation 'com.google.dagger:hilt-android:2.48'
+    kapt 'com.google.dagger:hilt-android-compiler:2.48'
+    kapt 'androidx.hilt:hilt-compiler:1.2.0'
+
+    // Lottie Animation
+    implementation 'com.airbnb.android:lottie:4.2.2'
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}

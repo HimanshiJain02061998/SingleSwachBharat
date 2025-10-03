@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/lbl_title"
+        style="@style/MyTitle"
+        android:layout_margin="5dp"
+        android:paddingLeft="10dp"
+        android:text="@string/bifurcate_title"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/dim_20_sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/firstView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/colorDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbl_title" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/firstView">
+
+        <RadioButton
+            android:id="@+id/rb_bifurcate_garbage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/bifurcate_garbage"
+            android:textColor="@color/colorGrayList"
+            android:textSize="@dimen/dim_14_sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="33dp"
+            android:layout_marginBottom="@dimen/dim_5_dp"
+            android:gravity="start|top|left"
+            android:text="@string/bifurcate_garbage_hint"
+            android:textSize="@dimen/dim_12_sp" />
+
+        <RadioButton
+            android:id="@+id/rb_mixed_garbage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dim_5_dp"
+            android:checked="false"
+            android:text="@string/mixed_garbage"
+            android:textColor="@color/colorGrayList"
+            android:textSize="@dimen/dim_14_sp" />
+
+        <RadioButton
+            android:id="@+id/rb_no_garbage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/no_garbage"
+            android:textColor="@color/colorGrayList"
+            android:textSize="@dimen/dim_14_sp" />
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dim_8_dp"
+        android:layout_marginTop="@dimen/dim_5_dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_garbage_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="top"
+            android:hint="@string/comments"
+            android:maxLines="10"
+            android:overScrollMode="always"
+            android:paddingStart="0dp"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_garbage_submit"
+        style="@style/MyButtonStyle"
+        android:layout_width="0dp"
+        android:layout_marginVertical="@dimen/dim_8_dp"
+        android:layout_marginLeft="@dimen/dim_80_dp"
+        android:layout_marginRight="@dimen/dim_80_dp"
+        android:text="@string/submit_txt"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+</androidx.constraintlayout.widget.ConstraintLayout>

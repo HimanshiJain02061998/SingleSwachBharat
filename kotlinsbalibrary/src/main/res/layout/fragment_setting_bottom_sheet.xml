@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/_16sdp"
+    android:paddingBottom="@dimen/_8sdp"
+    android:paddingHorizontal="@dimen/_24sdp"
+    tools:context=".common.utils.dialogs.SettingBottomSheetFrag">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/versionCodeTvSettings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvBifurcationType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/show_bifurcation_type"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dim_17_sp"
+            app:layout_constraintBottom_toTopOf="@+id/tvVehicleQR"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_bifurcation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="switch bifurcation"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBifurcationType"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvBifurcationType" />
+
+        <TextView
+            android:id="@+id/tvVehicleQR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/vehicle_qr_scan"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dim_17_sp"
+            app:layout_constraintStart_toStartOf="@+id/tvBifurcationType"
+            app:layout_constraintTop_toBottomOf="@+id/tvBifurcationType" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_vehicle_scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="switch bifurcation"
+            app:layout_constraintBottom_toBottomOf="@+id/tvVehicleQR"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvVehicleQR" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <TextView
+        android:id="@+id/versionCodeTvSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Version : 1.0"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

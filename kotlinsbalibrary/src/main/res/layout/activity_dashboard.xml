@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ghantagadi.ui.dashboard.DashboardActivity">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/parentCoordinatorLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="-12dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <ImageView
+                android:id="@+id/homeVector"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_100sdp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_home_screen_vector"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/homeCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/dim_12_dp"
+                    android:paddingVertical="@dimen/_8sdp">
+
+
+                    <!--                    <Button-->
+                    <!--                        android:layout_width="wrap_content"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:text="test btn"-->
+                    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--                        app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--                        app:layout_constraintHorizontal_bias="0.5"-->
+                    <!--                        app:layout_constraintStart_toStartOf="parent"-->
+                    <!--                        app:layout_constraintTop_toTopOf="parent"-->
+                    <!--                        app:layout_constraintVertical_bias="0.5" />-->
+
+                    <ImageView
+                        android:id="@+id/user_profile_pic"
+                        android:layout_width="@dimen/dim_100_dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="@string/hyphen"
+                        android:paddingEnd="@dimen/dim_12_dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_user"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.5" />
+
+                    <TextView
+                        android:id="@+id/user_full_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-5dp"
+                        android:text="@string/hyphen"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_18ssp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/user_profile_pic"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/user_emp_id_lbl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="@dimen/_1sdp"
+                        android:text="@string/emp_id_full"
+                        android:textColor="@color/colorDefault"
+                        app:layout_constraintStart_toStartOf="@+id/user_full_name"
+                        app:layout_constraintTop_toBottomOf="@+id/user_full_name" />
+
+
+                    <TextView
+                        android:id="@+id/user_emp_id"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dim_6_dp"
+                        android:layout_toEndOf="@id/user_emp_id_lbl"
+                        android:text="@string/hyphen"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/user_emp_id_lbl"
+                        app:layout_constraintTop_toTopOf="@+id/user_emp_id_lbl" />
+
+                    <TextView
+                        android:id="@+id/userEmployeeType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_1sdp"
+                        android:text="@string/employee_type"
+                        android:textColor="@color/colorDefault"
+                        app:layout_constraintStart_toStartOf="@+id/user_emp_id_lbl"
+                        app:layout_constraintTop_toBottomOf="@+id/user_emp_id_lbl" />
+
+
+                    <TextView
+                        android:id="@+id/userEmployeeTypeTv"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dim_6_dp"
+                        android:layout_toEndOf="@id/user_emp_id_lbl"
+                        android:text="@string/hyphen"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/userEmployeeType"
+                        app:layout_constraintTop_toTopOf="@+id/userEmployeeType" />
+
+                    <TextView
+                        android:id="@+id/user_attendance_status"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8sdp"
+                        android:layout_weight="0.6"
+                        android:gravity="center_vertical|start"
+                        android:text="@string/status_off_duty"
+                        android:textColor="@color/cart_count_color"
+                        app:layout_constraintEnd_toStartOf="@+id/user_attendance_toggle"
+                        app:layout_constraintStart_toStartOf="@+id/userEmployeeType"
+                        app:layout_constraintTop_toBottomOf="@+id/userEmployeeType" />
+
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/user_attendance_toggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="@+id/user_attendance_status"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:contentDescription="Duty toggle"
+                        app:layout_constraintTop_toTopOf="@+id/user_attendance_status" />
+
+                    <TextView
+                        android:id="@+id/user_vehicle_type"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|start"
+                        android:textColor="@color/colorDefault"
+                        android:layout_marginTop="@dimen/_4sdp"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="@+id/user_attendance_toggle"
+                        app:layout_constraintStart_toStartOf="@+id/user_attendance_status"
+                        app:layout_constraintTop_toBottomOf="@+id/user_attendance_status" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/homeCard"
+                app:layout_constraintVertical_bias="0.0">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/dashboardRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginHorizontal="@dimen/_5sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/gpsProgressLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="10dp"
+                    app:cardPreventCornerOverlap="true"
+                    app:cardUseCompatPadding="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="@dimen/dim_10_dp"
+                        android:orientation="vertical">
+
+                        <ProgressBar
+                            android:id="@+id/progress_circular"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/dim_20_dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/dim_10_dp"
+                            android:layout_marginBottom="@dimen/dim_10_dp"
+                            android:gravity="center_horizontal"
+                            android:text="@string/turning_on_the_gps_n_please_wait" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <View
+        android:id="@+id/transparentWhiteBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#66000000"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/nestedCoordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fabConstraint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:minHeight="@dimen/_20sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_dodgeInsetEdges="bottom">
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/add_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/colorAccent"
+                app:backgroundTint="@color/colorAccent"
+                app:icon="@drawable/ic_repairing_service"
+                app:iconTint="@color/white"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/ic_repairing_service"
+                app:tint="@color/white" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/colorAccent"
+                android:layout_marginBottom="@dimen/dim_5_dp"
+                app:fabSize="normal"
+                app:fabCustomSize="@dimen/_40sdp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/add_fab"
+                app:layout_constraintEnd_toEndOf="@+id/add_fab"
+                app:srcCompat="@drawable/ic_language_change"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/fab_language_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fab_bg"
+                android:clickable="true"
+                android:elevation="8dp"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="@string/change_language"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/fab_language"
+                app:layout_constraintEnd_toStartOf="@+id/fab_language"
+                app:layout_constraintTop_toTopOf="@+id/fab_language" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dim_5_dp"
+                android:clickable="true"
+                android:elevation="16dp"
+                android:focusable="true"
+                app:backgroundTint="@color/colorAccent"
+                app:fabCustomSize="@dimen/_40sdp"
+                app:fabSize="normal"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/fab_language"
+                app:layout_constraintEnd_toEndOf="@+id/fab_language"
+                app:layout_constraintStart_toStartOf="@+id/fab_language"
+                app:pressedTranslationZ="12dp"
+                app:srcCompat="@drawable/ic_logout_white"
+                app:tint="@color/white" />
+
+
+            <TextView
+                android:id="@+id/fab_logout_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fab_bg"
+                android:clickable="true"
+                android:elevation="8dp"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="@string/logout"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/fab_logout"
+                app:layout_constraintEnd_toStartOf="@+id/fab_logout"
+                app:layout_constraintTop_toTopOf="@+id/fab_logout" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dim_5_dp"
+                android:clickable="true"
+                android:elevation="16dp"
+                android:focusable="true"
+                app:backgroundTint="@color/colorAccent"
+                app:fabCustomSize="@dimen/_40sdp"
+                app:fabSize="normal"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/fab_logout"
+                app:layout_constraintEnd_toEndOf="@+id/fab_logout"
+                app:layout_constraintStart_toStartOf="@+id/fab_logout"
+                app:pressedTranslationZ="12dp"
+                app:srcCompat="@drawable/ic_settings_white"
+                app:tint="@color/white" />
+
+
+            <TextView
+                android:id="@+id/fab_setting_Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fab_bg"
+                android:clickable="true"
+                android:elevation="8dp"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="@string/setting"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/fab_setting"
+                app:layout_constraintEnd_toStartOf="@+id/fab_setting"
+                app:layout_constraintTop_toTopOf="@+id/fab_setting" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_privacy_policy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dim_5_dp"
+                android:clickable="true"
+                android:elevation="16dp"
+                android:focusable="true"
+                app:backgroundTint="@color/colorAccent"
+                app:fabCustomSize="@dimen/_40sdp"
+                app:fabSize="normal"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/fab_setting"
+                app:layout_constraintEnd_toEndOf="@+id/fab_setting"
+                app:layout_constraintStart_toStartOf="@+id/fab_setting"
+                app:srcCompat="@drawable/privacyvector"
+                app:tint="@color/white" />
+
+
+            <TextView
+                android:id="@+id/fab_privacy_policy_Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fab_bg"
+                android:clickable="true"
+                android:elevation="8dp"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="@string/privacy_policy"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/fab_privacy_policy"
+                app:layout_constraintEnd_toStartOf="@+id/fab_privacy_policy"
+                app:layout_constraintTop_toTopOf="@+id/fab_privacy_policy" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

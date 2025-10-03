@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/_15sdp"
+    android:paddingHorizontal="@dimen/_8sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/house_id_archived"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dim_20_dp"
+        android:layout_weight="0.3"
+        android:background="@drawable/rounded_blue_button"
+        android:gravity="center"
+        android:padding="0dp"
+        android:text="@string/hyphen"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dim_12_sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/error_archived"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="hello"
+        android:textColor="@color/colorOFFDutyRed"
+        android:paddingStart="@dimen/_12sdp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/house_id_archived"
+        app:layout_constraintBottom_toBottomOf="@+id/house_id_archived"
+        app:layout_constraintStart_toEndOf="@id/house_id_archived"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

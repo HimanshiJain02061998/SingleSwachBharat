@@ -1,0 +1,233 @@
+<resources>
+    <string name="app_name">Kotlin-SwachBharat</string>
+    <string name="login_title">LOGIN</string>
+    <string name="select_employee_type">Select Employee Type</string>
+    <string name="select_dump_yard">Select DumpYard</string>
+    <string name="select_dump_yard_id">Select DumpYard Id</string>
+    <string name="please_select_dump_yard_id">Please Select DumpYard Id</string>
+
+    <string name="user_name_txt">User Name</string>
+    <string name="password_txt">Password</string>
+    <string name="forgot_password_txt">Forgot Password ?</string>
+    <string name="login_txt">Login</string>
+    <string name="change_language">Change Language</string>
+    <string name="hyphen" translatable="false">-</string>
+
+    <string name="household_collection">Waste Collection Monitoring Technology</string>
+    <string name="street_sweeping">Street Sweeping Monitoring System</string>
+    <string name="liquid_waste_cleaning">Liquid Waste Cleaning Monitoring System</string>
+    <string name="app_notification_description" translatable="false">Please don\'t kill the app from background.</string>
+    <string name="dump_yard_supervisor">Dump Yard Supervisor</string>
+    <string name="title_activity_privacy_policy" translatable="false">PrivacyPolicyActivity</string>
+    <string name="title_activity_login" translatable="false">Login Activity</string>
+    <string name="dumpyard_plant_collection">DumpYard Plant Collection</string>
+    <!--    STRING ARRAY FOR EMPLOYEE TYPES (EXPOSE DROP DOWN WHILE LOGIN )-->
+    <string-array name="employee_types">
+        <item>@string/household_collection</item>
+        <item>@string/street_sweeping</item>
+        <item>@string/liquid_waste_cleaning</item>
+        <item>@string/dump_yard_supervisor</item>
+    </string-array>
+
+
+    <!--    STRING ARRAY FOR MONTHS-->
+    <string-array name="months" translatable="false">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>June</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
+    <string name="title_activity_qrcode_scanner">Scaniffy Code</string>
+    <string name="title_activity_take_photo">Taking Photo</string>
+    <string name="title_activity_history_page">Work History</string>
+    <string name="title_activity_sync_offline">Sync Offline</string>
+    <string name="title_activity_archived">Today\'s rejected data</string>
+
+    <string name="title_activity_broadcast_page">Broadcast</string>
+    <string name="title_activity_profile_page">Profile</string>
+    <string name="title_activity_my_location">Check Location</string>
+
+    <string name="emp_id_full">Emp ID :</string>
+    <string name="employee_type">Emp Type :</string>
+    <string name="emp_id_short">Emp ID</string>
+    <string name="status_off_duty">Off Duty</string>
+    <string name="status_on_duty">On Duty</string>
+
+    <string name="emp_code">Emp Code :</string>
+    <string name="partner_name">Pt Name :</string>
+    <string name="partner_code">Pt Emp Code :</string>
+
+    <string name="waste_employee">House</string>
+    <string name="liquid_employee">Liquid</string>
+    <string name="street_employee">Street</string>
+
+
+    <string name="house_collection_txt">House Collection</string>
+    <string name="dump_yard_txt">Dump Yard Trip</string>
+    <string name="house_id_txt">House ID :</string>
+    <string name="point_id_txt">Point ID :</string>
+
+    <string name="select_area_hint">Select Area</string>
+    <string name="submit_txt">Submit</string>
+    <string name="next">Next</string>
+    <string name="grant_permission_txt">Grant Permission</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="qr_error">Invalid Scaniffy Code</string>
+
+
+    <string name="ssc_qr_warning">For scanning Street QR, Kindly login with Street Sweeping Id!</string>
+    <string name="house_qr_alert">For scanning House QR, kindly login with waste collection id.</string>
+    <string name="gp_qr_alert">For scanning Garbage Point QR, kindly login with waste collection id</string>
+    <string name="dy_qr_alert">For scanning Dump Yard QR, kindly login with waste collection id.</string>
+    <string name="lwc_qr_alert">For scanning Liquid Waste QR, kindly login with liquid waste cleaning id</string>
+    <string name="alert">Alert !</string>
+
+    <string name="bifurcate_garbage">Bifurcated Garbage</string>
+    <string name="mixed_garbage">Mixed Garbage</string>
+    <string name="no_garbage">Garbage not Received</string>
+    <string name="bifurcate_title">Bifurcated Types</string>
+    <string name="bifurcate_garbage_hint">(Wet/Dried/Fatal)</string>
+    <string name="bifurcate_garbage_hint_akot">(Wet/Dried/Hazardous)</string>
+    <string name="choose_option_txt">Choose Option</string>
+    <string name="comments">Comments</string>
+
+    <string name="garbage_collection_completed">Garbage Collection Completed</string>
+
+    <string name="save_txt">Save</string>
+    <string name="cancel_txt">Cancel</string>
+    <string name="done_txt">Done</string>
+    <string name="retry_txt">Retry</string>
+
+    <string name="collectionStatus">Garbage Weight Registration Complete</string>
+    <string name="flash_image" translatable="false">flash_image</string>
+
+    <string name="month_txt">Month</string>
+    <string name="master_collection_txt">Master ID</string>
+    <string name="dump_yard_id_txt">Dump Yard ID :</string>
+    <string name="dump_yard_vehicle_id_txt">Vehicle ID :</string>
+    <string name="street_sweep_id_txt">Street Sweep ID :</string>
+    <string name="liquid_waste_id_txt">Liquid Waste ID :</string>
+    <string name="dump_yard">Dump Yard</string>
+    <string name="liquid_waste">Liquid Waste</string>
+    <string name="street_sweep">Street Sweeping</string>
+
+    <string name="offline_work_is_being_synced">Offline work is being synced.</string>
+    <string name="remaining">Remaining</string>
+    <string name="no_data_error">No history Found</string>
+    <string name="no_offline_data_error">No Offline Data Found</string>
+    <string name="no_archived_data_error">No Data Found</string>
+
+    <!--Fab buttons desc-->
+    <string name="fab_settings" translatable="false">Settings</string>
+    <string name="setting">Setting</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_activity" translatable="false">Privacy Policy</string>
+    <string name="rate_app">Rate App</string>
+    <string name="share_app">Share App</string>
+    <string name="logout">Logout</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="qr_code_scanner_place_holder" translatable="false">Place a qr code inside the viewfinder rectangle to scan it.</string>
+
+
+    <string name="logout_confirmation_title">Logout Confirmation</string>
+    <string name="logout_confirmation_msg">Are you sure, you want to Logout?</string>
+
+    <string name="offduty_confirmation_title">End Duty Confirmation</string>
+    <string name="offduty_confirmation_msg">Are you sure, you want to end your Duty?</string>
+
+    <string name="yes_txt">Yes</string>
+    <string name="no_txt">No</string>
+    <string name="ok_txt">OK</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="show_bifurcation_type">Show Bifurcation Type</string>
+    <string name="bifurcation_setting_changed">Bifurcation setting changed</string>
+    <string name="title_activity_dump_yard_weight">Weight Details</string>
+
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="dialog_title_txt_vehicle">Ghanta Gadi Types</string>
+
+    <string name="total_weight">Total Weight</string>
+    <string name="total_dry_weight">Total Dry Weight</string>
+    <string name="enter_dry_weight">Enter Dry Weight</string>
+    <string name="total_wet_weight">Total Wet Weight</string>
+    <string name="enter_wet_weight">Enter Wet Weight</string>
+
+    <string name="unit_kg" translatable="false">Kg</string>
+    <string name="unit_ton" translatable="false">Ton</string>
+    <string name="shutter_button_desc" translatable="false">shutter button</string>
+
+    <string name="take_a_photo">Take a photo</string>
+    <string name="empty_dump_weight_error">Please fill one of the weight field</string>
+    <string name="be_no_duty">Please Mark Your Attendance First</string>
+
+    <string name="take_before_photo">Take Before Photo</string>
+    <string name="take_after_photo">Take After Photo</string>
+    <string name="take_qr_photo">Take Scaniffy Photo</string>
+    <string name="take_property_photo">Take Property Photo</string>
+    <string name="take_liquid_point_photo">Take Liquid Point Photo</string>
+    <string name="take_street_point_photo">Take Street Point Photo</string>
+    <string name="take_dump_point_photo">Take Dump Point Photo</string>
+    <string name="turning_on_the_gps_n_please_wait">Turning on the GPS\nPlease wait…</string>
+
+    <string name="plz_capture_img">Please capture any one image</string>
+    <string name="empty_fields_not_allowed">Empty Fields are not allowed</string>
+    <string name="please_type_username">Please type username</string>
+    <string name="please_type_password">Please type password</string>
+    <string name="please_select_employee_type">Please select employee Type</string>
+    <string name="please_capture_both_photos">Please capture both photos</string>
+    <string name="please_capture_qr_photo">Please capture qr photo</string>
+
+    <string name="vehicle_number_txt">Vehicle No :</string>
+    <string name="noVehicleNo">Please select vehicle number</string>
+    <string name="vehicle_no_txt_select">Select or enter vehicle number</string>
+    <string name="off_duty_warning">Please End your Duty First</string>
+    <string name="sync_offline_data_warning">Please Sync Offline Data First</string>
+
+    <string name="no_internet_error">No Internet Connection</string>
+    <string name="please_scan_again">Please scan again</string>
+    <string name="please_type_valid_weight">Please type valid weight</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="syncing_is_on">Syncing is on</string>
+    <string name="saved_offline">Saved Offline</string>
+    <string name="center_marker" translatable="false">center marker</string>
+    <string name="confirm_location" translatable="false">Confirm Location</string>
+
+    <string name="distance_warning" translatable="false">you have exceeded the %1$d meters limit!</string>
+
+    <string name="photo_clicked">Photo Clicked</string>
+    <string name="select_garbage_type">Please select garbage type</string>
+    <string name="splash_image" translatable="false">splash_image</string>
+    <string name="turn_off_airplane_mode">Please turn off Aeroplane mode</string>
+    <string name="select_propety_type">Please select property type</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="new_update_available">New Version Available</string>
+    <string name="please_update_app">Please update your application to latest version.</string>
+    <string name="update">Update</string>
+    <string name="download_in_progres">Download is in progress !!</string>
+    <string name="download_completed">Download Completed !!</string>
+    <string name="vehicle_scan_setting_changed">Vehicle Scan Setting Changed</string>
+
+    <string name="vehicle_qr_scan">Vehicle QR scan</string>
+    <string name="refresh">Refresh</string>
+    <string name="refresh_location">Refresh Location</string>
+
+    <string name="distance_alert">Distance Alert !!</string>
+    <string name="distance_alert_desc">You are %1$d meters away from last Scanify.</string>
+    <string name="confirm">Confirm</string>
+    <string name="add_house">Add House</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="master_id">"Master-ID: "</string>
+    <string name="add_master_plate">Add Master Plate</string>
+</resources>

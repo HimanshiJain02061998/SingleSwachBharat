@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/dim_8_dp"
+    app:cardElevation="@dimen/dim_8_dp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dim_8_dp">
+
+        <TextView
+            android:id="@+id/history_date_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_8_dp"
+            android:text="@string/hyphen"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/dim_20_sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/guideline2"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/history_month_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hyphen"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/history_date_txt"
+            app:layout_constraintStart_toStartOf="@+id/history_date_txt"
+            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/dim_8_dp"
+            android:background="@color/colorAccent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/history_date_txt"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim_8_dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/view"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/house_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/house_collection_txt"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/house_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/house_collection_lbl"
+                android:layout_marginBottom="@dimen/dim_6_dp"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorBlue"
+                android:textSize="@dimen/dim_17_sp"
+                android:visibility="gone" />
+
+            <!--<TextView
+                android:id="@+id/gp_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/house_collection"
+                android:layout_marginTop="@dimen/dim_6_dp"
+                android:text="@string/point_collection_txt"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp" />
+
+            <TextView
+                android:id="@+id/gp_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/gp_collection_lbl"
+                android:textSize="@dimen/dim_17_sp"
+                android:textColor="@color/colorPinkLight"
+                android:text="@string/hyphen"/>-->
+
+            <TextView
+                android:id="@+id/dy_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/masterPlate_collection"
+                android:layout_marginTop="@dimen/dim_6_dp"
+                android:text="@string/dump_yard"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp" />
+
+            <TextView
+                android:id="@+id/dy_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dy_collection_lbl"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorOrange"
+                android:textSize="@dimen/dim_17_sp" />
+
+            <TextView
+                android:id="@+id/lwc_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dy_collection"
+                android:layout_marginTop="@dimen/dim_6_dp"
+                android:text="@string/liquid_waste"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/lwc_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/lwc_collection_lbl"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorGreenLight"
+                android:textSize="@dimen/dim_17_sp"
+                android:visibility="gone" />
+            <!--colorGreenLight-->
+
+            <TextView
+                android:id="@+id/ss_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/lwc_collection"
+                android:layout_marginTop="9dp"
+                android:text="@string/street_sweep"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/ss_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ss_collection_lbl"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorPinkLight"
+                android:textSize="@dimen/dim_17_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/ds_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/masterPlate_collection"
+                android:layout_marginTop="@dimen/dim_6_dp"
+                android:text="@string/dumpyard_plant_collection"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/ds_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ds_collection_lbl"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorPinkLight"
+                android:textSize="@dimen/dim_17_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/masterPlate_collection_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/house_collection"
+                android:layout_marginTop="@dimen/dim_6_dp"
+                android:text="@string/master_collection_txt"
+                android:textColor="@color/colorDefault"
+                android:textSize="@dimen/dim_12_sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/masterPlate_collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/masterPlate_collection_lbl"
+                android:text="@string/hyphen"
+                android:textColor="@color/colorVioletDark"
+                android:textSize="@dimen/dim_17_sp"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kotlin-SwachBharat</string>
+    <string name="login_title">लॉग इन</string>
+    <string name="select_employee_type">कर्मचारी प्रकार निवडा</string>
+    <string name="select_dump_yard">डंपयार्ड निवडा</string>
+    <string name="select_dump_yard_id">डंपयार्ड आयडी निवडा</string>
+    <string name="please_select_dump_yard_id">कृपया डंपयार्ड आयडी निवडा</string>
+
+    <string name="user_name_txt">वापरकर्ता नाव</string>
+    <string name="password_txt">पासवर्ड</string>
+    <string name="forgot_password_txt">फॉरगेट पासवर्ड?</string>
+    <string name="login_txt">लॉग इन</string>
+    <string name="change_language">भाषा बदला</string>
+
+    <string name="household_collection">वेस्ट कलेक्शन मॉनिटरिंग टेक्नोलॉजी</string>
+    <string name="street_sweeping">स्ट्रीट स्वीपिंग मॉनिटरिंग सिस्टम</string>
+    <string name="liquid_waste_cleaning">लिक्विड वेस्ट क्लीनिंग मॉनिटरिंग सिस्टम</string>
+    <string name="dump_yard_supervisor">डंप यार्ड सुपरवाइज़र</string>
+    <!--    STRING ARRAY FOR EMPLOYEE TYPES (EXPOSE DROP DOWN WHILE LOGIN )-->
+    <string-array name="employee_types">
+        <item>@string/household_collection</item>
+        <item>@string/street_sweeping</item>
+        <item>@string/liquid_waste_cleaning</item>
+        <item>@string/dump_yard_supervisor</item>
+    </string-array>
+
+
+    <string name="title_activity_qrcode_scanner">स्कॅनिफाय कोड</string>
+    <string name="title_activity_take_photo">फोटो घ्या</string>
+    <string name="title_activity_profile_page">प्रोफाइल</string>
+    <string name="title_activity_history_page">कामाचा इतिहास</string>
+    <string name="title_activity_broadcast_page">प्रसारण</string>
+    <string name="title_activity_sync_offline">ऑफलाइन समक्रमित करा</string>
+    <string name="title_activity_archived">आजचा नाकारलेला डेटा</string>
+    <string name="title_activity_my_location">लोकेशन तपासा</string>
+
+
+    <string name="emp_id_full">कर्मचारी आयडी :</string>
+    <string name="employee_type">कर्मचारी प्रकार :</string>
+    <string name="emp_id_short">कर्मचारी आयडी</string>
+    <string name="status_off_duty">ऑफ ड्यूटी</string>
+    <string name="status_on_duty">"ऑन ड्यूटी "</string>
+
+    <string name="emp_code">कर्मचारी कोड :</string>
+    <string name="partner_name">पार्टनर नाव :</string>
+    <string name="partner_code">पार्टनर कोड :</string>
+
+    <string name="waste_employee">हाउस</string>
+    <string name="liquid_employee">लिक्विड</string>
+    <string name="street_employee">स्ट्रीट</string>
+
+    <string name="house_collection_txt">घर संकलन</string>
+    <string name="dump_yard_txt">डंप यार्ड ट्रिप</string>
+    <string name="select_area_hint">क्षेत्र निवडा</string>
+    <string name="submit_txt">सबमिट</string>
+    <string name="next">पुढे</string>
+    <string name="grant_permission_txt">परवानगी देया</string>
+
+    <string name="qr_error">अवैध स्कॅनिफाय कोड</string>
+
+    <string name="yes_txt">हो</string>
+    <string name="no_txt">नाही</string>
+    <string name="ok_txt">ठीक आहे</string>
+
+    <string name="ssc_qr_warning">स्ट्रीट क्यूआर स्कॅन करण्यासाठी, कृपया स्ट्रीट स्वीपिंग आयडी ने लॉग इन करा!</string>
+    <string name="house_qr_alert">हाऊस QR स्कॅन करण्यासाठी कृपया waste collection आयडी ने लॉगिन करा.</string>
+    <string name="gp_qr_alert">गार्बेज पॉईंट QR स्कॅन करण्यासाठी कृपया Waste Collection आयडी ने लॉग इन करा.</string>
+    <string name="dy_qr_alert">डंप यार्ड क्यूआर स्कॅन करण्यासाठी, कृपया Waste Collection आयडी ने  लॉग इन करा.</string>
+    <string name="lwc_qr_alert">लिक्विड वेस्ट क्यूआर स्कॅन करण्यासाठी, कृपया लिक्विड वेस्ट क्लीनिंग आयडी ने  लॉग इन करा.</string>
+    <string name="alert">अलर्ट !</string>
+
+    <string name="bifurcate_garbage">वर्गीकृत कचरा</string>
+    <string name="mixed_garbage">मिश्र कचरा</string>
+    <string name="no_garbage">कचरा मिळाला नाही</string>
+    <string name="bifurcate_title">वर्गीकरणाचे प्रकार</string>
+    <string name="bifurcate_garbage_hint">(ओला/सुका/घातक)</string>
+    <string name="bifurcate_garbage_hint_akot">(ओला/सुका/घातक)</string>
+    <string name="choose_option_txt">पर्याय निवडा</string>
+    <string name="comments">टिप्पण्या</string>
+
+    <string name="garbage_collection_completed">कचरा संकलन पूर्ण झाले</string>
+    <string name="save_txt">सेव करा</string>
+    <string name="cancel_txt">रद्द करा</string>
+    <string name="done_txt">पूर्ण झाले</string>
+    <string name="retry_txt">पुन्हा प्रयत्न करा</string>
+
+    <string name="collectionStatus">वजन नोंदणी पूर्ण झाली</string>
+
+    <string name="month_txt">महिना</string>
+    <string name="master_collection_txt">मास्टर आईडी</string>
+    <string name="house_id_txt">घर आयडी :</string>
+    <string name="point_id_txt">पॉइंट आयडी :</string>
+    <string name="dump_yard_id_txt">डंप यार्ड आयडी :</string>
+    <string name="dump_yard_vehicle_id_txt">वाहन आईडी :</string>
+    <string name="street_sweep_id_txt">स्ट्रीट स्वीप आयडी:</string>
+    <string name="liquid_waste_id_txt">लिक्विड वेस्ट आयडी:</string>
+    <string name="dump_yard">डंप यार्ड</string>
+    <string name="liquid_waste">लिक्विड वेस्ट</string>
+    <string name="street_sweep">स्ट्रीट स्वीपिंग</string>
+    <string name="dumpyard_plant_collection">डंपयार्ड प्लांट कलेक्शन</string>
+    <string name="rate_app">रेट अँप</string>
+    <string name="share_app">"शेअर अँप  "</string>
+    <string name="logout">लॉग आऊट</string>
+    <string name="setting">सेटिंग</string>
+    <string name="privacy_policy">प्राइवेसी पॉलिसी</string>
+    <string name="offline_work_is_being_synced">ऑफलाइन कार्य समक्रमित केले जात आहे.</string>
+    <string name="remaining">बाकी आहेत</string>
+    <string name="no_data_error">कोणताही इतिहास आढळला नाही</string>
+    <string name="no_offline_data_error">कोणताही ऑफलाइन डेटा आढळला नाही</string>
+    <string name="no_archived_data_error">कोणताही डेटा आढळला नाही</string>
+
+
+    <string name="logout_confirmation_title">लॉगआउट पुष्टीकरण</string>
+    <string name="logout_confirmation_msg">आपणास खात्री आहे की आपण लॉगआउट करू इच्छिता?</string>
+
+    <string name="offduty_confirmation_title">एन्ड ड्यूटी पुष्टीकरण</string>
+    <string name="offduty_confirmation_msg">आपण आपले ड्यूटी एन्ड करू इच्छिता?</string>
+
+    <string name="show_bifurcation_type">वर्गीकरणाचे प्रकार दाखवा</string>
+    <string name="bifurcation_setting_changed">विभाजन सेटिंग बदलली</string>
+
+
+    <string name="dialog_title_txt_vehicle">घंटा गाडी प्रकार</string>
+
+    <string name="total_weight">एकुण वजन</string>
+    <string name="total_dry_weight">एकूण वजन सुका कचरा</string>
+    <string name="enter_dry_weight">सुका कचरा वजन लिहा</string>
+    <string name="total_wet_weight">एकूण वजन ओला कचरा</string>
+    <string name="enter_wet_weight">ओला कचरा वजन लिहा</string>
+
+    <string name="title_activity_dump_yard_weight">वजन तपशील</string>
+
+    <string name="take_a_photo">फोटो घ्या</string>
+    <string name="empty_dump_weight_error">कृपया एक वजन फील्ड भरा</string>
+    <string name="be_no_duty">प्रथम आपली उपस्थिति लावा!</string>
+
+    <string name="take_before_photo">पूर्वीची फोटो</string>
+    <string name="take_after_photo">नंतरची फोटो</string>
+    <string name="take_qr_photo">स्कॅनिफाय फोटो घ्या</string>
+    <string name="take_property_photo">मालमत्ता फोटो घ्या</string>
+    <string name="take_liquid_point_photo">लिक्विड पॉईंट फोटो घ्या</string>
+    <string name="take_street_point_photo">स्ट्रीट पॉईंट फोटो घ्या</string>
+    <string name="take_dump_point_photo">डंपयार्ड पॉईंट फोटो घ्या</string>
+    <string name="turning_on_the_gps_n_please_wait">GPS चालू होत आहे\nकृपया प्रतीक्षा करा…</string>
+
+    <string name="plz_capture_img">कृपया कोणताही एक फोटो कॅप्चर करा</string>
+    <string name="empty_fields_not_allowed">रिकाम्या फील्डला परवानगी नाही</string>
+    <string name="please_type_username">कृपया वापरकर्तानाव टाइप करा</string>
+    <string name="please_type_password">कृपया पासवर्ड टाइप करा</string>
+    <string name="please_select_employee_type">कृपया कर्मचारी प्रकार निवडा</string>
+    <string name="please_capture_both_photos">कृपया दोन्ही फोटो काढा</string>
+    <string name="please_capture_qr_photo">कृपया क्यूआर फोटो काढा</string>
+
+    <string name="vehicle_number_txt">वाहन नंबर :</string>
+    <string name="noVehicleNo">कृपया वाहन नंबर प्रविष्ट करा</string>
+    <string name="vehicle_no_txt_select">वाहन नंबर प्रविष्ट करा</string>
+
+    <string name="off_duty_warning">प्रथम आपली ड्यूटी समाप्त करा</string>
+    <string name="sync_offline_data_warning">कृपया प्रथम ऑफलाइन डेटा समक्रमित करा</string>
+
+    <string name="no_internet_error">इंटरनेट कनेक्शन नाही</string>
+    <string name="please_scan_again">कृपया पुन्हा स्कॅन करा</string>
+    <string name="please_type_valid_weight">कृपया वैध वजन टाइप करा</string>
+
+    <string name="syncing_is_on">समक्रमण चालू आहे</string>
+    <string name="saved_offline">ऑफलाइन जतन केले</string>
+    <string name="photo_clicked">फोटो क्लिक केला</string>
+    <string name="select_garbage_type">कृपया कचरा प्रकार निवडा</string>
+
+    <string name="turn_off_airplane_mode">कृपया एरोप्लेन मोड बंद करा</string>
+    <string name="select_propety_type">कृपया प्रॉपर्टी प्रकार निवडा</string>
+
+    <string name="vehicle_qr_scan">वाहन क्यूआर स्कैन</string>
+
+
+    <string name="new_update_available">नवीन अपडेट उपलब्ध आहे</string>
+    <string name="please_update_app">कृपया ऐप नवीनतम आवृत्तीवर अपडेट करा.</string>
+    <string name="update">अपडेट</string>
+
+    <string name="download_in_progres">डाउनलोड सुरू आहे !!</string>
+    <string name="download_completed">डाउनलोड पूर्ण झाले !!</string>
+    <string name="vehicle_scan_setting_changed">वाहन स्कॅन सेटिंग बदलले</string>
+    <string name="refresh">रिफ्रेश</string>
+    <string name="refresh_location">रिफ्रेश लोकेशन</string>
+
+
+    <string name="distance_alert">डिस्टन्स अलर्ट !!</string>
+    <string name="distance_alert_desc">तुम्ही शेवटच्या स्क्यानिफाय पासून %1$d मीटर दूर आहात.</string>
+    <string name="confirm">कन्फर्म करा</string>
+    <string name="add_house">घर जोडा</string>
+    <string name="change_photo">फोटो बदला</string>
+    <string name="master_id">"मास्टर-आयडी: "</string>
+    <string name="add_master_plate">मास्टर प्लेट जोडा</string>
+
+</resources>
