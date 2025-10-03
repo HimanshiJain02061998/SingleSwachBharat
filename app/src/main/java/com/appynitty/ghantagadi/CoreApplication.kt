@@ -3,6 +3,7 @@ package com.appynitty.ghantagadi
 import com.appynitty.kotlinsbalibrary.common.MyApplication
 import dagger.hilt.android.HiltAndroidApp
 
+
 @HiltAndroidApp
 class CoreApplication : MyApplication() {
 

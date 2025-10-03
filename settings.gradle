@@ -14,6 +14,6 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "Kotlin-SwachBharat"
+rootProject.name = "ICTSBM"
 include ':app'
 include ':kotlinsbalibrary'
