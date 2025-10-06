@@ -3,6 +3,7 @@ package com.appynitty.kotlinsbalibrary.common.utils.datastore
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
@@ -41,9 +42,18 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val LAST_GHANTA_GADI_SCAN_ACCURACY = stringPreferencesKey(name = "last_ghanta_gadi_scan_accuracy")
         private val LAST_GHANTA_GADI_SCAN_LAT = stringPreferencesKey(name = "last_ghanta_gadi_scan_lat")
         private val LAST_GHANTA_GADI_SCAN_LONG = stringPreferencesKey(name = "last_ghanta_gadi_scan_long")
+        private val DIS_ID_KEY = intPreferencesKey(name = "dis_id_key")
 
     }
-
+    suspend fun saveDisId(disId: Int) {
+        userDataStore.edit { preferences ->
+            preferences[DIS_ID_KEY] = disId
+        }
+    }
+    val getDisId: Flow<Int> = userDataStore.data
+        .map { preferences ->
+            preferences[DIS_ID_KEY] ?: 0
+        }
     suspend fun saveIsBifurcationOn(isBifurcationOn: Boolean) {
         userDataStore.edit { preferences ->
             preferences[IS_BIFURCATION_ON] = isBifurcationOn

@@ -275,6 +275,14 @@ object AppModule {
     fun provideMasterPlateApi(@Named("Authorize") retrofit: Retrofit): MasterPlateApi {
         return retrofit.create(MasterPlateApi::class.java)
     }
+    @Provides
+    fun provideDistrictApiService(@Named("Authorize") retrofit: Retrofit): DistrictApiService {
+        return retrofit.create(DistrictApiService::class.java)
+    }
+    @Provides
+    fun provideULBApiService(@Named("Authorize") retrofit: Retrofit): ULBApiService {
+        return retrofit.create(ULBApiService::class.java)
+    }
 }
 
 @Retention(AnnotationRetention.RUNTIME)

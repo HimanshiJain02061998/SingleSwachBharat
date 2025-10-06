@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.inAppUpdate.UpdateDialogFragment
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
@@ -79,7 +80,8 @@ class SplashActivity : AppCompatActivity() {
                     }
 
                     SplashViewModel.SplashEvent.NavigateToLoginScreen -> {
-                        navigateToLoginScreen()
+                      //  navigateToLoginScreen()
+                        navigateToSelectUlbScreen()
                     }
 
                     is SplashViewModel.SplashEvent.ShowErrorMsg -> {
@@ -107,6 +109,11 @@ class SplashActivity : AppCompatActivity() {
 
     private fun navigateToLoginScreen() {
         val intent = Intent(this, LoginActivity::class.java)
+        startAnotherActivity(intent)
+    }
+
+    private fun navigateToSelectUlbScreen() {
+        val intent = Intent(this, SelectUlb::class.java)
         startAnotherActivity(intent)
     }
 

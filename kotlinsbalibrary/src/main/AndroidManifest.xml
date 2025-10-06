@@ -42,6 +42,9 @@
         android:windowDisablePreview="true"
         tools:targetApi="31">
         <activity
+            android:name=".common.ui.select_ulb_module.SelectUlb"
+            android:exported="false" />
+        <activity
             android:name=".common.ui.my_location.MyLocationActivity"
             android:configChanges="orientation"
             android:exported="false"
@@ -170,7 +173,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
         <activity
             android:name=".housescanify.ui.masterPlateActivity.MasterPlateActivity"
             android:configChanges="orientation"
