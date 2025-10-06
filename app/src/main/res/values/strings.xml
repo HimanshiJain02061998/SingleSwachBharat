@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Demo Nagar Panchayat</string>
-    <string name="app_id_title">Demo Nagar Panchayat</string>
-    <string name="app_label" translatable="false">डेमो नगर पंचायत</string>
+    <string name="app_name">ICTBSM</string>
+    <string name="app_id_title">ICTSBM</string>
+    <string name="app_label" translatable="false">ICTSBM</string>
 </resources>
