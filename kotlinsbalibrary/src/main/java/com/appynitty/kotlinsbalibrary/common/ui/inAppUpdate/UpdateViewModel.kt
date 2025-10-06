@@ -52,7 +52,7 @@ class UpdateViewModel @Inject constructor(private val application: Application) 
                 val sessionId = installer.createSession(params)
                 val session = installer.openSession(sessionId)
 
-                session.openWrite(NAME, 0, length).use { sessionStream ->
+                session.openWrite(NAME, 0, length.toLong()).use { sessionStream ->
                     apkStream.copyTo(sessionStream)
                     session.fsync(sessionStream)
                 }
