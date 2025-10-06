@@ -62,8 +62,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.9.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.9.5'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "androidx.activity:activity-ktx:1.8.0"
-    implementation "androidx.fragment:fragment-ktx:1.6.2"
+    implementation "androidx.activity:activity-ktx:1.11.0"
+    implementation "androidx.fragment:fragment-ktx:1.8.9"
 
     // Room
     implementation 'androidx.room:room-runtime:2.8.1'
