@@ -11,29 +11,30 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
-import com.appynitty.kotlinsbalibrary.common.ui.inAppUpdate.UpdateDialogFragment
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
-import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardActivity
 import com.appynitty.kotlinsbalibrary.housescanify.ui.empDashboard.EmpDashboardActivity
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-
 
 @SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    private val viewModel: SplashViewModel by viewModels()
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
-    private lateinit var languageDataStore: LanguageDataStore
+    companion object {
+        private const val UPDATE_REQUEST_CODE = 1001
+    }
+    private val viewModel: SplashViewModel by viewModels()
     private lateinit var versionCodeTv: TextView
-    private lateinit var updateDialogFragment: UpdateDialogFragment
     private var versionCode: Int = 0
 
     //setting app language ( by default it will be marathi if user doesn't change language )
@@ -51,20 +52,15 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
+        checkForImmediateUpdate()
         versionCode = (CommonUtils.VERSION_CODE).toInt()
         val versionName = "$versionCode.0"
-        updateDialogFragment = UpdateDialogFragment()
-        updateDialogFragment.isCancelable = false
-
         versionCodeTv = findViewById(R.id.versionCodeTv)
         versionCodeTv.text = buildString {
             append("Version : ")
             append(versionName)
         }
-
-        viewModel.checkForUpdate(versionCode)
-
+        viewModel.checkWhereToNavigate()
         // listening to events sent by viewModel
         lifecycleScope.launchWhenStarted {
             viewModel.splashEventsFlow.collect { event ->
@@ -84,11 +80,6 @@ class SplashActivity : AppCompatActivity() {
 
                     is SplashViewModel.SplashEvent.ShowErrorMsg -> {
                         CustomToast.showErrorToast(this@SplashActivity, event.msg)
-                    }
-
-                    is SplashViewModel.SplashEvent.ShowUpdateDialog -> {
-                        updateDialogFragment.show(supportFragmentManager, UpdateDialogFragment.TAG)
-                        updateDialogFragment.downloadLink = event.downloadLink
                     }
                 }
             }
@@ -111,7 +102,6 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun startAnotherActivity(intent: Intent) {
-
         Handler(Looper.myLooper()!!).postDelayed({
             startActivity(intent)
             overridePendingTransition(
@@ -122,4 +112,43 @@ class SplashActivity : AppCompatActivity() {
 
     }
 
+    private fun checkForImmediateUpdate() {
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                val appUpdateOptions = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
+                    .setAllowAssetPackDeletion(true)
+                    .build()
+
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    this, // Activity
+                    appUpdateOptions,
+                    UPDATE_REQUEST_CODE
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Resume update if already in progress
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                val appUpdateOptions = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
+                    .setAllowAssetPackDeletion(true)
+                    .build()
+
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    this,
+                    appUpdateOptions,
+                    UPDATE_REQUEST_CODE
+                )
+            }
+        }
+    }
 }
