@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kotlin-SwachBharat</string>
+    <string name="app_name">ICTSBM</string>
     <string name="login_title">LOGIN</string>
     <string name="select_employee_type">Select Employee Type</string>
     <string name="select_dump_yard">Select DumpYard</string>

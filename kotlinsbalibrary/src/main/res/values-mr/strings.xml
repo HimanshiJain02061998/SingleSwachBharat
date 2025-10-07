@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Kotlin-SwachBharat</string>
+    <string name="app_name">ICTSBM</string>
     <string name="login_title">लॉग इन</string>
     <string name="select_employee_type">कर्मचारी प्रकार निवडा</string>
     <string name="select_dump_yard">डंपयार्ड निवडा</string>
