@@ -7,8 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.net.TrafficStats
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.util.Log
 import android.util.TypedValue
@@ -24,8 +27,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.MyApplication
@@ -37,7 +42,15 @@ import com.appynitty.kotlinsbalibrary.common.ui.my_location.MyLocationActivity
 import com.appynitty.kotlinsbalibrary.common.ui.privacyPolicy.PrivacyPolicyActivity
 import com.appynitty.kotlinsbalibrary.common.ui.profile.ProfileActivity
 import com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel.UserDetailsViewModel
-import com.appynitty.kotlinsbalibrary.common.utils.*
+import com.appynitty.kotlinsbalibrary.common.utils.BackBtnPressedUtil
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
+import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
+import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
+import com.appynitty.kotlinsbalibrary.common.utils.GpsStatusListener
+import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
+import com.appynitty.kotlinsbalibrary.common.utils.LocationUtils
+import com.appynitty.kotlinsbalibrary.common.utils.TurnOnGps
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
@@ -68,12 +81,12 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 
 
@@ -773,7 +786,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun initVars() {
-
+     /*   startNetworkSpeedMonitor { speed ->
+            binding.internetSpeed.text = "Internet Speed: $speed"
+        }*/
         locationPermission = LocationPermission(this)
         locationPermission.initFineLocationPermission(this)
 
@@ -1595,6 +1610,29 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     } else BackBtnPressedUtil.exitOnBackPressed(this@DashboardActivity)
                 }
             })
+        }
+    }
+
+    fun startNetworkSpeedMonitor(onSpeedUpdate: (String) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var previousRxBytes = TrafficStats.getTotalRxBytes()
+            var previousTxBytes = TrafficStats.getTotalTxBytes()
+
+            while (true) {
+                delay(1000) // every second
+                val currentRxBytes = TrafficStats.getTotalRxBytes()
+                val currentTxBytes = TrafficStats.getTotalTxBytes()
+
+                val downloadSpeed = (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
+                val uploadSpeed = (currentTxBytes - previousTxBytes) * 8 / 1024 // Kbps
+
+                previousRxBytes = currentRxBytes
+                previousTxBytes = currentTxBytes
+
+                withContext(Dispatchers.Main) {
+                    onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
+                }
+            }
         }
     }
 }
