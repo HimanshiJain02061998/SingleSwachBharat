@@ -125,18 +125,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         userDataStore = UserDataStore(this)
-//        lifecycleScope.launch {
-//            val storedAppId = userDataStore.getAppId.first()
-//            if (!storedAppId.isNullOrEmpty()) {
-//                MyApplication.APP_ID = storedAppId
-//                CustomToast.showSuccessToast(this@LoginActivity, "AppId loaded: $storedAppId")
-//            } else {
-//                CustomToast.showWarningToast(this@LoginActivity, "AppId not found in DataStore")
-//            }
-//        }
-
-
-
         initPermissions()
         initVars()
         clickEvents()
@@ -156,9 +144,16 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent = Intent(this, SelectUlb::class.java)
-        startActivity(intent)
-        finish()
+        lifecycleScope.launch {
+            val userDataStore = UserDataStore(this@LoginActivity)
+
+            userDataStore.clearAppId()
+
+            val intent = Intent(this@LoginActivity, SelectUlb::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun subscribeChannelEvent() {

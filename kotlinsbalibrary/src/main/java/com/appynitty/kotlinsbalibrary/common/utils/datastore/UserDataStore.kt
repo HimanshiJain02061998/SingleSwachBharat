@@ -51,6 +51,12 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
             preferences[APP_ID] = appId
         }
     }
+    suspend fun clearAppId() {
+        userDataStore.edit { prefs ->
+            prefs.remove(APP_ID)
+        }
+    }
+
     val getAppId: Flow<String> = userDataStore.data
         .map { preferences ->
             (preferences[APP_ID] ?: "")
