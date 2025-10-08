@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "809965979551",
-    "project_id": "kotlin-swachbharat",
-    "storage_bucket": "kotlin-swachbharat.firebasestorage.app"
+    "project_number": "650282876219",
+    "project_id": "ictsbm-single-app",
+    "storage_bucket": "ictsbm-single-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:809965979551:android:c7bf2cc41a4d3e8e14dfaa",
+        "mobilesdk_app_id": "1:650282876219:android:686d3dd978e962d30a4b1e",
         "android_client_info": {
           "package_name": "com.appynitty.ghantagadi"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCn7AKuoalckXkgKpXuJ5P-D9ttV-HRhdc"
+          "current_key": "AIzaSyBKAbhyqLy302p8YoK4P-Mgsywmxvcmses"
         }
       ],
       "services": {
