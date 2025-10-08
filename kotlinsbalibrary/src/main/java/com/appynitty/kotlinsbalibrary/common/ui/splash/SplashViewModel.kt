@@ -28,58 +28,6 @@ class SplashViewModel @Inject constructor(
     private val splashChannelEvent = Channel<SplashEvent>()
     val splashEventsFlow = splashChannelEvent.receiveAsFlow()
 
-    fun checkForUpdate(versionCode: Int) {
-
-        viewModelScope.launch {
-
-            try {
-                val response =
-                    updateRepository.getVersionUpdate(CommonUtils.APP_ID, versionCode)
-                handleUpdateResponse(response)
-
-            } catch (t: Throwable) {
-                checkWhereToNavigate()
-                when (t) {
-                    is IOException -> splashChannelEvent.send(
-                        SplashEvent.ShowErrorMsg(
-                            "No Internet Connection"
-                        )
-                    )
-
-                    else -> splashChannelEvent.send(
-                        SplashEvent.ShowErrorMsg(
-                            "Connection Timeout"
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun handleUpdateResponse(response: Response<ForceUpdateResponse>) =
-        viewModelScope.launch {
-            if (response.isSuccessful) {
-                response.body()?.let {
-
-                    if (it.status == CommonUtils.STATUS_SUCCESS && it.isForceUpdate == true) {
-
-                        it.appDownloadLink?.let { it1 ->
-                            SplashEvent.ShowUpdateDialog(
-                                it1
-                            )
-                        }?.let { it2 -> splashChannelEvent.send(it2) }
-
-                    } else {
-                        checkWhereToNavigate()
-                    }
-                }
-            } else {
-                splashChannelEvent.send(SplashEvent.ShowErrorMsg(response.message()))
-                checkWhereToNavigate()
-            }
-        }
-
-
     fun checkWhereToNavigate() = viewModelScope.launch {
 
         //getting isUserLogged in value from datastore
@@ -107,7 +55,6 @@ class SplashViewModel @Inject constructor(
         object NavigateToLoginScreen : SplashEvent()
         object NavigateToDashboardScreen : SplashEvent()
         object NavigateToEmpDashBoardScreen : SplashEvent()
-        data class ShowUpdateDialog(val downloadLink : String) : SplashEvent()
         data class ShowErrorMsg(val msg: String) : SplashEvent()
 
     }

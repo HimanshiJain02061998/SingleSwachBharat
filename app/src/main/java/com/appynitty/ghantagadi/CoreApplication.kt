@@ -14,5 +14,4 @@ class CoreApplication : MyApplication() {
         VERSION_CODE = BuildConfig.VERSION_CODE.toString()
         PACKAGE_NAME = BuildConfig.APPLICATION_ID
     }
-
 }

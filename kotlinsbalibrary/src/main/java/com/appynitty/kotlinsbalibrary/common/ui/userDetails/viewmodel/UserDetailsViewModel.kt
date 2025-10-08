@@ -18,6 +18,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
+import java.util.Locale
+import java.util.Locale.getDefault
 import javax.inject.Inject
 
 /**
@@ -146,7 +148,8 @@ class UserDetailsViewModel @Inject constructor(
         if (response.isSuccessful) {
             response.body()?.let {
 
-                if (!userFullName.trim().toLowerCase().equals(it.name?.trim()?.toLowerCase())) {
+                if (!userFullName.trim().lowercase(getDefault()).equals(it.name?.trim()
+                        ?.lowercase(getDefault()))) {
 
                     Log.d(TAG, "handleUserDetailResult: $it")
                     val userData = UserData(
@@ -175,7 +178,8 @@ class UserDetailsViewModel @Inject constructor(
 
                     return ApiResponseListener.Success(it)
 
-                }else if (!userPartnerNameValue.trim().toLowerCase().equals(it.partnerName?.trim()?.toLowerCase())){
+                }else if (!userPartnerNameValue.trim().lowercase(getDefault()).equals(it.partnerName?.trim()
+                        ?.lowercase(getDefault()))){
 
                     if (!userPartnerNameValue.equals("null")) {
                         val userData = UserData(

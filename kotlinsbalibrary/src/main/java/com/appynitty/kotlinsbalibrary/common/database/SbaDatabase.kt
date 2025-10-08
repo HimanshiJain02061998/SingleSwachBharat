@@ -7,6 +7,7 @@ import com.appynitty.kotlinsbalibrary.common.dao.GisLocDao
 import com.appynitty.kotlinsbalibrary.common.dao.LocationDao
 import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.dao.UserDetailsDao
+import com.appynitty.kotlinsbalibrary.common.model.DateConverters
 import com.appynitty.kotlinsbalibrary.common.model.GisLatLong
 import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.model.request.LocationApiRequest
@@ -30,7 +31,7 @@ import com.appynitty.kotlinsbalibrary.housescanify.model.request.EmpGarbageColle
 import com.appynitty.kotlinsbalibrary.housescanify.model.response.PropertyType
 
 
-@TypeConverters(ListTypeConverter::class)
+@TypeConverters(ListTypeConverter::class, DateConverters::class)
 @Database(
     entities = [UserData::class, GarbageCollectionData::class,
         LocationApiRequest::class, ArchivedData::class,
