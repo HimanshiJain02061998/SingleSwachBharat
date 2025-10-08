@@ -689,7 +689,7 @@ class DashboardViewModel @Inject constructor(
                     userDataStore.clearUserDatastore()
                     sessionDataStore.clearSessionDatastore()
                     archivedDao.deleteAllArchivedData()
-                    dashboardEventChannel.send(DashboardEvent.NavigateToLoginScreen)
+                    dashboardEventChannel.send(DashboardEvent.NavigateToSelectUlbScreen)
 
                 }
             } else if (type == CommonUtils.CONFIRM_OFF_DUTY_DIALOG) {
@@ -716,6 +716,7 @@ class DashboardViewModel @Inject constructor(
         object NavigateToProfileScreen : DashboardEvent()
         object NavigateToPrivacyPolicyScreen : DashboardEvent()
         object NavigateToLoginScreen : DashboardEvent()
+        object NavigateToSelectUlbScreen : DashboardEvent()
         object ShowSettingScreen : DashboardEvent()
         object ShowChangeLanguageScreen : DashboardEvent()
         object DismissAlertDialogFrag : DashboardEvent()

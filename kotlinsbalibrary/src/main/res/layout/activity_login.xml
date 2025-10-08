@@ -9,6 +9,17 @@
     android:focusableInTouchMode="true"
     tools:context=".common.ui.login.LoginActivity">
 
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/arrow_back"
+        app:tint="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/img_bg"

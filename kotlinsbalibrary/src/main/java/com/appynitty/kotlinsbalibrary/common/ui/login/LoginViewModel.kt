@@ -2,7 +2,6 @@ package com.appynitty.kotlinsbalibrary.common.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.dao.UserDetailsDao
 import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.model.request.LoginRequest

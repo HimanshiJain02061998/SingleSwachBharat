@@ -16,8 +16,11 @@ class CommonUtils {
     companion object {
 
         val APP_ID = MyApplication.APP_ID
+
         val VERSION_CODE = MyApplication.VERSION_CODE
         val PACKAGE_NAME = MyApplication.PACKAGE_NAME
+
+
 
         //const val BASE_URL = "http://202.65.157.254:7570/"
         const val BASE_URL = "https://ictcoreapi.ictsbm.com/"
@@ -75,12 +78,25 @@ class CommonUtils {
             return currYear[Calendar.YEAR]
         }
 
+//        fun getEncodedAppId(): String {
+//            val enAppId =
+//                "ictsbm@" + APP_ID.substring(0, 2) + "@Shirdi." + APP_ID.substring(2, 4)
+//            val data: ByteArray = enAppId.toByteArray(StandardCharsets.UTF_8)
+//            return Base64.encodeToString(data, Base64.NO_WRAP)
+//        }
+
         fun getEncodedAppId(): String {
+            if (APP_ID.isNullOrEmpty() || APP_ID.length < 4) {
+                // Prevent crash and return fallback
+                return Base64.encodeToString("ictsbm@00@Shirdi.00".toByteArray(StandardCharsets.UTF_8), Base64.NO_WRAP)
+            }
+
             val enAppId =
                 "ictsbm@" + APP_ID.substring(0, 2) + "@Shirdi." + APP_ID.substring(2, 4)
             val data: ByteArray = enAppId.toByteArray(StandardCharsets.UTF_8)
             return Base64.encodeToString(data, Base64.NO_WRAP)
         }
+
 
         fun isAirplaneModeOn(context: Context): Boolean {
             return Settings.Global.getInt(

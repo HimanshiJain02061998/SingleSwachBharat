@@ -1,12 +1,16 @@
 package com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.MyApplication
+import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.viewmodel.DistrictViewModel
 import com.appynitty.kotlinsbalibrary.databinding.ActivitySelectUlbBinding
@@ -21,6 +25,7 @@ class SelectUlb : AppCompatActivity() {
     private val districtViewModel: DistrictViewModel by viewModels()
     private lateinit var userDataStore: UserDataStore
 
+    private var selectedAppId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +34,10 @@ class SelectUlb : AppCompatActivity() {
 
         userDataStore = UserDataStore(this)
 
-        // Fetch districts
+
         districtViewModel.fetchDistrictList()
 
+        // Observe District List
         lifecycleScope.launch {
             districtViewModel.districtList.collectLatest { districts ->
                 if (districts.isNotEmpty()) {
@@ -56,13 +62,14 @@ class SelectUlb : AppCompatActivity() {
                             ) {
                                 if (position > 0) {
                                     val selectedDistrict = districts[position - 1]
-
-                                    // Save selected disId in DataStore
                                     lifecycleScope.launch {
                                         userDataStore.saveDisId(selectedDistrict.Disid)
                                     }
-
                                     districtViewModel.fetchULBList(selectedDistrict.Disid)
+                                }
+                                else {
+                                    // Reset ULB spinner if "Select District" is chosen again
+                                    resetUlbSpinner()
                                 }
                             }
 
@@ -72,7 +79,9 @@ class SelectUlb : AppCompatActivity() {
             }
         }
 
-        // Observe ULB list
+
+
+        // Observe ULB List
         lifecycleScope.launch {
             districtViewModel.ulbList.collectLatest { ulbs ->
                 if (ulbs.isNotEmpty()) {
@@ -97,7 +106,8 @@ class SelectUlb : AppCompatActivity() {
                             ) {
                                 if (position > 0) {
                                     val selectedULB = ulbs[position - 1]
-                                    // Use selectedULB if needed
+                                    selectedAppId =
+                                        selectedULB.appId.toString()  // Save AppId temporarily
                                 }
                             }
 
@@ -106,6 +116,44 @@ class SelectUlb : AppCompatActivity() {
                 }
             }
         }
-    }
-}
 
+        binding.btnAhead.setOnClickListener {
+            val districtSelected = binding.spinnerDistrict.selectedItemPosition > 0
+            val ulbSelected = !selectedAppId.isNullOrEmpty()
+
+            when {
+                !districtSelected -> CustomToast.showWarningToast(this, "Please select a District first")
+                !ulbSelected -> CustomToast.showWarningToast(this, "Please select a ULB before continuing")
+                else -> {
+                    lifecycleScope.launch {
+                        userDataStore.saveAppId(selectedAppId!!)
+
+                        MyApplication.APP_ID = selectedAppId!!
+
+
+                        CustomToast.showSuccessToast(this@SelectUlb, "ULB selected successfully")
+
+                        val intent = Intent(this@SelectUlb, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            }
+        }
+
+
+    }
+    private fun resetUlbSpinner() {
+        val emptyList = listOf("Select ULB")
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            emptyList
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerUlb.adapter = adapter
+
+        selectedAppId = null
+    }
+
+}

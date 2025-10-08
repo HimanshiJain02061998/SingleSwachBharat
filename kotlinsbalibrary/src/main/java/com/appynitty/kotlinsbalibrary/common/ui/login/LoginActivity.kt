@@ -19,15 +19,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.MyApplication
 import com.appynitty.kotlinsbalibrary.common.model.request.LoginRequest
+import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.LanguageBottomSheetFrag
 import com.appynitty.kotlinsbalibrary.databinding.ActivityLoginBinding
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardActivity
 import com.appynitty.kotlinsbalibrary.housescanify.ui.empDashboard.EmpDashboardActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,12 +56,15 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
     private var selectedLanguage: String? = null
     private var selectedLanguageId: String? = null
     private var isInternetOn = false
+    private lateinit var userDataStore: UserDataStore
+    private lateinit var archivedDao: ArchivedDao
+    private lateinit var sessionDataStore: SessionDataStore
 
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
                 if (!it.value) {
-                  //  showPermissionRequestDialog(it.key)
+                    //  showPermissionRequestDialog(it.key)
                 }
             }
         }
@@ -116,6 +124,17 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        userDataStore = UserDataStore(this)
+//        lifecycleScope.launch {
+//            val storedAppId = userDataStore.getAppId.first()
+//            if (!storedAppId.isNullOrEmpty()) {
+//                MyApplication.APP_ID = storedAppId
+//                CustomToast.showSuccessToast(this@LoginActivity, "AppId loaded: $storedAppId")
+//            } else {
+//                CustomToast.showWarningToast(this@LoginActivity, "AppId not found in DataStore")
+//            }
+//        }
+
 
 
         initPermissions()
@@ -123,7 +142,23 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
         clickEvents()
         subscribeLiveData()
         subscribeChannelEvent()
+        onBack()
+    }
 
+
+    private fun onBack() {
+        binding.btnBack?.setOnClickListener {
+
+            val intent = Intent(this, SelectUlb::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this, SelectUlb::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun subscribeChannelEvent() {
@@ -134,24 +169,45 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
                     LoginViewModel.LoginEvent.HideProgressBar -> hideProgressBar()
                     LoginViewModel.LoginEvent.NavigateToDashboard -> {
                         val intent = Intent(this@LoginActivity, DashboardActivity::class.java)
+                        val appId = intent.getStringExtra(userDataStore.getAppId.toString())
+
+                        if (!appId.isNullOrEmpty()) {
+                            CustomToast.showSuccessToast(
+                                this@LoginActivity,
+                                "AppId received: $appId"
+                            )
+                        }
                         startAnotherActivity(intent)
                     }
+
                     LoginViewModel.LoginEvent.NavigateToEmpDashboard -> {
                         val intent = Intent(this@LoginActivity, EmpDashboardActivity::class.java)
+                        val appId = intent.getStringExtra(userDataStore.getAppId.toString())
+
+                        if (!appId.isNullOrEmpty()) {
+                            CustomToast.showSuccessToast(
+                                this@LoginActivity,
+                                "AppId received: $appId"
+                            )
+                        }
                         startAnotherActivity(intent)
                     }
+
                     is LoginViewModel.LoginEvent.ShowFailureMessage -> {
                         CustomToast.showErrorToast(this@LoginActivity, event.msg)
                     }
+
                     LoginViewModel.LoginEvent.ShowProgressBar -> showProgressBar()
                     is LoginViewModel.LoginEvent.ShowResponseErrorMessage -> showApiErrorMessage(
                         event.msg,
                         event.msgMr
                     )
+
                     is LoginViewModel.LoginEvent.ShowResponseSuccessMessage -> showApiSuccessMessage(
                         event.msg,
                         event.msgMr
                     )
+
                     LoginViewModel.LoginEvent.DisableLoginButton -> disableLoginButton()
                     LoginViewModel.LoginEvent.EnableLoginButton -> enableLoginButton()
                 }
@@ -330,13 +386,32 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
                 empType = "D"
             }
         }
-
         //getting device id from android device ( kinda imei )
-        val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-        var deviceId: String? = CommonUtils.getAndroidId(this)
+//        val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+//        var deviceId: String? = CommonUtils.getAndroidId(this)
+//
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//            deviceId = telephonyManager.deviceId
+//        }
+        val telephonyManager = getSystemService(TELEPHONY_SERVICE) as? TelephonyManager
 
+        var deviceId: String? = try {
+            CommonUtils.getAndroidId(this@LoginActivity)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting ANDROID_ID", e)
+            null
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            deviceId = telephonyManager.deviceId
+            try {
+                val telephonyId = telephonyManager?.deviceId
+                if (!telephonyId.isNullOrEmpty()) {
+                    deviceId = telephonyId
+                }
+            } catch (e: SecurityException) {
+                Log.e(TAG, "READ_PHONE_STATE permission not granted", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting device ID from TelephonyManager", e)
+            }
         }
         if (deviceId == null) {
             CustomToast.showErrorToast(this, "Couldn't get device id")
@@ -344,11 +419,14 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
             Log.i(TAG, "logUserIn: $empType")
             loginRequest = LoginRequest(empType, password, userName, deviceId)
 
-            viewModel.saveLoginDetails(
-                CommonUtils.APP_ID,
-                CommonUtils.CONTENT_TYPE,
-                loginRequest!!
-            )
+            lifecycleScope.launch {
+                val appId = userDataStore.getAppId.first() ?: ""
+                viewModel.saveLoginDetails(
+                    appId,
+                    CommonUtils.CONTENT_TYPE,
+                    loginRequest!!
+                )
+            }
 
         }
 

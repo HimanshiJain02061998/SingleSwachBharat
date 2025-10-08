@@ -53,48 +53,48 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        versionCode = (CommonUtils.VERSION_CODE).toInt()
-        val versionName = "$versionCode.0"
-        updateDialogFragment = UpdateDialogFragment()
-        updateDialogFragment.isCancelable = false
+  //      versionCode = (CommonUtils.VERSION_CODE).toInt()
+//        val versionName = "$versionCode.0"
+//        updateDialogFragment = UpdateDialogFragment()
+//        updateDialogFragment.isCancelable = false
+//
+//        versionCodeTv = findViewById(R.id.versionCodeTv)
+//        versionCodeTv.text = buildString {
+//            append("Version : ")
+//            append(versionName)
+//        }
 
-        versionCodeTv = findViewById(R.id.versionCodeTv)
-        versionCodeTv.text = buildString {
-            append("Version : ")
-            append(versionName)
-        }
-
-        viewModel.checkForUpdate(versionCode)
-
+      //  viewModel.checkForUpdate(versionCode)
+        navigateToSelectUlbScreen()
         // listening to events sent by viewModel
-        lifecycleScope.launchWhenStarted {
-            viewModel.splashEventsFlow.collect { event ->
-
-                when (event) {
-                    SplashViewModel.SplashEvent.NavigateToDashboardScreen -> {
-                        navigateToDashboardScreen()
-                    }
-
-                    SplashViewModel.SplashEvent.NavigateToEmpDashBoardScreen -> {
-                        navigateToEmpDashboardScreen()
-                    }
-
-                    SplashViewModel.SplashEvent.NavigateToLoginScreen -> {
-                      //  navigateToLoginScreen()
-                        navigateToSelectUlbScreen()
-                    }
-
-                    is SplashViewModel.SplashEvent.ShowErrorMsg -> {
-                        CustomToast.showErrorToast(this@SplashActivity, event.msg)
-                    }
-
-                    is SplashViewModel.SplashEvent.ShowUpdateDialog -> {
-                        updateDialogFragment.show(supportFragmentManager, UpdateDialogFragment.TAG)
-                        updateDialogFragment.downloadLink = event.downloadLink
-                    }
-                }
-            }
-        }
+//        lifecycleScope.launchWhenStarted {
+//            viewModel.splashEventsFlow.collect { event ->
+//
+//                when (event) {
+//                    SplashViewModel.SplashEvent.NavigateToDashboardScreen -> {
+//                        navigateToDashboardScreen()
+//                    }
+//
+//                    SplashViewModel.SplashEvent.NavigateToEmpDashBoardScreen -> {
+//                        navigateToEmpDashboardScreen()
+//                    }
+//
+//                    SplashViewModel.SplashEvent.NavigateToLoginScreen -> {
+//                      //  navigateToLoginScreen()
+//                        navigateToSelectUlbScreen()
+//                    }
+//
+//                    is SplashViewModel.SplashEvent.ShowErrorMsg -> {
+//                        CustomToast.showErrorToast(this@SplashActivity, event.msg)
+//                    }
+//
+//                    is SplashViewModel.SplashEvent.ShowUpdateDialog -> {
+//                        updateDialogFragment.show(supportFragmentManager, UpdateDialogFragment.TAG)
+//                        updateDialogFragment.downloadLink = event.downloadLink
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun navigateToEmpDashboardScreen() {

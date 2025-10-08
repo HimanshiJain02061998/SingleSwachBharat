@@ -81,6 +81,7 @@
 
 
     <Button
+        android:id="@+id/btn_ahead"
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
@@ -88,7 +89,7 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:backgroundTint="#1E88E5"
+        android:backgroundTint="#01C6D0"
         android:fontFamily="sans-serif-medium" />
 
 </LinearLayout>

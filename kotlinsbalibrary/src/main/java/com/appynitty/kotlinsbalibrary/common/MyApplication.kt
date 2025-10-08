@@ -21,7 +21,7 @@ open class MyApplication : Application(), ViewModelStoreOwner {
         instance = this
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
+        APP_ID = ""
     }
 
     companion object {
