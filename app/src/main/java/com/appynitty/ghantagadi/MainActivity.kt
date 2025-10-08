@@ -14,6 +14,5 @@ class MainActivity : AppCompatActivity() {
 
         startActivity(Intent(this, SplashActivity::class.java))
         finish()
-
     }
 }
