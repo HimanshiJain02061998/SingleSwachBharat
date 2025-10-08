@@ -2,20 +2,15 @@ package com.appynitty.kotlinsbalibrary.common.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appynitty.kotlinsbalibrary.common.model.response.ForceUpdateResponse
 import com.appynitty.kotlinsbalibrary.common.repository.UpdateRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
-import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +24,6 @@ class SplashViewModel @Inject constructor(
     val splashEventsFlow = splashChannelEvent.receiveAsFlow()
 
     fun checkWhereToNavigate() = viewModelScope.launch {
-
         //getting isUserLogged in value from datastore
         val isUserLoggedIn = sessionDataStore.getIsUserLoggedIn.first()
 

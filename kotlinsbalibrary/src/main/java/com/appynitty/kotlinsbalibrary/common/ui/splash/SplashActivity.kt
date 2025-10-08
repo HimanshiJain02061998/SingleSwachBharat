@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
@@ -53,13 +54,6 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         checkForImmediateUpdate()
-        versionCode = (CommonUtils.VERSION_CODE).toInt()
-        val versionName = "$versionCode.0"
-        versionCodeTv = findViewById(R.id.versionCodeTv)
-        versionCodeTv.text = buildString {
-            append("Version : ")
-            append(versionName)
-        }
         viewModel.checkWhereToNavigate()
         // listening to events sent by viewModel
         lifecycleScope.launchWhenStarted {
@@ -75,7 +69,7 @@ class SplashActivity : AppCompatActivity() {
                     }
 
                     SplashViewModel.SplashEvent.NavigateToLoginScreen -> {
-                        navigateToLoginScreen()
+                        navigateToSelectUlbScreen()
                     }
 
                     is SplashViewModel.SplashEvent.ShowErrorMsg -> {
