@@ -3,8 +3,10 @@ package com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.net.TrafficStats
@@ -152,6 +154,23 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private var isSyncingOn = false
     private lateinit var alertMessageDialogFrag: AlertMessageDialogFrag
     private var isDutyOnToggleClicked = false
+
+    private val serviceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val msg = intent?.getStringExtra("message")
+            if (msg=="LOG_OUT"){
+                viewModel.performForcefullyLogout()
+                showApiErrorMessage("Invalid IMEI No", "अवैध IMEI No")
+//             viewModel.shouldStartLocationService(
+//                 isMyServiceRunning(
+//                     GisLocationService::class.java
+//                 )
+//             )
+//             stopLocationTracking()
+            }
+        }
+    }
+
 
     private val vehicleQrLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -467,6 +486,21 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
                     }
                 }
+
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            garbageCollectionViewModel.garbageCollectionEventsFlow.collect { event ->
+                when (event) {
+                    GarbageCollectionViewModel.LogoutEvent.PerformForcefullyLogout -> {
+                        viewModel.performForcefullyLogout()
+                    }
+
+                    is GarbageCollectionViewModel.LogoutEvent.ShowResponseErrorMessage -> {
+                        showApiErrorMessage(event.msg, event.msgMr)
+                    }
+                }
             }
         }
     }
@@ -514,7 +548,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun navigateToLoginScreen() {
-
+        garbageCollectionViewModel.setSyncingLiveDataToNull()
         userDetailsViewModel.deleteAllUserDataFromRoom()
         val intent = Intent(this@DashboardActivity, LoginActivity::class.java)
         startAnotherActivity(intent)
@@ -800,9 +834,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun initVars() {
-     /*   startNetworkSpeedMonitor { speed ->
-            binding.internetSpeed.text = "Internet Speed: $speed"
-        }*/
+        /*   startNetworkSpeedMonitor { speed ->
+               binding.internetSpeed.text = "Internet Speed: $speed"
+           }*/
         locationPermission = LocationPermission(this)
         locationPermission.initFineLocationPermission(this)
 
@@ -831,6 +865,17 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         dialog = PopUpDialogFragment()
         dialog.setListener(this)
+        viewModel.getDeviceId(this)
+        garbageCollectionViewModel.getDeviceId(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                serviceReceiver,
+                IntentFilter("com.appynitty.LOGOUT_EVENT"),
+                Context.RECEIVER_NOT_EXPORTED // or RECEIVER_EXPORTED based on your use case
+            )
+        } else {
+            registerReceiver(serviceReceiver, IntentFilter("com.appynitty.LOGOUT_EVENT"))
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -899,16 +944,23 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         if (!isSyncingOn) {
             lifecycleScope.launch {
-                val gcCount = garbageCollectionViewModel.getGcCount()
-                if (gcCount > 0) {
-                    userTypeId?.let {
-                        garbageCollectionViewModel.saveGarbageCollectionOfflineDataToApi(
-                            CommonUtils.APP_ID,
-                            it,
-                            CommonUtils.getBatteryStatus(application),
-                            CommonUtils.CONTENT_TYPE,
-                        )
+
+                if (viewModel.checkSameUserLogin()) {
+                    Log.d("tempId","Temp id is ${viewModel.checkSameUserLogin()}")
+
+                    val gcCount = garbageCollectionViewModel.getGcCount()
+                    if (gcCount > 0) {
+                        userTypeId?.let {
+                            garbageCollectionViewModel.saveGarbageCollectionOfflineDataToApi(
+                                CommonUtils.APP_ID,
+                                it,
+                                CommonUtils.getBatteryStatus(application),
+                                CommonUtils.CONTENT_TYPE,
+                            )
+                        }
                     }
+                } else {
+                    viewModel.clearAllDataNewUser()
                 }
             }
         }
@@ -1624,6 +1676,15 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     } else BackBtnPressedUtil.exitOnBackPressed(this@DashboardActivity)
                 }
             })
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            unregisterReceiver(serviceReceiver)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
         }
     }
 

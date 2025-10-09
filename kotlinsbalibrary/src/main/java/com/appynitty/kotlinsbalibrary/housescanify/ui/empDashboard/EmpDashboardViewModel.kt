@@ -7,18 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.api.GisApi
 import com.appynitty.kotlinsbalibrary.common.dao.GisLocDao
-import com.appynitty.kotlinsbalibrary.common.model.request.GisLocRequest
+import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.model.response.AttendanceResponse
-import com.appynitty.kotlinsbalibrary.common.model.response.GisLocResponse
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.TempUserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.housescanify.dao.EmpHouseOnMapDao
 import com.appynitty.kotlinsbalibrary.housescanify.dao.PropertyTypeDao
 import com.appynitty.kotlinsbalibrary.housescanify.model.request.EmpPunchInRequest
@@ -49,7 +51,11 @@ class EmpDashboardViewModel @Inject constructor(
     private val gisLocDao: GisLocDao,
     private val gisApi: GisApi,
     private val propertyTypeDao: PropertyTypeDao,
-    private val propertyTypeRepository: PropertyTypeRepository
+    private val propertyTypeRepository: PropertyTypeRepository,
+    private val userTravelLocDao: UserTravelLocDao,
+    private val nearestLatLngDao: NearestLatLngDao,
+    private val garbageCollectionDao: GarbageCollectionDao,
+    private val tempUserDataStore: TempUserDataStore,
 ) : ViewModel() {
 
 
@@ -59,6 +65,18 @@ class EmpDashboardViewModel @Inject constructor(
     /**
      *  METHOD TO SAVE ATTENDANCE ON TO API
      */
+
+    suspend fun checkSameUserLogin(): Boolean {
+        val tempUser = tempUserDataStore.getUserEssentials.first()
+        val user = userDataStore.getUserEssentials.first()
+
+        val tempId = tempUser.userId
+        val userId = user.userId
+
+        // Return true if IDs are same OR either is empty/null
+        return tempId.isNullOrEmpty() || tempId == userId
+    }
+
     fun saveEmpPunchInDetails(
         appId: String,
         content_type: String,
@@ -389,7 +407,7 @@ class EmpDashboardViewModel @Inject constructor(
     }
 
 
-     fun getAllPropertyTypesFromApi(appId: String) = viewModelScope.launch {
+    fun getAllPropertyTypesFromApi(appId: String) = viewModelScope.launch {
 
         try {
             val response = propertyTypeRepository.getAllPropertyTypes(appId)
@@ -408,16 +426,41 @@ class EmpDashboardViewModel @Inject constructor(
     private fun handlePropertyTypeResponse(response: Response<List<PropertyType>>) =
         viewModelScope.launch {
 
-                if (!response.body().isNullOrEmpty()){
-                    propertyTypeDao.deleteAllProperties()
+            if (!response.body().isNullOrEmpty()){
+                propertyTypeDao.deleteAllProperties()
 
-                    response.body()?.forEach {
-                        propertyTypeDao.insertPropertyDao(it)
-                    }
-
+                response.body()?.forEach {
+                    propertyTypeDao.insertPropertyDao(it)
                 }
 
+            }
+
         }
+
+    fun performForcefullyLogout(){
+        viewModelScope.launch {
+            val userDetails = userDataStore.getUserEssentials.first()
+            tempUserDataStore.saveUserEssentials(UserEssentials(userDetails.userId,userDetails.employeeType,userDetails.userTypeId))
+            userDataStore.clearUserDatastore()
+            sessionDataStore.clearSessionDatastore()
+//            archivedDao.deleteAllArchivedData()
+//            userTravelLocDao.deleteAllUserTravelLatLongs()
+//            nearestLatLngDao.deleteAllNearestHouses()
+//            garbageCollectionDao.deleteAllGarbageCollection()
+            empDashboardEventChannel.send(EmpDashboardEvent.StopLocationTracking)
+            empDashboardEventChannel.send(EmpDashboardEvent.NavigateToLoginScreen)
+        }
+    }
+
+    fun clearAllDataNewUser(){
+        viewModelScope.launch {
+            archivedDao.deleteAllArchivedData()
+            userTravelLocDao.deleteAllUserTravelLatLongs()
+            nearestLatLngDao.deleteAllNearestHouses()
+            garbageCollectionDao.deleteAllGarbageCollection()
+        }
+    }
+
 
 
     sealed class EmpDashboardEvent {

@@ -26,6 +26,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
+import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel.UserDetailsViewModel
 import com.appynitty.kotlinsbalibrary.common.utils.AirplaneModeChangeReceiver
 import com.appynitty.kotlinsbalibrary.common.utils.BackBtnPressedUtil
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
@@ -33,6 +35,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.GpsStatusListener
+import com.appynitty.kotlinsbalibrary.common.utils.LocationUtils
 import com.appynitty.kotlinsbalibrary.common.utils.TurnOnGps
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.CustomAlertDialog
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.GarbageTypeDialogFragment
@@ -61,6 +64,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     DialogInterface.OnClickListener {
 
     private val viewModel: QrScannerViewModel by viewModels()
+    private val userDetailsViewModel: UserDetailsViewModel by viewModels()
 
     private lateinit var binding: ActivityQrscannerBinding
     private lateinit var receiver: AirplaneModeChangeReceiver
@@ -207,11 +211,33 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
                     is QrScannerViewModel.QrScannerEvent.ShowSuccessToast -> {
                         showSuccessToast(event.resourceId)
                     }
+
+                    QrScannerViewModel.QrScannerEvent.NavigateToLoginScreen -> {
+                        LocationUtils.stopGisLocationTracking(applicationContext)
+                        navigateToLoginScreen()
+                    }
                 }
             }
         }
     }
 
+    private fun navigateToLoginScreen() {
+        userDetailsViewModel.deleteAllUserDataFromRoom()
+        val intent = Intent(this@QRScannerActivity, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
+        startAnotherActivity(intent)
+        finish()
+    }
+
+    private fun startAnotherActivity(intent: Intent) {
+        startActivity(intent)
+        overridePendingTransition(
+            R.anim.slide_in_right, R.anim.slide_out_left
+        )
+    }
 
     private fun showSuccessToast(resourceId: Int) {
         CustomToast.showSuccessToast(this, resources.getString(resourceId))
@@ -298,6 +324,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         offlineSecondImagePath = afterImagePath
 
         receiver = AirplaneModeChangeReceiver()
+        viewModel.getDeviceId(this)
 
     }
 

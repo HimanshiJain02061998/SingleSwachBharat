@@ -16,6 +16,7 @@ interface LocationApi {
         @Header("typeId") typeId: String?,
         @Header("EmpType") empType: String?,
         @Header("batteryStatus") batteryStatus: Int,
+        @Header("imeino") imeino: String?,
         @Body userLocationPojoList: List<LocationApiRequest>
     ): Response<List<LocationApiResponse>>
 

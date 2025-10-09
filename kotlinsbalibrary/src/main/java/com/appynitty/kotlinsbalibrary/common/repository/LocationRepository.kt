@@ -2,6 +2,7 @@ package com.appynitty.kotlinsbalibrary.common.repository
 
 import com.appynitty.kotlinsbalibrary.common.api.LocationApi
 import com.appynitty.kotlinsbalibrary.common.model.request.LocationApiRequest
+import retrofit2.http.Header
 import javax.inject.Inject
 
 class LocationRepository @Inject constructor(private val locationApi: LocationApi) {
@@ -12,6 +13,7 @@ class LocationRepository @Inject constructor(private val locationApi: LocationAp
         typeId: String,
         empType: String,
         batteryStatus: Int,
+        imeino: String?,
         userLocationPojoList: List<LocationApiRequest>
     ) = locationApi.saveUserLocation(
         appId,
@@ -19,6 +21,7 @@ class LocationRepository @Inject constructor(private val locationApi: LocationAp
         typeId,
         empType,
         batteryStatus,
+        imeino,
         userLocationPojoList
     )
 

@@ -41,7 +41,7 @@ import com.appynitty.kotlinsbalibrary.housescanify.model.response.PropertyType
         NearestLatLng::class,
         PropertyType::class,
         UserTravelLoc::class],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class SbaDatabase : RoomDatabase() {

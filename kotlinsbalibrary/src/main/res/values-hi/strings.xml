@@ -188,5 +188,6 @@
     <string name="change_photo">फोटो बदलें</string>
     <string name="master_id">"मास्टर आईडी: "</string>
     <string name="add_master_plate">मास्टर प्लेट जोड़ें</string>
+    <string name="note_that_associated">कृपया ध्यान दें कि संबंधित मास्टर प्लेट डेटा दोपहर 2 बजे से रात 8 बजे के बीच अपडेट किया जाएगा। नवीनतम और सटीक जानकारी प्राप्त करने के लिए उपयोगकर्ताओं को रात 8 बजे के बाद पुनः जाँच करने की सलाह दी जाती है।</string>
 
 </resources>

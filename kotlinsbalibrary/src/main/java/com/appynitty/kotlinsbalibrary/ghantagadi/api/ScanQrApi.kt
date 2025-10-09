@@ -16,6 +16,7 @@ interface ScanQrApi {
         @Header("typeId") typeId: String,
         @Header("batteryStatus") batteryStatus: Int,
         @Header("Content-Type") contentType: String,
+        @Header("imeino") imeino: String?,
         @Body garbageCollectionDataList: List<GarbageCollectionData>
     ): Response<List<GarbageCollectionResponse>>
 
@@ -26,6 +27,7 @@ interface ScanQrApi {
         @Header("typeId") typeId: String,
         @Header("batteryStatus") batteryStatus: Int,
         @Header("Content-Type") contentType: String,
+        @Header("imeino") imeino: String?,
         @Body garbageCollectionDataList: GarbageCollectionData
     ): Response<List<GarbageCollectionResponse>>
 }

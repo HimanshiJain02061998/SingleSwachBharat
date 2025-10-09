@@ -1,5 +1,11 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard
 
+import android.content.Context
+import android.content.Context.TELEPHONY_SERVICE
+import android.os.Build
+import android.telephony.TelephonyManager
+import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,9 +20,13 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.TempUserDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.DumpYardIds
@@ -42,16 +52,33 @@ class DashboardViewModel @Inject constructor(
     private val sessionDataStore: SessionDataStore,
     private val archivedDao: ArchivedDao,
     private val languageDataStore: LanguageDataStore,
-    private val nearestLatLngDao: NearestLatLngDao
-
+    private val nearestLatLngDao: NearestLatLngDao,
+    private val userTravelLocDao: UserTravelLocDao,
+    private val garbageCollectionDao: GarbageCollectionDao,
+    private val tempUserDataStore: TempUserDataStore
 ) : ViewModel() {
 
     private val dashboardEventChannel = Channel<DashboardEvent>()
     val dashboardEventsFlow = dashboardEventChannel.receiveAsFlow()
 
+    private var deviceIdCon: String? = null
+
+
     /**
      *  METHOD TO GET VEHICLE TYPES FROM API
      */
+
+    suspend fun checkSameUserLogin(): Boolean {
+        val tempUser = tempUserDataStore.getUserEssentials.first()
+        val user = userDataStore.getUserEssentials.first()
+
+        val tempId = tempUser.userId
+        val userId = user.userId
+
+        // Return true if IDs are same OR either is empty/null
+        return tempId.isNullOrEmpty() || tempId == userId
+    }
+
     fun getVehicleTypeDetails() = viewModelScope.launch {
 
         dashboardEventChannel.send(DashboardEvent.ShowProgressBar)
@@ -67,6 +94,7 @@ class DashboardViewModel @Inject constructor(
                     )
                     handleDumpYardIdsResponse(response)
                 }
+
                 else -> {
                     val response = dutyRepository.getVehicleTypeDetails(
                         CommonUtils.APP_ID, CommonUtils.CONTENT_TYPE
@@ -180,7 +208,7 @@ class DashboardViewModel @Inject constructor(
         try {
 
             val response = dutyRepository.saveInPunchDetails(
-                appId, content_type, batteryStatus, inPunchRequest
+                appId, content_type, batteryStatus, deviceIdCon, inPunchRequest
             )
             handleAttendanceOnResponse(response, userVehicleDetails)
 
@@ -358,6 +386,15 @@ class DashboardViewModel @Inject constructor(
                     )
                 }
             }
+        } else if (response.code() == 422) {
+
+            Log.d("messgeboy", "message s ${response.body()}")
+            dashboardEventChannel.send(
+                DashboardEvent.ShowResponseErrorMessage(
+                    "Invalid IMEI No", "अवैध IMEI No"
+                )
+            )
+            performForcefullyLogout()
         } else {
             dashboardEventChannel.send(
                 DashboardEvent.ShowFailureMessage(
@@ -386,7 +423,7 @@ class DashboardViewModel @Inject constructor(
                 outPunchRequest.ReferanceId = vehicleDetails.vehicleNumber
             }
             val response = dutyRepository.saveOutPunchDetails(
-                appId, content_type, batteryStatus, trailId, outPunchRequest
+                appId, content_type, batteryStatus, trailId, deviceIdCon, outPunchRequest
             )
             handleAttendanceOffResponse(response)
 
@@ -433,6 +470,14 @@ class DashboardViewModel @Inject constructor(
                     )
                 }
             }
+        } else if (response.code() == 422) {
+            Log.d("messgeboy", "message s ${response.body()}")
+            dashboardEventChannel.send(
+                DashboardEvent.ShowResponseErrorMessage(
+                    "Invalid IMEI No", "अवैध IMEI No"
+                )
+            )
+            performForcefullyLogout()
         } else {
             dashboardEventChannel.send(
                 DashboardEvent.ShowFailureMessage(
@@ -544,11 +589,11 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun onMyLocationMenuClicked(isDutyOn: Boolean) = viewModelScope.launch {
-      //  if (isDutyOn) {
-            dashboardEventChannel.send(DashboardEvent.NavigateToMyLocationScreen)
-     //   } else {
-       //     dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.be_no_duty))
-      //  }
+        //  if (isDutyOn) {
+        dashboardEventChannel.send(DashboardEvent.NavigateToMyLocationScreen)
+        //   } else {
+        //     dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.be_no_duty))
+        //  }
     }
 
     fun onWorkHistoryMenuClicked() = viewModelScope.launch {
@@ -594,7 +639,7 @@ class DashboardViewModel @Inject constructor(
         batteryStatus: Int
     ) = viewModelScope.launch {
 
-    if (isInternetOn && isGpsOn) {
+        if (isInternetOn && isGpsOn) {
             val isDutyOn = isUserDutyOnFlow.first()
             if (isChecked) {
                 if (!isDutyOn) {
@@ -664,15 +709,15 @@ class DashboardViewModel @Inject constructor(
 //            }else if(!isInternetOn){
 //
 //            }
-        if (!isGpsOn) {
-            dashboardEventChannel.send(DashboardEvent.TurnGpsOn)
-        } else {
-            dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.no_internet_error))
-            dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
+            if (!isGpsOn) {
+                dashboardEventChannel.send(DashboardEvent.TurnGpsOn)
+            } else {
+                dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.no_internet_error))
+                dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
+            }
+
+
         }
-
-
-    }
     }
 
     fun onAlertDialogYesBtnClicked(type: String, isDutyOn: Boolean, gcCount: Int) =
@@ -703,6 +748,44 @@ class DashboardViewModel @Inject constructor(
         languageDataStore.savePreferredLanguage(appLanguage)
         dashboardEventChannel.send(DashboardEvent.RestartDashboardActivity)
         dashboardEventChannel.send(DashboardEvent.DismissLanguageDialog)
+    }
+
+    fun performForcefullyLogout() {
+        viewModelScope.launch {
+            val userDetails = userDataStore.getUserEssentials.first()
+            tempUserDataStore.saveUserEssentials(
+                UserEssentials(
+                    userDetails.userId,
+                    userDetails.employeeType,
+                    userDetails.userTypeId
+                )
+            )
+            userDataStore.clearUserDatastore()
+            sessionDataStore.clearSessionDatastore()
+            dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
+            dashboardEventChannel.send(DashboardEvent.NavigateToLoginScreen)
+        }
+    }
+
+    fun clearAllDataNewUser() {
+        viewModelScope.launch {
+            archivedDao.deleteAllArchivedData()
+            userTravelLocDao.deleteAllUserTravelLatLongs()
+            nearestLatLngDao.deleteAllNearestHouses()
+            garbageCollectionDao.deleteAllGarbageCollection()
+        }
+    }
+
+
+    fun getDeviceId(context: Context) {
+        val telephonyManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        var deviceId: String? = CommonUtils.getAndroidId(context)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            deviceId = telephonyManager.deviceId
+        }
+
+        deviceIdCon = deviceId
     }
 
 
@@ -742,8 +825,10 @@ class DashboardViewModel @Inject constructor(
 
         data class ShowVehicleTypeDialog(val vehicleTypeList: List<VehicleTypeResponse>) :
             DashboardEvent()
+
         data class ShowDumpYardIdsDialog(val dumpYardIdsList: List<DumpYardIds>) :
             DashboardEvent()
+
         data class ShowVehicleNumberList(val vehicleNumberList: List<VehicleNumberResponse>) :
             DashboardEvent()
 

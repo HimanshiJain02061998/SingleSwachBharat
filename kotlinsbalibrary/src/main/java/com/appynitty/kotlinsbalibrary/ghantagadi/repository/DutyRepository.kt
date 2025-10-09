@@ -3,6 +3,7 @@ package com.appynitty.kotlinsbalibrary.ghantagadi.repository
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.DutyApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
+import retrofit2.http.Header
 import javax.inject.Inject
 
 
@@ -26,8 +27,9 @@ class DutyRepository @Inject constructor(
         appId: String,
         content_type: String,
         batteryStatus: Int,
+        imeino: String?,
         inPunchRequest: InPunchRequest
-    ) = dutyApi.saveInPunchDetails(appId, content_type, batteryStatus, inPunchRequest)
+    ) = dutyApi.saveInPunchDetails(appId, content_type, batteryStatus,imeino, inPunchRequest)
 
     suspend fun getVehicleQrDetails(
         appId: String,
@@ -35,7 +37,7 @@ class DutyRepository @Inject constructor(
         referenceId: String,
         empType: String,
         currentLat: String,
-        currentLon: String
+        currentLon: String,
     ) = dutyApi.getVehicleQrDetails(
         appId,
         contentType,
@@ -50,8 +52,9 @@ class DutyRepository @Inject constructor(
         content_type: String,
         batteryStatus: Int,
         trailId: String,
+        imeino: String?,
         outPunchRequest: OutPunchRequest
-    ) = dutyApi.saveOutPunchDetails(appId, content_type, batteryStatus, trailId, outPunchRequest)
+    ) = dutyApi.saveOutPunchDetails(appId, content_type, batteryStatus, trailId,imeino, outPunchRequest)
 
     suspend fun getDumpYardIds(
         appId: String
