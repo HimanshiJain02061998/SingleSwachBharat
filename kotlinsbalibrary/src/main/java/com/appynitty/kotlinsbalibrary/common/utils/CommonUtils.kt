@@ -16,7 +16,7 @@ class CommonUtils {
     companion object {
 
         val APP_ID: String
-            get() = APP_ID
+            get() = MyApplication.APP_ID
 
         val VERSION_CODE: String
             get() = MyApplication.VERSION_CODE
