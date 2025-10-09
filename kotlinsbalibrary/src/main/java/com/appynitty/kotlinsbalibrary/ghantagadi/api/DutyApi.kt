@@ -35,6 +35,7 @@ interface DutyApi {
         @Header("appId") appId: String,
         @Header("Content-Type") content_type: String,
         @Header("batteryStatus") batteryStatus: Int,
+        @Header("imeino") imeino: String?,
         @Body inPunchRequest: InPunchRequest
     ): Response<AttendanceResponse>
 
@@ -54,6 +55,7 @@ interface DutyApi {
         @Header("Content-Type") content_type: String?,
         @Header("batteryStatus") batteryStatus: Int,
         @Header("Trail_id") trailId: String,
+        @Header("imeino") imeino: String?,
         @Body outPunchRequest: OutPunchRequest
     ): Response<AttendanceResponse>
 

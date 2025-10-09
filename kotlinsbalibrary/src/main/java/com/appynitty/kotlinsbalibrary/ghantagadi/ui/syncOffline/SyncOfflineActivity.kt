@@ -18,7 +18,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.location.GisLocationService
 import com.appynitty.kotlinsbalibrary.common.ui.archived.ArchivedActivity
+import com.appynitty.kotlinsbalibrary.common.ui.my_location.MyLocationActivity
 import com.appynitty.kotlinsbalibrary.common.ui.workHistoryDetail.WorkHistoryDetailActivity
 import com.appynitty.kotlinsbalibrary.common.utils.BackBtnPressedUtil
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
@@ -26,6 +28,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
+import com.appynitty.kotlinsbalibrary.common.utils.TurnOnGps
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.CustomAlertDialog
@@ -37,6 +40,9 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardActivity
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.qrScanner.QRScannerActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +122,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         subscribeLiveData()
         registerClickEvents()
         BackBtnPressedUtil.handleBackBtnPressed(this, this, this)
+        subscribeChannelEvents()
 
     }
 
@@ -125,6 +132,8 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     }
+
+
 
     private fun initVars() {
 
@@ -169,6 +178,23 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
         lifecycleScope.launch {
             totalGcCount = garbageCollectionViewModel.getGcCount()
+        }
+        garbageCollectionViewModel.getDeviceId(this)
+    }
+
+    private fun subscribeChannelEvents() {
+        lifecycleScope.launchWhenStarted {
+            garbageCollectionViewModel.garbageCollectionEventsFlow.collect { event ->
+                when (event) {
+                    GarbageCollectionViewModel.LogoutEvent.PerformForcefullyLogout -> {
+//                        garbageCollectionViewModel.performForcefullyLogout()
+                    }
+
+                    is GarbageCollectionViewModel.LogoutEvent.ShowResponseErrorMessage -> {
+
+                    }
+                }
+            }
         }
     }
 

@@ -119,6 +119,21 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
     private lateinit var alertMessageDialogFrag: AlertMessageDialogFrag
     private var isDutyOnToggleClicked = false
 
+    private val serviceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val msg = intent?.getStringExtra("message")
+            if (msg=="LOG_OUT"){
+                viewModel.performForcefullyLogout()
+                showApiErrorMessage("Invalid IMEI No", "अवैध IMEI No")
+//                viewModel.shouldStartLocationService(
+//                    isMyServiceRunning(
+//                        GisLocationService::class.java
+//                    )
+//                )
+            }
+        }
+    }
+
     override fun attachBaseContext(newBase: Context?) {
         newBase?.let { context ->
             languageDataStore = LanguageDataStore(newBase.applicationContext)
@@ -241,6 +256,16 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
         )
         syncSnackBar.view.background =
             ResourcesCompat.getDrawable(resources, R.drawable.snackbar_bg, null)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                serviceReceiver,
+                IntentFilter("com.appynitty.LOGOUT_EVENT"),
+                Context.RECEIVER_NOT_EXPORTED // or RECEIVER_EXPORTED based on your use case
+            )
+        } else {
+            registerReceiver(serviceReceiver, IntentFilter("com.appynitty.LOGOUT_EVENT"))
+        }
     }
 
     private fun getUserDetailsFromRoom() {
@@ -272,7 +297,7 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
         } else {
 
             binding.userFullName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
-       }
+        }
 
         binding.userFullName.text = fullName
 
@@ -325,11 +350,17 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
     private fun submitOfflineData() {
         if (!isSyncingOn) {
             lifecycleScope.launch {
-                val gcCount = empSyncGcViewModel.getGcCount()
-                if (gcCount > 0) {
-                    empSyncGcViewModel.saveGarbageCollectionOfflineDataToApi(
-                        CommonUtils.APP_ID, CommonUtils.CONTENT_TYPE
-                    )
+                if (viewModel.checkSameUserLogin()) {
+                    Log.d("tempId", "emp dashboard Temp id is ${viewModel.checkSameUserLogin()}")
+
+                    val gcCount = empSyncGcViewModel.getGcCount()
+                    if (gcCount > 0) {
+                        empSyncGcViewModel.saveGarbageCollectionOfflineDataToApi(
+                            CommonUtils.APP_ID, CommonUtils.CONTENT_TYPE
+                        )
+                    }
+                } else {
+                    viewModel.clearAllDataNewUser()
                 }
             }
         }

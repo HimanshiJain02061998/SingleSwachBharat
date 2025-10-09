@@ -29,4 +29,7 @@ interface GarbageCollectionDao {
     @Query("SELECT COUNT(offlineId) FROM garbage_collection_table")
     suspend fun getRowCount(): Int
 
+    @Query("DELETE FROM garbage_collection_table")
+    suspend fun deleteAllGarbageCollection()
+
 }

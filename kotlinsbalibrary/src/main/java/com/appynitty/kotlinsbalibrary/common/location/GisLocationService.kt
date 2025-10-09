@@ -16,6 +16,7 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.os.Build
 import android.os.Looper
+import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -152,6 +153,8 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
     private var isInternetOn = false
 
+    private var deviceIdCon: String? = null
+
 
     //location request for fused location client
     private val locationRequest: LocationRequest =
@@ -215,7 +218,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                                         0, location.latitude, location.longitude, gisStartTs
                                     )
                                     //todo -> uncomment when gis will be on
-                                 //   gisLocDao.insertGisLatLong(latLong)
+                                    //   gisLocDao.insertGisLatLong(latLong)
                                     val userTravel =
                                         UserTravelLoc(0, location.latitude, location.longitude)
                                     userTravelLocDao.insertUserTravelLatLong(userTravel)
@@ -233,7 +236,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                                     0, location.latitude, location.longitude, gisStartTs
                                 )
                                 //todo -> uncomment when gis will be on
-                               // gisLocDao.insertGisLatLong(latLong)
+                                // gisLocDao.insertGisLatLong(latLong)
                                 val userTravel =
                                     UserTravelLoc(0, location.latitude, location.longitude)
                                 userTravelLocDao.insertUserTravelLatLong(userTravel)
@@ -250,66 +253,72 @@ class GisLocationService : LifecycleService(), SensorEventListener {
     }
 
     private fun submitGarbageCollectionForNotScanned(actualNearestHouseList : ArrayList<NearestLatLng>) {
-      scope.launch {
-          val vehicleNumber = userDataStore.getUserVehicleDetails.first().vehicleNumber
-          val notScannedGarbageCollectionData = ArrayList<GarbageCollectionData>()
-          val userId = userDataStore.getUserEssentials.first().userId
-          if (userData != null){
-              actualNearestHouseList.forEach {
-                  val garbageCollectionData = GarbageCollectionData(
-                      0,
-                      it.referenceId,
-                      userId,
-                      it.houseLat,
-                      it.houseLong,
-                      vehicleNumber,
-                      "1",
-                      "4",
-                      DateTimeUtils.getScanningServerDate(),
-                      CommonUtils.getBatteryStatus(application).toString(),
-                      "0",
-                      isLocation = false,
-                      isOffline = true,
-                      empType = "N",
-                      note = "",
-                      gpBeforeImage = "",
-                      gpAfterImage = "",
-                      gpBeforeImageTime = null,
-                      totalGcWeight = "0.0",
-                      totalDryWeight = "0.0",
-                      totalWetWeight = "0.0"
-                  )
-                  notScannedGarbageCollectionData.add(garbageCollectionData)
-              }
-              if (notScannedGarbageCollectionData.isNotEmpty()){
+        scope.launch {
+            val vehicleNumber = userDataStore.getUserVehicleDetails.first().vehicleNumber
+            val notScannedGarbageCollectionData = ArrayList<GarbageCollectionData>()
+            val userId = userDataStore.getUserEssentials.first().userId
+            if (userData != null){
+                actualNearestHouseList.forEach {
+                    val garbageCollectionData = GarbageCollectionData(
+                        0,
+                        it.referenceId,
+                        userId,
+                        it.houseLat,
+                        it.houseLong,
+                        vehicleNumber,
+                        "1",
+                        "4",
+                        DateTimeUtils.getScanningServerDate(),
+                        CommonUtils.getBatteryStatus(application).toString(),
+                        "0",
+                        isLocation = false,
+                        isOffline = true,
+                        empType = "N",
+                        note = "",
+                        gpBeforeImage = "",
+                        gpAfterImage = "",
+                        gpBeforeImageTime = null,
+                        totalGcWeight = "0.0",
+                        totalDryWeight = "0.0",
+                        totalWetWeight = "0.0"
+                    )
+                    notScannedGarbageCollectionData.add(garbageCollectionData)
+                }
+                if (notScannedGarbageCollectionData.isNotEmpty()){
 
-                  try {
-                      val response = garbageCollectionRepo.saveGarbageCollectionOfflineData(
-                          CommonUtils.APP_ID,
-                          "0",
-                          CommonUtils.getBatteryStatus(application),
-                          CommonUtils.CONTENT_TYPE,
-                          notScannedGarbageCollectionData
-                      )
-                      handleNotScannedResponse(response)
-                      Toast.makeText(
-                          this@GisLocationService,
-                          "Not scanned Api Hit ${notScannedGarbageCollectionData.size}",
-                          Toast.LENGTH_LONG
-                      ).show()
-                  }catch (t : Throwable){
-                      Log.e(TAG, "submitGarbageCollectionForNotScanned: ${t.message}" )
-                  }
-              }
-          }
-          userTravelLocDao.deleteAllUserTravelLatLongs()
-      }
+                    try {
+                        val response = garbageCollectionRepo.saveGarbageCollectionOfflineData(
+                            CommonUtils.APP_ID,
+                            "0",
+                            CommonUtils.getBatteryStatus(application),
+                            CommonUtils.CONTENT_TYPE,
+                            deviceIdCon,
+                            notScannedGarbageCollectionData
+                        )
+                        handleNotScannedResponse(response)
+                        Toast.makeText(
+                            this@GisLocationService,
+                            "Not scanned Api Hit ${notScannedGarbageCollectionData.size}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }catch (t : Throwable){
+                        Log.e(TAG, "submitGarbageCollectionForNotScanned: ${t.message}" )
+                    }
+                }
+            }
+            userTravelLocDao.deleteAllUserTravelLatLongs()
+        }
     }
 
     private fun handleNotScannedResponse(response: Response<List<GarbageCollectionResponse>>) {
         scope.launch {
-            response.body()?.forEach {
-                it.referenceID?.let { it1 -> nearestLatLngDao.deleteNearestHouseById(it1) }
+            if (response.isSuccessful) {
+
+                response.body()?.forEach {
+                    it.referenceID?.let { it1 -> nearestLatLngDao.deleteNearestHouseById(it1) }
+                }
+            } else if (response.code()==422){
+                sendBroadCast()
             }
         }
     }
@@ -322,6 +331,8 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
         userDataStore = UserDataStore(this)
         sessionDataStore = SessionDataStore(this)
+        getDeviceId(this)
+
 
         prepareData()
 
@@ -401,6 +412,26 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
     }
 
+    private fun sendBroadCast(){
+        val message = "LOG_OUT"
+        // Send broadcast
+        val broadcastIntent = Intent("com.appynitty.LOGOUT_EVENT").apply {
+            putExtra("message", message)
+            setPackage(packageName) // ensure it's delivered only to your app
+        }
+        sendBroadcast(broadcastIntent)
+    }
+
+    fun getDeviceId(context: Context){
+        val telephonyManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        var deviceId: String? = CommonUtils.getAndroidId(context)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            deviceId = telephonyManager.deviceId
+        }
+
+        deviceIdCon  = deviceId
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChanel() {
@@ -506,7 +537,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
             if (response.isSuccessful) {
                 GlobalScope.launch {
-                  //  nearestLatLngDao.deleteAllNearestHouses()
+                    //  nearestLatLngDao.deleteAllNearestHouses()
                     response.body()?.forEach {
                         val existingHouse = nearestLatLngDao.getNearestHouseByRefId(it.referenceId)
                         if (existingHouse == null) {
@@ -598,6 +629,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                                             userData!!.userTypeId,
                                             userData!!.employeeType,
                                             CommonUtils.getBatteryStatus(application),
+                                            deviceIdCon,
                                             locList
                                         )
                                         handleLocationResponse(response)
@@ -626,6 +658,8 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                     }
                 }
             }
+        }else if (response.code()==422){
+            sendBroadCast()
         }
     }
 
@@ -645,103 +679,103 @@ class GisLocationService : LifecycleService(), SensorEventListener {
     }
 
 //todo -> uncomment when gis will be on
-/*    private fun sendGisLocation(tempList: List<GisLatLong>) {
+    /*    private fun sendGisLocation(tempList: List<GisLatLong>) {
 
-        Log.d(TAG, "sendGisLocation: $tempList")
-        val offlineIds = StringBuilder()
-        val mLineString = StringBuilder("Linestring (")
+            Log.d(TAG, "sendGisLocation: $tempList")
+            val offlineIds = StringBuilder()
+            val mLineString = StringBuilder("Linestring (")
 
-        for (i in tempList.indices) {
-            if (i == (tempList.size - 1)) {
+            for (i in tempList.indices) {
+                if (i == (tempList.size - 1)) {
 
-                mLineString.append(tempList[i].longitude)
-                mLineString.append(" ")
-                mLineString.append(tempList[i].latitude)
-                mLineString.append(")")
+                    mLineString.append(tempList[i].longitude)
+                    mLineString.append(" ")
+                    mLineString.append(tempList[i].latitude)
+                    mLineString.append(")")
 
-                offlineIds.append(tempList[i].id)
-            } else {
+                    offlineIds.append(tempList[i].id)
+                } else {
 
-                mLineString.append(tempList[i].longitude)
-                mLineString.append(" ")
-                mLineString.append(tempList[i].latitude)
-                mLineString.append(",")
+                    mLineString.append(tempList[i].longitude)
+                    mLineString.append(" ")
+                    mLineString.append(tempList[i].latitude)
+                    mLineString.append(",")
 
-                offlineIds.append("${tempList[i].id},")
-            }
-        }
-
-        scope.launch {
-
-            val trailId = sessionDataStore.getGisTrailId.first()
-
-            val isRunning = if (isDutyOn) 1 else 0
-
-            userId = userDataStore.getUserEssentials.first().userId
-
-            if (userId.isNotEmpty()) {
-
-            val gisLatLong = GisLocRequest(
-                trailId,
-                gisStartTs,
-                gisStartTs,
-                DateTimeUtils.getGisServiceTimeStamp(),
-                DateTimeUtils.getGisServiceTimeStamp(),
-                userId.toInt(),
-                userId.toInt(),
-                mLineString.toString(),
-                offlineIds.toString(),
-                isRunning
-            )
-            val mList = ArrayList<GisLocRequest>()
-            mList.add(gisLatLong)
-
-            val userData = userDataStore.getUserEssentials.first()
-            val userTypeId = userData.userTypeId
-
-            if (userTypeId == "0") {
-                try {
-                    val response = gisApi.saveGarbageMapGisLocations(CommonUtils.APP_ID, gisLatLong)
-                    handleGisResponse(response)
-                } catch (t: Throwable) {
-                    when (t) {
-                        is IOException -> Log.e(TAG, "sendGisLocation: ${t.message}")
-                        else -> Log.e(TAG, "sendGisLocation: ${t.message}")
-                    }
-                }
-            } else if (userTypeId == "1") {
-                try {
-                    val response = gisApi.saveHouseMapGisLocations(CommonUtils.APP_ID, gisLatLong)
-                    handleGisResponse(response)
-                } catch (t: Throwable) {
-                    when (t) {
-                        is IOException -> Log.e(TAG, "sendGisLocation: ${t.message}")
-                        else -> Log.e(TAG, "sendGisLocation: ${t.message}")
-                    }
+                    offlineIds.append("${tempList[i].id},")
                 }
             }
-        }
-        }
-    }*/
+
+            scope.launch {
+
+                val trailId = sessionDataStore.getGisTrailId.first()
+
+                val isRunning = if (isDutyOn) 1 else 0
+
+                userId = userDataStore.getUserEssentials.first().userId
+
+                if (userId.isNotEmpty()) {
+
+                val gisLatLong = GisLocRequest(
+                    trailId,
+                    gisStartTs,
+                    gisStartTs,
+                    DateTimeUtils.getGisServiceTimeStamp(),
+                    DateTimeUtils.getGisServiceTimeStamp(),
+                    userId.toInt(),
+                    userId.toInt(),
+                    mLineString.toString(),
+                    offlineIds.toString(),
+                    isRunning
+                )
+                val mList = ArrayList<GisLocRequest>()
+                mList.add(gisLatLong)
+
+                val userData = userDataStore.getUserEssentials.first()
+                val userTypeId = userData.userTypeId
+
+                if (userTypeId == "0") {
+                    try {
+                        val response = gisApi.saveGarbageMapGisLocations(CommonUtils.APP_ID, gisLatLong)
+                        handleGisResponse(response)
+                    } catch (t: Throwable) {
+                        when (t) {
+                            is IOException -> Log.e(TAG, "sendGisLocation: ${t.message}")
+                            else -> Log.e(TAG, "sendGisLocation: ${t.message}")
+                        }
+                    }
+                } else if (userTypeId == "1") {
+                    try {
+                        val response = gisApi.saveHouseMapGisLocations(CommonUtils.APP_ID, gisLatLong)
+                        handleGisResponse(response)
+                    } catch (t: Throwable) {
+                        when (t) {
+                            is IOException -> Log.e(TAG, "sendGisLocation: ${t.message}")
+                            else -> Log.e(TAG, "sendGisLocation: ${t.message}")
+                        }
+                    }
+                }
+            }
+            }
+        }*/
 //todo -> uncomment when gis will be on
-/*    private fun handleGisResponse(response: Response<GisLocResponse?>) {
-        if (response.isSuccessful) {
-            val gisLocResponse = response.body()
-            if (gisLocResponse != null) {
-                val offlineIds = gisLocResponse.offlineId
-                if (offlineIds.isNotEmpty()) {
-                    val offlineIdsList: List<String>? = offlineIds.split(",").map { it.trim() }
-                    if (offlineIdsList?.isNotEmpty() == true) {
-                        offlineIdsList.forEach {
-                            scope.launch {
-                                gisLocDao.deleteLocationById(it)
+    /*    private fun handleGisResponse(response: Response<GisLocResponse?>) {
+            if (response.isSuccessful) {
+                val gisLocResponse = response.body()
+                if (gisLocResponse != null) {
+                    val offlineIds = gisLocResponse.offlineId
+                    if (offlineIds.isNotEmpty()) {
+                        val offlineIdsList: List<String>? = offlineIds.split(",").map { it.trim() }
+                        if (offlineIdsList?.isNotEmpty() == true) {
+                            offlineIdsList.forEach {
+                                scope.launch {
+                                    gisLocDao.deleteLocationById(it)
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }*/
+        }*/
 
     override fun onSensorChanged(event: SensorEvent?) {
 

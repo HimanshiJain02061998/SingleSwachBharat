@@ -1,5 +1,9 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.ui.qrScanner
 
+import android.content.Context
+import android.content.Context.TELEPHONY_SERVICE
+import android.os.Build
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,10 +18,13 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripHouseData
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel.DashboardEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +46,9 @@ class QrScannerViewModel @Inject constructor(
     private val garbageCollectionDao: GarbageCollectionDao,
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
-    userDataStore: UserDataStore
+    userDataStore: UserDataStore,
+    private val archivedDao: ArchivedDao,
+    private val userTravelLocDao: UserTravelLocDao
 ) : ViewModel() {
 
     @Inject
@@ -61,6 +70,7 @@ class QrScannerViewModel @Inject constructor(
     var submitDialogTitleText = ""
     var isInternetOn = false
     val userLatLongFlow = userDataStore.getUserLatLong
+    private var deviceIdCon: String? = null
 
     fun validateScannedQrCode(empType: String, result: String) = viewModelScope.launch {
 
@@ -221,7 +231,7 @@ class QrScannerViewModel @Inject constructor(
         qrScannerEventChannel.send(QrScannerEvent.ShowLoading)
         try {
             val response = garbageCollectionRepo.saveGarbageCollectionOnlineData(
-                appId, typeId, batteryStatus, contentType, garbageCollectionData
+                appId, typeId, batteryStatus, contentType,deviceIdCon, garbageCollectionData
             )
 
             handleGarbageCollectionResponse(
@@ -278,7 +288,20 @@ class QrScannerViewModel @Inject constructor(
                     )
                 }
             }
-        } else {
+        } else if(response.code()==422){
+//            qrScannerEventChannel.send(
+//                QrScannerEvent.ShowResponseSuccessMessage(
+//                    response.body()?.,  response.body()?.messageMar
+//                )
+//            )
+            qrScannerEventChannel.send(
+                QrScannerEvent.ShowResponseErrorMessage(
+                    "Invalid IMEI No", "अवैध IMEI No"
+                )
+            )
+            performForcefullyLogout()
+        }
+        else {
             qrScannerEventChannel.send(QrScannerEvent.ShowFailureMessage(response.message()))
             qrScannerEventChannel.send(QrScannerEvent.FinishActivity)
         }
@@ -428,6 +451,28 @@ class QrScannerViewModel @Inject constructor(
         sessionDataStore.saveBeforeImageFilePath(filePath)
     }
 
+    fun getDeviceId(context: Context){
+        val telephonyManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        var deviceId: String? = CommonUtils.getAndroidId(context)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            deviceId = telephonyManager.deviceId
+        }
+
+        deviceIdCon  = deviceId
+    }
+
+    private fun performForcefullyLogout(){
+        viewModelScope.launch {
+            userDataStore.clearUserDatastore()
+            sessionDataStore.clearSessionDatastore()
+//            archivedDao.deleteAllArchivedData()
+//            userTravelLocDao.deleteAllUserTravelLatLongs()
+//            nearestLatLngDao.deleteAllNearestHouses()
+//            garbageCollectionDao.deleteAllGarbageCollection()
+            qrScannerEventChannel.send(QrScannerEvent.NavigateToLoginScreen)
+        }
+    }
 
     sealed class QrScannerEvent {
 
@@ -455,6 +500,7 @@ class QrScannerViewModel @Inject constructor(
 
         data class ShowResponseErrorMessage(val msg: String?, val msgMr: String?) : QrScannerEvent()
         data class ShowSuccessToast(val resourceId: Int) : QrScannerEvent()
+        object NavigateToLoginScreen : QrScannerEvent()
 
     }
 }

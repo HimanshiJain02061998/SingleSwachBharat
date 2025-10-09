@@ -12,12 +12,14 @@ class GarbageCollectionRepo @Inject constructor(private val scanQrApi: ScanQrApi
         typeId: String,
         batteryStatus: Int,
         contentType: String,
+        imeino: String?,
         garbageCollectionDataList: List<GarbageCollectionData>
     ) = scanQrApi.saveGarbageCollectionOfflineData(
         appId,
         typeId,
         batteryStatus,
         contentType,
+        imeino,
         garbageCollectionDataList
     )
 
@@ -26,12 +28,14 @@ class GarbageCollectionRepo @Inject constructor(private val scanQrApi: ScanQrApi
         typeId: String,
         batteryStatus: Int,
         contentType: String,
+        imeino: String?,
         garbageCollectionDataList: GarbageCollectionData
     ) = scanQrApi.saveGarbageCollectionOnlineData(
         appId,
         typeId,
         batteryStatus,
         contentType,
+        imeino,
         garbageCollectionDataList
     )
 }

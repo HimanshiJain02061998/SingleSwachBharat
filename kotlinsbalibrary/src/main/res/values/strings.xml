@@ -230,4 +230,5 @@
     <string name="change_photo">Change Photo</string>
     <string name="master_id">"Master-ID: "</string>
     <string name="add_master_plate">Add Master Plate</string>
+    <string name="note_that_associated">Note that the associated Master Plate data will be updated between 2 PM and 8 PM. Users are advised to check back after 8 PM for the most current and accurate information.</string>
 </resources>

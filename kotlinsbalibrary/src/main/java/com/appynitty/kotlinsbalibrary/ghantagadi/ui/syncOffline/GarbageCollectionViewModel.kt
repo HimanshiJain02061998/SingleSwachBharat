@@ -1,6 +1,10 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline
 
 import android.app.Application
+import android.content.Context
+import android.content.Context.TELEPHONY_SERVICE
+import android.os.Build
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -18,12 +22,15 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel.DashboardEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
@@ -44,11 +51,15 @@ class GarbageCollectionViewModel(
     val garbageCollectionResponseLiveData: MutableLiveData<ApiResponseListener<List<GarbageCollectionResponse>>?> =
         MutableLiveData()
 
+    private val garbageCollectionChannel = Channel<LogoutEvent>()
+    val garbageCollectionEventsFlow = garbageCollectionChannel.receiveAsFlow()
+
 
     private val deleteImageList = ArrayList<String>()
     val isSyncingOnLiveData = MutableLiveData<Boolean>()
     private val isDumpTripSyncFlow = MutableStateFlow(false)
     private var isDumpTripSyncOn = false
+    private var deviceIdCon: String? = null
 
     init {
 
@@ -89,6 +100,7 @@ class GarbageCollectionViewModel(
                     typeId,
                     batteryStatus,
                     contentType,
+                    deviceIdCon,
                     garbageCollectionDataList
                 )
 
@@ -191,6 +203,7 @@ class GarbageCollectionViewModel(
         appId: String, typeId: String, batteryStatus: Int, contentType: String,
         response: Response<List<GarbageCollectionResponse>>
     ) {
+
         if (response.isSuccessful) {
 
             response.body()?.let {
@@ -225,7 +238,13 @@ class GarbageCollectionViewModel(
                 }
                 garbageCollectionResponseLiveData.postValue(ApiResponseListener.Success(it))
             }
-        } else {
+        } else if(response.code()==422){
+            viewModelScope.launch {
+                garbageCollectionChannel.send(LogoutEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No"))
+                garbageCollectionChannel.send(LogoutEvent.PerformForcefullyLogout)
+            }
+        }
+        else {
             garbageCollectionResponseLiveData.postValue(ApiResponseListener.Failure(response.message()))
         }
     }
@@ -247,6 +266,7 @@ class GarbageCollectionViewModel(
         return job.await()
 
     }
+
 
     //blockchain sync
     @OptIn(DelicateCoroutinesApi::class)
@@ -293,7 +313,7 @@ class GarbageCollectionViewModel(
             if (response.isSuccessful) {
                 if (response.body() != null) {
                     //tripRepository.deleteAllTripHousesFromRoom()
-                   // sessionDataStore.saveDumpYardTripNo(tripNo)
+                    // sessionDataStore.saveDumpYardTripNo(tripNo)
 
                     response.body()!!.forEach {
                         it.offlineId?.let { it1 -> tripRepository.deleteDumpYardTripFromRoom(it1) }
@@ -303,5 +323,20 @@ class GarbageCollectionViewModel(
             isDumpTripSyncFlow.emit(false)
         }
 
+    fun getDeviceId(context: Context){
+        val telephonyManager = context.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+        var deviceId: String? = CommonUtils.getAndroidId(context)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            deviceId = telephonyManager.deviceId
+        }
+
+        deviceIdCon  = deviceId
+    }
+
+    sealed class LogoutEvent {
+        object PerformForcefullyLogout : LogoutEvent()
+        data class ShowResponseErrorMessage(val msg: String?, val msgMr: String?) : LogoutEvent()
+    }
 
 }
