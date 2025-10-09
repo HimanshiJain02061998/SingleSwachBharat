@@ -8,13 +8,21 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
+import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.osmdroid.config.Configuration
+import javax.inject.Inject
+
 
 
 open class MyApplication : Application(), ViewModelStoreOwner {
+
 
     override fun onCreate() {
         super.onCreate()
@@ -22,6 +30,15 @@ open class MyApplication : Application(), ViewModelStoreOwner {
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         APP_ID = ""
+
+        var userDataStore= UserDataStore(this)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val tempAppId = userDataStore.getAppId.first()
+            if (tempAppId != "") {
+                APP_ID = tempAppId
+            }
+        }
     }
 
     companion object {

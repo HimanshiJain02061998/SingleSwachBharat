@@ -550,7 +550,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private fun navigateToLoginScreen() {
         garbageCollectionViewModel.setSyncingLiveDataToNull()
         userDetailsViewModel.deleteAllUserDataFromRoom()
-        val intent = Intent(this@DashboardActivity, LoginActivity::class.java)
+        val intent = Intent(this@DashboardActivity, SelectUlb::class.java)
         startAnotherActivity(intent)
         finish()
 
