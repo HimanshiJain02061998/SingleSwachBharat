@@ -147,6 +147,7 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
         lifecycleScope.launch {
             val userDataStore = UserDataStore(this@LoginActivity)
 
+            MyApplication.APP_ID = ""
             userDataStore.clearAppId()
 
             val intent = Intent(this@LoginActivity, SelectUlb::class.java)

@@ -23,9 +23,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.appynitty.ghantagadi" />
-                  <option name="mobileSdkAppId" value="1:809965979551:android:c7bf2cc41a4d3e8e14dfaa" />
-                  <option name="projectId" value="kotlin-swachbharat" />
-                  <option name="projectNumber" value="809965979551" />
+                  <option name="mobileSdkAppId" value="1:650282876219:android:686d3dd978e962d30a4b1e" />
+                  <option name="projectId" value="ictsbm-single-app" />
+                  <option name="projectNumber" value="650282876219" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -47,6 +47,7 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
 
     }
     suspend fun saveAppId(appId: String) {
+        clearAppId()
         userDataStore.edit { preferences ->
             preferences[APP_ID] = appId
         }

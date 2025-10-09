@@ -3,13 +3,13 @@ package com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.AdapterView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.common.MyApplication
+import com.appynitty.kotlinsbalibrary.common.model.response.District
+import com.appynitty.kotlinsbalibrary.common.model.response.ULB
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
-import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.viewmodel.DistrictViewModel
@@ -26,6 +26,8 @@ class SelectUlb : AppCompatActivity() {
     private lateinit var userDataStore: UserDataStore
 
     private var selectedAppId: String? = null
+    private var districtList: List<District> = emptyList()
+    private var ulbList: List<ULB> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,91 +36,92 @@ class SelectUlb : AppCompatActivity() {
 
         userDataStore = UserDataStore(this)
 
-
+        // Fetch District list
         districtViewModel.fetchDistrictList()
 
-        // Observe District List
+        // --- Observe District List ---
         lifecycleScope.launch {
             districtViewModel.districtList.collectLatest { districts ->
                 if (districts.isNotEmpty()) {
                     val districtNames = mutableListOf("Select District")
                     districtNames.addAll(districts.map { it.DistrictName })
+                    districtList = districts
 
-                    val adapter = ArrayAdapter(
+                    val districtAdapter = ArrayAdapter(
                         this@SelectUlb,
-                        android.R.layout.simple_spinner_item,
+                        android.R.layout.simple_dropdown_item_1line,
                         districtNames
                     )
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    binding.spinnerDistrict.adapter = adapter
+                    binding.autoDistrict.setAdapter(districtAdapter)
 
-                    binding.spinnerDistrict.onItemSelectedListener =
-                        object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: android.view.View?,
-                                position: Int,
-                                id: Long
-                            ) {
-                                if (position > 0) {
-                                    val selectedDistrict = districts[position - 1]
-                                    lifecycleScope.launch {
-                                        userDataStore.saveDisId(selectedDistrict.Disid)
-                                    }
-                                    districtViewModel.fetchULBList(selectedDistrict.Disid)
-                                }
-                                else {
-                                    // Reset ULB spinner if "Select District" is chosen again
-                                    resetUlbSpinner()
-                                }
+                    binding.autoDistrict.setOnItemClickListener { parent, _, position, _ ->
+                        if (position == 0) {
+                            // "Select District" clicked → reset ULB list
+                            binding.autoUlb.setText("")
+                            binding.autoUlb.setAdapter(null)
+                            selectedAppId = null
+                        } else {
+                            val selectedName = parent.getItemAtPosition(position).toString()
+                            val selectedDistrict = districtList.find { it.DistrictName == selectedName }
+
+                            selectedDistrict?.let {
+                                lifecycleScope.launch { userDataStore.saveDisId(it.Disid) }
+
+                                // Clear previous ULB selection
+                                binding.autoUlb.setText("")
+                                selectedAppId = null
+
+                                // Fetch ULB list for this district
+                                districtViewModel.fetchULBList(it.Disid)
                             }
-
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                            binding.autoDistrict.clearFocus()
+                            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                            imm.hideSoftInputFromWindow(binding.autoDistrict.windowToken, 0)
                         }
+                    }
                 }
             }
         }
 
 
-
-        // Observe ULB List
+        // --- Observe ULB List ---
         lifecycleScope.launch {
             districtViewModel.ulbList.collectLatest { ulbs ->
                 if (ulbs.isNotEmpty()) {
-                    val ulbNames = mutableListOf("Select ULB")
-                    ulbNames.addAll(ulbs.map { it.ulbName })
+                    ulbList = ulbs
+                    val ulbNames = ulbs.map { it.ulbName }
 
-                    val adapter = ArrayAdapter(
+                    val ulbAdapter = ArrayAdapter(
                         this@SelectUlb,
-                        android.R.layout.simple_spinner_item,
+                        android.R.layout.simple_dropdown_item_1line,
                         ulbNames
                     )
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    binding.spinnerUlb.adapter = adapter
+                    binding.autoUlb.setAdapter(ulbAdapter)
 
-                    binding.spinnerUlb.onItemSelectedListener =
-                        object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: android.view.View?,
-                                position: Int,
-                                id: Long
-                            ) {
-                                if (position > 0) {
-                                    val selectedULB = ulbs[position - 1]
-                                    selectedAppId =
-                                        selectedULB.appId.toString()  // Save AppId temporarily
-                                }
-                            }
+                    binding.autoUlb.setOnItemClickListener { parent, _, position, _ ->
+                        val selectedName = parent.getItemAtPosition(position).toString()
+                        val selectedULB = ulbList.find { it.ulbName == selectedName }
+                        selectedAppId = selectedULB?.appId?.toString()
 
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
-                        }
+                        // --- Remove focus and hide keyboard ---
+                        binding.autoUlb.clearFocus()
+                        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                        imm.hideSoftInputFromWindow(binding.autoUlb.windowToken, 0)
+                    }
+
+                } else {
+                    // Clear when no ULB found
+                    binding.autoUlb.setAdapter(null)
+                    binding.autoUlb.setText("")
+                    selectedAppId = null
                 }
             }
         }
 
+
+        // --- Button Click ---
         binding.btnAhead.setOnClickListener {
-            val districtSelected = binding.spinnerDistrict.selectedItemPosition > 0
+            val districtSelected = binding.autoDistrict.text.isNotEmpty()
             val ulbSelected = !selectedAppId.isNullOrEmpty()
 
             when {
@@ -127,33 +130,15 @@ class SelectUlb : AppCompatActivity() {
                 else -> {
                     lifecycleScope.launch {
                         userDataStore.saveAppId(selectedAppId!!)
-
                         MyApplication.APP_ID = selectedAppId!!
-
 
                         CustomToast.showSuccessToast(this@SelectUlb, "ULB selected successfully")
 
-                        val intent = Intent(this@SelectUlb, LoginActivity::class.java)
-                        startActivity(intent)
+                        startActivity(Intent(this@SelectUlb, LoginActivity::class.java))
                         finish()
                     }
                 }
             }
         }
-
-
     }
-    private fun resetUlbSpinner() {
-        val emptyList = listOf("Select ULB")
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            emptyList
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerUlb.adapter = adapter
-
-        selectedAppId = null
-    }
-
 }
