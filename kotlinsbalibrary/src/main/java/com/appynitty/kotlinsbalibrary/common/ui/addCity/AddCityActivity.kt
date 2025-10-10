@@ -102,6 +102,7 @@ class AddCityActivity : AppCompatActivity() {
                     AddCityViewModel.AddCityEvent.HideProgressBar -> hideProgressBar()
                     AddCityViewModel.AddCityEvent.NavigateToLogin -> {
                         startActivity(Intent(this@AddCityActivity, LoginActivity::class.java))
+                        finish()
                     }
                     is AddCityViewModel.AddCityEvent.ShowFailureMessage -> {
                         CustomToast.showErrorToast(this@AddCityActivity, event.msg)

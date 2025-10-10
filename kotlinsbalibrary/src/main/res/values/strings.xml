@@ -26,7 +26,7 @@
         <item>@string/household_collection</item>
         <item>@string/street_sweeping</item>
         <item>@string/liquid_waste_cleaning</item>
-        <item>@string/dump_yard_supervisor</item>
+       <!-- <item>@string/dump_yard_supervisor</item>-->
     </string-array>
 
 

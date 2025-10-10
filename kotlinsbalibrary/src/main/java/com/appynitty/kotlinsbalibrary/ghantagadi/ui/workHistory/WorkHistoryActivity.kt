@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.MyApplication.Companion.APP_ID
 import com.appynitty.kotlinsbalibrary.common.ui.workHistoryDetail.WorkHistoryDetailActivity
 import com.appynitty.kotlinsbalibrary.common.utils.BackBtnPressedUtil
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
@@ -107,6 +108,8 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     override fun onResume() {
         super.onResume()
         initSpinner()
+        if (APP_ID == "3201")
+            showMasterPlateUpdateDialogIfNeeded()
     }
 
     private fun initToolbar() {
@@ -114,7 +117,6 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
 
 
     private fun initSpinner() {
@@ -291,5 +293,30 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showMasterPlateUpdateDialogIfNeeded() {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+
+        val titleView = TextView(this).apply {
+            text = getString(R.string.alert)
+            gravity = Gravity.CENTER
+            setTextColor(Color.RED)
+            textSize = 20f
+            setPadding(0, 30, 0, 30)
+        }
+
+        if (hour in 4..20) {
+            AlertDialog.Builder(this)
+                .setCustomTitle(titleView)
+                .setMessage(
+                    R.string.note_that_associated
+                )
+                .setPositiveButton(R.string.ok_txt) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setCancelable(true)
+                .show()
+        }
+    }
 
 }

@@ -43,9 +43,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/choose_your_ulb"
-        android:textColor="@android:color/black"
+        android:textColor="@color/colorPrimary"
         android:textStyle="bold"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <!-- Subtitle -->
     <TextView
@@ -58,7 +58,7 @@
         android:textAlignment="center"
         android:gravity="center"
         android:lineSpacingExtra="2dp"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
 
         <RelativeLayout
@@ -78,20 +78,15 @@
                 android:id="@+id/tvDist"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginEnd="17dp"
                 android:gravity="center_vertical"
-                android:paddingLeft="@dimen/_8sdp"
                 android:hint="@string/select_district"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginEnd="8dp"
-                android:tint="@color/black"
+                android:tint="@color/colorGray"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_arrow_drop_down"/>
@@ -118,18 +113,15 @@
                 android:layout_centerInParent="true"
                 android:gravity="center_vertical"
                 android:textColor="@color/black"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:hint="@string/select_ulb"
-                android:paddingLeft="@dimen/_8sdp"
                 />
 
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-
-                android:layout_marginEnd="8dp"
-                android:tint="@color/black"
+                android:tint="@color/colorGray"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_arrow_drop_down"/>
