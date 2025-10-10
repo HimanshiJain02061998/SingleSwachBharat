@@ -85,7 +85,6 @@ class AddCityActivity : AppCompatActivity() {
     }
 
     private fun subscribeLiveData() {
-
         ConnectivityStatus(this).observe(this) {
             isInternetOn = it
         }
@@ -265,9 +264,9 @@ class AddCityActivity : AppCompatActivity() {
         }
 
         if (filteredlist?.isEmpty() == true) {
-            CustomToast.showErrorToast(
+          /*  CustomToast.showErrorToast(
                 this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
-            )
+            )*/
         } else {
             districtAdapter.filterList(filteredlist)
         }
@@ -284,9 +283,9 @@ class AddCityActivity : AppCompatActivity() {
         }
 
         if (filteredlist?.isEmpty() == true) {
-            CustomToast.showErrorToast(
+        /*    CustomToast.showErrorToast(
                 this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
-            )
+            )*/
         } else {
             ulbAdapter.filterList(filteredlist)
         }
