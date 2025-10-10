@@ -834,9 +834,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun initVars() {
-        /*   startNetworkSpeedMonitor { speed ->
-               binding.internetSpeed.text = "Internet Speed: $speed"
-           }*/
         locationPermission = LocationPermission(this)
         locationPermission.initFineLocationPermission(this)
 
@@ -1685,29 +1682,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             unregisterReceiver(serviceReceiver)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()
-        }
-    }
-
-    fun startNetworkSpeedMonitor(onSpeedUpdate: (String) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            var previousRxBytes = TrafficStats.getTotalRxBytes()
-            var previousTxBytes = TrafficStats.getTotalTxBytes()
-
-            while (true) {
-                delay(1000) // every second
-                val currentRxBytes = TrafficStats.getTotalRxBytes()
-                val currentTxBytes = TrafficStats.getTotalTxBytes()
-
-                val downloadSpeed = (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
-                val uploadSpeed = (currentTxBytes - previousTxBytes) * 8 / 1024 // Kbps
-
-                previousRxBytes = currentRxBytes
-                previousTxBytes = currentTxBytes
-
-                withContext(Dispatchers.Main) {
-                    onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
-                }
-            }
         }
     }
 }

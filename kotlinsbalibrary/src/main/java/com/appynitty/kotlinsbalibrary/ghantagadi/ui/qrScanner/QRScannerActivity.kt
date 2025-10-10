@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraAccessException
+import android.net.TrafficStats
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,11 +23,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
-import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
 import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel.UserDetailsViewModel
 import com.appynitty.kotlinsbalibrary.common.utils.AirplaneModeChangeReceiver
@@ -54,8 +55,11 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 private const val TAG = "QRScannerActivity"
@@ -269,12 +273,14 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun hideLoading() {
+        binding.scannerView.internetSpeed.visibility = View.GONE
         binding.scannerView.progressBar.visibility = View.GONE
         binding.scannerView.transparentWhiteBg.visibility = View.GONE
         binding.flashToggle.visibility = View.VISIBLE
     }
 
     private fun showLoading() {
+        binding.scannerView.internetSpeed.visibility = View.VISIBLE
         binding.scannerView.progressBar.visibility = View.VISIBLE
         binding.scannerView.transparentWhiteBg.visibility = View.VISIBLE
         binding.flashToggle.visibility = View.INVISIBLE
@@ -307,7 +313,15 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun initVars() {
-
+        hideLoading()
+        startNetworkSpeedMonitor { speed ->
+            val formattedSpeed = "<b>$speed</b>"
+            binding.scannerView.internetSpeed.text =
+                HtmlCompat.fromHtml(
+                    "Internet Speed: $formattedSpeed",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+        }
         empType = intent.getStringExtra("empType")
         isAttendanceRequest = intent.getBooleanExtra("isAttendanceRequest",false)
         comment = intent.getStringExtra("comment")
@@ -840,5 +854,28 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+    }
+
+    fun startNetworkSpeedMonitor(onSpeedUpdate: (String) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var previousRxBytes = TrafficStats.getTotalRxBytes()
+            var previousTxBytes = TrafficStats.getTotalTxBytes()
+
+            while (true) {
+                delay(1000) // every second
+                val currentRxBytes = TrafficStats.getTotalRxBytes()
+                val currentTxBytes = TrafficStats.getTotalTxBytes()
+
+                val downloadSpeed = (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
+                val uploadSpeed = (currentTxBytes - previousTxBytes) * 8 / 1024 // Kbps
+
+                previousRxBytes = currentRxBytes
+                previousTxBytes = currentTxBytes
+
+                withContext(Dispatchers.Main) {
+                    onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
+                }
+            }
+        }
     }
 }
