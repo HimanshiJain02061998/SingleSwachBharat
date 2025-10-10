@@ -236,6 +236,8 @@
     <string name="go_ahead">Go ahead</string>
     <string name="select_district">Select District</string>
     <string name="select_ulb">Select ULB</string>
-
+    <string name="please_select_a_district_first">Please select a District first</string>
+    <string name="please_select_a_ulb_before_continuing">Please select a ULB before continuing</string>
+    <string name="ulb_selected_successfully">ULB selected successfully</string>
 
 </resources>

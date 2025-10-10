@@ -198,4 +198,7 @@
     <string name="go_ahead">पुढे जा</string>
     <string name="select_district">जिल्हा निवडा</string>
     <string name="select_ulb">ULB निवडा</string>
+    <string name="please_select_a_district_first">कृपया प्रथम जिल्हा निवडा.</string>
+    <string name="please_select_a_ulb_before_continuing">पुढे जाण्यापूर्वी कृपया एक ULB निवडा.</string>
+    <string name="ulb_selected_successfully">ULB यशस्वीरित्या निवडले</string>
 </resources>

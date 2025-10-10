@@ -17,6 +17,8 @@ class CommonUtils {
 
         val APP_ID: String
             get() = MyApplication.APP_ID
+        val ULB_NAME: String
+            get() = MyApplication.ULB_NAME
 
         val VERSION_CODE: String
             get() = MyApplication.VERSION_CODE

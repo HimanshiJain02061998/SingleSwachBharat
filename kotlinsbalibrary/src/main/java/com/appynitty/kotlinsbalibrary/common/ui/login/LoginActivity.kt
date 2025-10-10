@@ -21,7 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.MyApplication
 import com.appynitty.kotlinsbalibrary.common.model.request.LoginRequest
-import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
+import com.appynitty.kotlinsbalibrary.common.ui.addCity.AddCityActivity
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
@@ -137,7 +137,7 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
     private fun onBack() {
         binding.btnBack?.setOnClickListener {
 
-            val intent = Intent(this, SelectUlb::class.java)
+            val intent = Intent(this, AddCityActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -148,9 +148,10 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
             val userDataStore = UserDataStore(this@LoginActivity)
 
             MyApplication.APP_ID = ""
+            MyApplication.ULB_NAME = ""
             userDataStore.clearAppId()
 
-            val intent = Intent(this@LoginActivity, SelectUlb::class.java)
+            val intent = Intent(this@LoginActivity, AddCityActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()

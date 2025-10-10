@@ -29,10 +29,9 @@ import com.appynitty.kotlinsbalibrary.common.MyApplication
 import com.appynitty.kotlinsbalibrary.common.location.GisLocationService
 import com.appynitty.kotlinsbalibrary.common.location.awaitCurrentLocation
 import com.appynitty.kotlinsbalibrary.common.model.UserData
-import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.ui.addCity.AddCityActivity
 import com.appynitty.kotlinsbalibrary.common.ui.my_location.MyLocationActivity
 import com.appynitty.kotlinsbalibrary.common.ui.privacyPolicy.PrivacyPolicyActivity
-import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel.UserDetailsViewModel
 import com.appynitty.kotlinsbalibrary.common.utils.*
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
@@ -608,7 +607,7 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
 
     private fun navigateToLoginScreen() {
         userDetailsViewModel.deleteAllUserDataFromRoom()
-        val intent = Intent(this, SelectUlb::class.java)
+        val intent = Intent(this, AddCityActivity::class.java)
         startAnotherActivity(intent)
         finish()
     }

@@ -44,6 +44,7 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val LAST_GHANTA_GADI_SCAN_LONG = stringPreferencesKey(name = "last_ghanta_gadi_scan_long")
         private val DIS_ID_KEY = intPreferencesKey(name = "dis_id_key")
         private val APP_ID = stringPreferencesKey(name = "app_id")
+        private val ULB_NAME = stringPreferencesKey(name = "ulb_name")
 
     }
     suspend fun saveAppId(appId: String) {
@@ -52,15 +53,34 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
             preferences[APP_ID] = appId
         }
     }
+
+    suspend fun saveUlbName(ulbName: String) {
+        clearUlbName()
+        userDataStore.edit { preferences ->
+            preferences[ULB_NAME] = ulbName
+        }
+    }
+
     suspend fun clearAppId() {
         userDataStore.edit { prefs ->
             prefs.remove(APP_ID)
         }
     }
 
+    suspend fun clearUlbName() {
+        userDataStore.edit { prefs ->
+            prefs.remove(ULB_NAME)
+        }
+    }
+
     val getAppId: Flow<String> = userDataStore.data
         .map { preferences ->
             (preferences[APP_ID] ?: "")
+        }
+
+    val getUlbName: Flow<String> = userDataStore.data
+        .map { preferences ->
+            (preferences[ULB_NAME] ?: "")
         }
 
     suspend fun saveDisId(disId: Int) {

@@ -30,6 +30,7 @@ open class MyApplication : Application(), ViewModelStoreOwner {
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         APP_ID = ""
+        ULB_NAME = ""
 
         var userDataStore= UserDataStore(this)
 
@@ -37,6 +38,7 @@ open class MyApplication : Application(), ViewModelStoreOwner {
             val tempAppId = userDataStore.getAppId.first()
             if (tempAppId != "") {
                 APP_ID = tempAppId
+                ULB_NAME = userDataStore.getUlbName.first()
             }
         }
     }
@@ -46,6 +48,7 @@ open class MyApplication : Application(), ViewModelStoreOwner {
             private set
 
         lateinit var APP_ID: String
+        lateinit var ULB_NAME: String
         lateinit var VERSION_CODE : String
         lateinit var PACKAGE_NAME : String
     }
