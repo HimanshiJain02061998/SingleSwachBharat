@@ -107,7 +107,6 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     override fun onResume() {
         super.onResume()
         initSpinner()
-        showMasterPlateUpdateDialogIfNeeded()
     }
 
     private fun initToolbar() {
@@ -116,31 +115,7 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun showMasterPlateUpdateDialogIfNeeded() {
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
 
-        val titleView = TextView(this).apply {
-            text = getString(R.string.alert)
-            gravity = Gravity.CENTER
-            setTextColor(Color.RED)
-            textSize = 20f
-            setPadding(0, 30, 0, 30)
-        }
-
-        if (hour in 4..20) {
-            AlertDialog.Builder(this)
-                .setCustomTitle(titleView)
-                .setMessage(
-                    R.string.note_that_associated
-                )
-                .setPositiveButton(R.string.ok_txt) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setCancelable(true)
-                .show()
-        }
-    }
 
     private fun initSpinner() {
 

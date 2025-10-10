@@ -49,53 +49,8 @@ class GarbageCollectionAdapter :
                                 dyCollection.text = syncOfflineData.offlineDumpCount.toString()
                                 houseCollection.visibility = View.VISIBLE
                                 houseCollectionLbl.visibility = View.VISIBLE
-
-//                                val countText = syncOfflineData.offlineGarbageCollectionCount.toString() + " *"
-//                                val spannable = SpannableString(countText)
-//                                spannable.setSpan(
-//                                    ForegroundColorSpan(Color.RED),
-//                                    countText.length - 1, // start index of '*'
-//                                    countText.length,     // end index (exclusive)
-//                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                                )
-//
-//                                houseCollection.text = spannable
-
-                                val calendar = Calendar.getInstance()
-                                val hour = calendar.get(Calendar.HOUR_OF_DAY)
-
-                                val todayDate = Date() // current date object
-                                val todayFormatted = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(todayDate)
-
-                                // handle cases like "08-Oct-2025" → convert to "dd-MM-yyyy"
-                                val inputFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
-                                val outputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
-                                var itemDateFormatted = ""
-                                try {
-                                    val parsedDate = inputFormat.parse(syncOfflineData.date)
-                                    itemDateFormatted = outputFormat.format(parsedDate!!)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                                // ✅ Check: today's date and between 4 AM – 8 PM
-                                if (itemDateFormatted == todayFormatted  && hour in 4..20) {
-                                    val countText = syncOfflineData.offlineGarbageCollectionCount.toString() + " *"
-
-                                    val spannable = SpannableString(countText)
-                                    spannable.setSpan(
-                                        ForegroundColorSpan(Color.RED),
-                                        countText.length - 1,
-                                        countText.length,
-                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                    )
-
-                                    houseCollection.text = spannable
-                                } else {
-                                    // show normal count without red asterisk
-                                    houseCollection.text = syncOfflineData.offlineGarbageCollectionCount.toString()
-                                }
-
+                                houseCollection.text =
+                                    syncOfflineData.offlineGarbageCollectionCount.toString()
                             }
                             "S" -> {
                                 //street
