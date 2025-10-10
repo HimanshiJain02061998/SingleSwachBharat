@@ -20,11 +20,9 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SelectUlb : AppCompatActivity() {
-
     private lateinit var binding: ActivitySelectUlbBinding
     private val districtViewModel: DistrictViewModel by viewModels()
     private lateinit var userDataStore: UserDataStore
-
     private var selectedAppId: String? = null
     private var districtList: List<District> = emptyList()
     private var ulbList: List<ULB> = emptyList()

@@ -193,4 +193,8 @@
     <string name="master_id">"मास्टर-आयडी: "</string>
     <string name="add_master_plate">मास्टर प्लेट जोडा</string>
     <string name="note_that_associated">कृपया नोंद घ्या की संबंधित मास्टर प्लेट डेटा दुपारी २ ते रात्री ८ दरम्यान अद्ययावत केला जाईल. सर्वात अद्ययावत आणि अचूक माहिती मिळविण्यासाठी वापरकर्त्यांना रात्री ८ नंतर पुन्हा तपासण्याचा सल्ला दिला जातो.</string>
+    <string name="choose_your_ulb">Choose your ULB</string>
+    <string name="please_select_your_ulb_to_help_us_for_ngive_you_a_better_experience">Please select your ULB to help us for\ngive you a better experience</string>
+    <string name="select_district">Select District</string>
+    <string name="select_ulb">Select ULB</string>
 </resources>

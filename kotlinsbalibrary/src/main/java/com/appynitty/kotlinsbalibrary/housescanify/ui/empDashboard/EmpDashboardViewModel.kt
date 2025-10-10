@@ -13,7 +13,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
-import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.TempUserDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.TempUserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials

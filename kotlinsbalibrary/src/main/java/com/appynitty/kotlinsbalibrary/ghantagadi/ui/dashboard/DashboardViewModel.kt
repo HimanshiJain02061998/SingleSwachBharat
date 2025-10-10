@@ -5,7 +5,6 @@ import android.content.Context.TELEPHONY_SERVICE
 import android.os.Build
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -20,7 +19,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
-import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.TempUserDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.TempUserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails

@@ -24,7 +24,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose your ULB"
+        android:text="@string/choose_your_ulb"
         android:textColor="#212121"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -34,7 +34,7 @@
         android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please select your ULB to help us for\ngive you a better experience"
+        android:text="@string/please_select_your_ulb_to_help_us_for_ngive_you_a_better_experience"
         android:textColor="#757575"
         android:textSize="14sp"
         android:gravity="center"
@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:hint="Select District">
+        android:hint="@string/select_district">
 
         <AutoCompleteTextView
             android:id="@+id/autoDistrict"
@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:hint="Select ULB">
+        android:hint="@string/select_ulb">
 
         <AutoCompleteTextView
             android:id="@+id/autoUlb"

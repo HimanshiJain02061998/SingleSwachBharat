@@ -231,4 +231,8 @@
     <string name="master_id">"Master-ID: "</string>
     <string name="add_master_plate">Add Master Plate</string>
     <string name="note_that_associated">Note that the associated Master Plate data will be updated between 2 PM and 8 PM. Users are advised to check back after 8 PM for the most current and accurate information.</string>
+    <string name="choose_your_ulb">Choose your ULB</string>
+    <string name="please_select_your_ulb_to_help_us_for_ngive_you_a_better_experience">Please select your ULB to help us for\ngive you a better experience</string>
+    <string name="select_district">Select District</string>
+    <string name="select_ulb">Select ULB</string>
 </resources>
