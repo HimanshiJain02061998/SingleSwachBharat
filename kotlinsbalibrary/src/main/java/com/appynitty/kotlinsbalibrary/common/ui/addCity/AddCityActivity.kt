@@ -1,0 +1,313 @@
+package com.appynitty.kotlinsbalibrary.common.ui.addCity
+
+import android.app.Dialog
+import android.content.Context
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.model.response.DistrictListItem
+import com.appynitty.kotlinsbalibrary.common.model.response.ULBListItem
+import com.appynitty.kotlinsbalibrary.common.ui.addCity.adapter.DistrictAdapter
+import com.appynitty.kotlinsbalibrary.common.ui.addCity.adapter.UlbAdapter
+import com.appynitty.kotlinsbalibrary.common.ui.addCity.viewModel.AddCityViewModel
+import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
+import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
+import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
+import com.appynitty.kotlinsbalibrary.databinding.ActivityAddCityBinding
+
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.util.Locale
+import kotlin.getValue
+
+@AndroidEntryPoint
+class AddCityActivity : AppCompatActivity() {
+
+    private val viewModel: AddCityViewModel by viewModels()
+    private lateinit var binding: ActivityAddCityBinding
+    private var isInternetOn = false
+    private var selectedLanguage: String? = null
+    private var selectedLanguageId: String? = null
+    private lateinit var languageDataStore: LanguageDataStore
+    lateinit var districtAdapter : DistrictAdapter
+    lateinit var ulbAdapter : UlbAdapter
+    var district:DistrictListItem? = null
+    var ulb:ULBListItem? = null
+
+    var ulbList :  List<ULBListItem?>? = null
+    var districtList :  List<DistrictListItem?>? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityAddCityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        init()
+        subscribeLiveData()
+        setOnClickListner()
+        subscribeChannelEvent()
+    }
+
+    private fun init(){
+     viewModel.getDistrictList()
+    }
+
+    private fun setOnClickListner(){
+        binding.rlDist.setOnClickListener {
+            showDistrictDialog(binding.tvDist,districtList)
+        }
+        binding.rlUlb.setOnClickListener {
+            showCityDialog(binding.tvUlb, ulbList)
+        }
+        binding.btnGoAhead.setOnClickListener {
+            if (viewModel.validateUlb(binding.tvDist.text.toString().trim(),binding.tvUlb.text.toString().trim())){
+//                Constant.stateId = state?.stateId.toString()
+//                Constant.cityId = city?.id.toString()
+//                Log.d("checkState","state is ${state?.stateName} city ${city?.cityName}")
+//                findNavController().navigate(AddYourStateFragmentDirections.actionAddYourStateFragmentToStreetAddressFragment())
+            }
+        }
+    }
+
+    private fun subscribeLiveData() {
+
+        ConnectivityStatus(this).observe(this) {
+            isInternetOn = it
+        }
+
+    }
+
+
+
+    private fun subscribeChannelEvent() {
+
+        lifecycleScope.launch {
+            viewModel.addCityEventsFlow.collect { event ->
+                Log.d("addCity","city is ${event}")
+                when (event) {
+                    AddCityViewModel.AddCityEvent.HideProgressBar -> hideProgressBar()
+                    AddCityViewModel.AddCityEvent.NavigateToLogin -> TODO()
+                    is AddCityViewModel.AddCityEvent.ShowFailureMessage -> {
+                        CustomToast.showErrorToast(this@AddCityActivity, event.msg)
+                    }
+                    AddCityViewModel.AddCityEvent.ShowProgressBar -> showProgressBar()
+                    is AddCityViewModel.AddCityEvent.ShowResponseErrorMessage -> showApiErrorMessage( event.msg,
+                        event.msgMr)
+                    is AddCityViewModel.AddCityEvent.ShowResponseSuccessMessage -> showApiErrorMessage( event.msg,
+                        event.msgMr)
+
+                    is AddCityViewModel.AddCityEvent.DistrictListResponse -> {
+                      districtList = event.districtList
+                        Log.d("districtlist","list is ${event.districtList}")
+                    }
+                    is AddCityViewModel.AddCityEvent.UlbListResponse -> {
+                      ulbList = event.uLbList
+                    }
+
+
+                }
+            }
+        }
+
+    }
+
+    private fun showDistrictDialog(spCity: AppCompatTextView, data: List<DistrictListItem?>?) {
+//        val dialog = Dialog(requireContext(), R.style.MyAlertDialogTheme)
+        val dialog = Dialog(this)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        // val height = (resources.displayMetrics.heightPixels * 0.90).toInt()
+
+        dialog.window!!.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.setContentView(R.layout.dialog_city_spinner)
+        val tvTitle = dialog.findViewById<AppCompatTextView>(R.id.tvTitle)
+        tvTitle.text = "Select your District"
+        val rvCity = dialog.findViewById<RecyclerView>(R.id.rvCity)
+        val etCityName = dialog.findViewById<EditText>(R.id.etCityName)
+        val ll3 = dialog.findViewById<LinearLayout>(R.id.ll3)
+
+        etCityName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                filterDistrict(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+        })
+
+
+        districtAdapter = DistrictAdapter(this,data)
+        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+        rvCity?.adapter = districtAdapter
+
+        districtAdapter.setAdapterAListener(object :DistrictAdapter.DistrictAdapterListener{
+            override fun onItemClick(name: DistrictListItem?) {
+                district = name
+                spCity.setText(name?.districtName)
+                dialog.dismiss()
+                binding.tvUlb.text = ""
+                ulb = null
+                name?.disid?.toInt()?.let { viewModel.getUlbList(it) }
+            }
+
+        })
+
+
+        ll3!!.setOnClickListener {
+
+            dialog.dismiss()
+        }
+
+
+        dialog.show()
+    }
+
+    private fun showCityDialog(spCity: AppCompatTextView, stateList: List<ULBListItem?>?) {
+//        val dialog = Dialog(requireContext(), R.style.MyAlertDialogTheme)
+        val dialog = Dialog(this)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        // val height = (resources.displayMetrics.heightPixels * 0.90).toInt()
+
+        dialog.window!!.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.setContentView(R.layout.dialog_city_spinner)
+
+        val tvTitle = dialog.findViewById<AppCompatTextView>(R.id.tvTitle)
+        tvTitle.text = "Select your ULB"
+        val rvCity = dialog.findViewById<RecyclerView>(R.id.rvCity)
+        val etCityName = dialog.findViewById<EditText>(R.id.etCityName)
+        val ll3 = dialog.findViewById<LinearLayout>(R.id.ll3)
+
+
+
+        etCityName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                filterUlb(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+        })
+
+
+        ulbAdapter = UlbAdapter(this, stateList)
+        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+        rvCity?.adapter = ulbAdapter
+
+        ulbAdapter.setAdapterAListener(object :UlbAdapter.UlbAdapterListener{
+
+
+            override fun onItemClick(name: ULBListItem?) {
+                ulb = name
+                spCity.setText(name?.uLBName)
+                dialog.dismiss()
+            }
+
+        })
+
+
+        ll3!!.setOnClickListener {
+
+            dialog.dismiss()
+        }
+
+
+        dialog.show()
+    }
+
+
+    private fun filterDistrict(text: String) {
+        val filteredlist: ArrayList<DistrictListItem?>? = ArrayList<DistrictListItem?> ()
+        if (districtList!=null){
+            for (item in districtList!!) {
+                if (item?.districtName?.toLowerCase()?.contains(text.lowercase(Locale.getDefault())) == true) {
+                    filteredlist?.add(item)
+                }
+            }
+        }
+
+        if (filteredlist?.isEmpty() == true) {
+            Toast.makeText(this, "No Data Found..", Toast.LENGTH_SHORT).show()
+        } else {
+            districtAdapter.filterList(filteredlist)
+        }
+    }
+
+    private fun filterUlb(text: String) {
+        val filteredlist: ArrayList<ULBListItem?>? = ArrayList<ULBListItem?> ()
+        if (ulbList!=null){
+            for (item in ulbList!!) {
+                if (item?.uLBName?.toLowerCase()?.contains(text.lowercase(Locale.getDefault())) == true) {
+                    filteredlist?.add(item)
+                }
+            }
+        }
+
+        if (filteredlist?.isEmpty() == true) {
+            Toast.makeText(this, "No Data Found..", Toast.LENGTH_SHORT).show()
+        } else {
+            ulbAdapter.filterList(filteredlist)
+        }
+    }
+
+    private fun showApiErrorMessage(msg: String?, msgMr: String?) {
+        if (selectedLanguageId == "mr") {
+            msgMr?.let {
+                CustomToast.showErrorToast(this, msgMr)
+            }
+        } else {
+            msg?.let {
+                CustomToast.showErrorToast(this, msg)
+            }
+        }
+    }
+
+    private fun showProgressBar() {
+        binding.loginProgressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.loginProgressBar.visibility = View.GONE
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+
+        newBase?.let { context ->
+            languageDataStore = LanguageDataStore(newBase.applicationContext)
+            val appLanguage = languageDataStore.currentLanguage
+            selectedLanguage = appLanguage.languageName
+            selectedLanguageId = appLanguage.languageId
+            LanguageConfig.changeLanguage(context, selectedLanguageId.toString())
+        }
+        super.attachBaseContext(newBase)
+    }
+
+}
