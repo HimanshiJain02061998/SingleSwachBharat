@@ -7,12 +7,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
@@ -26,14 +26,11 @@ import com.appynitty.kotlinsbalibrary.common.ui.addCity.adapter.DistrictAdapter
 import com.appynitty.kotlinsbalibrary.common.ui.addCity.adapter.UlbAdapter
 import com.appynitty.kotlinsbalibrary.common.ui.addCity.viewModel.AddCityViewModel
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
-import com.appynitty.kotlinsbalibrary.common.ui.select_ulb_module.SelectUlb
 import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.databinding.ActivityAddCityBinding
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardActivity
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -48,38 +45,43 @@ class AddCityActivity : AppCompatActivity() {
     private var selectedLanguage: String? = null
     private var selectedLanguageId: String? = null
     private lateinit var languageDataStore: LanguageDataStore
-    lateinit var districtAdapter : DistrictAdapter
-    lateinit var ulbAdapter : UlbAdapter
-    var district:DistrictListItem? = null
-    var ulb:ULBListItem? = null
+    lateinit var districtAdapter: DistrictAdapter
+    lateinit var ulbAdapter: UlbAdapter
+    var district: DistrictListItem? = null
+    var ulb: ULBListItem? = null
 
-    var ulbList :  List<ULBListItem?>? = null
-    var districtList :  List<DistrictListItem?>? = null
+    var ulbList: List<ULBListItem?>? = null
+    var districtList: List<DistrictListItem?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddCityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.rlUlb.isEnabled = false
         init()
         subscribeLiveData()
         setOnClickListner()
         subscribeChannelEvent()
     }
 
-    private fun init(){
-     viewModel.getDistrictList()
+    private fun init() {
+        viewModel.getDistrictList()
     }
 
-    private fun setOnClickListner(){
+    private fun setOnClickListner() {
         binding.rlDist.setOnClickListener {
-            showDistrictDialog(binding.tvDist,districtList)
+            showDistrictDialog(binding.tvDist, districtList)
         }
         binding.rlUlb.setOnClickListener {
-            showCityDialog(binding.tvUlb, ulbList)
+                showCityDialog(binding.tvUlb, ulbList)
         }
         binding.btnGoAhead.setOnClickListener {
-            if (viewModel.validateUlb(binding.tvDist.text.toString().trim(),binding.tvUlb.text.toString().trim())){
-                viewModel.selectUlb(ulb?.appid.toString(),ulb?.uLBName)
+            if (viewModel.validateUlb(
+                    binding.tvDist.text.toString().trim(),
+                    binding.tvUlb.text.toString().trim()
+                )
+            ) {
+                viewModel.selectUlb(ulb?.appid.toString(), ulb?.uLBName)
             }
         }
     }
@@ -92,7 +94,6 @@ class AddCityActivity : AppCompatActivity() {
     }
 
 
-
     private fun subscribeChannelEvent() {
 
         lifecycleScope.launch {
@@ -103,21 +104,29 @@ class AddCityActivity : AppCompatActivity() {
                         startActivity(Intent(this@AddCityActivity, LoginActivity::class.java))
                         finish()
                     }
+
                     is AddCityViewModel.AddCityEvent.ShowFailureMessage -> {
                         CustomToast.showErrorToast(this@AddCityActivity, event.msg)
                     }
+
                     AddCityViewModel.AddCityEvent.ShowProgressBar -> showProgressBar()
-                    is AddCityViewModel.AddCityEvent.ShowResponseErrorMessage -> showApiErrorMessage( event.msg,
-                        event.msgMr)
-                    is AddCityViewModel.AddCityEvent.ShowResponseSuccessMessage -> showApiErrorMessage( event.msg,
-                        event.msgMr)
+                    is AddCityViewModel.AddCityEvent.ShowResponseErrorMessage -> showApiErrorMessage(
+                        event.msg,
+                        event.msgMr
+                    )
+
+                    is AddCityViewModel.AddCityEvent.ShowResponseSuccessMessage -> showApiErrorMessage(
+                        event.msg,
+                        event.msgMr
+                    )
 
                     is AddCityViewModel.AddCityEvent.DistrictListResponse -> {
-                      districtList = event.districtList
-                        Log.d("districtlist","list is ${event.districtList}")
+                        districtList = event.districtList
+                        Log.d("districtlist", "list is ${event.districtList}")
                     }
+
                     is AddCityViewModel.AddCityEvent.UlbListResponse -> {
-                      ulbList = event.uLbList
+                        ulbList = event.uLbList
                     }
 
                     is AddCityViewModel.AddCityEvent.ShowSuccessMessage -> {
@@ -169,12 +178,13 @@ class AddCityActivity : AppCompatActivity() {
         })
 
 
-        districtAdapter = DistrictAdapter(this,data)
-        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+        districtAdapter = DistrictAdapter(this, data)
+        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rvCity?.adapter = districtAdapter
 
-        districtAdapter.setAdapterAListener(object :DistrictAdapter.DistrictAdapterListener{
+        districtAdapter.setAdapterAListener(object : DistrictAdapter.DistrictAdapterListener {
             override fun onItemClick(name: DistrictListItem?) {
+                binding.rlUlb.isEnabled = true
                 district = name
                 spCity.setText(name?.districtName)
                 dialog.dismiss()
@@ -185,12 +195,9 @@ class AddCityActivity : AppCompatActivity() {
 
         })
 
-
         ll3!!.setOnClickListener {
-
             dialog.dismiss()
         }
-
 
         dialog.show()
     }
@@ -228,10 +235,10 @@ class AddCityActivity : AppCompatActivity() {
 
 
         ulbAdapter = UlbAdapter(this, stateList)
-        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+        rvCity?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rvCity?.adapter = ulbAdapter
 
-        ulbAdapter.setAdapterAListener(object :UlbAdapter.UlbAdapterListener{
+        ulbAdapter.setAdapterAListener(object : UlbAdapter.UlbAdapterListener {
 
 
             override fun onItemClick(name: ULBListItem?) {
@@ -254,38 +261,42 @@ class AddCityActivity : AppCompatActivity() {
 
 
     private fun filterDistrict(text: String) {
-        val filteredlist: ArrayList<DistrictListItem?>? = ArrayList<DistrictListItem?> ()
-        if (districtList!=null){
+        val filteredlist: ArrayList<DistrictListItem?>? = ArrayList<DistrictListItem?>()
+        if (districtList != null) {
             for (item in districtList!!) {
-                if (item?.districtName?.lowercase()?.contains(text.lowercase(Locale.getDefault())) == true) {
+                if (item?.districtName?.lowercase()
+                        ?.contains(text.lowercase(Locale.getDefault())) == true
+                ) {
                     filteredlist?.add(item)
                 }
             }
         }
 
         if (filteredlist?.isEmpty() == true) {
-          /*  CustomToast.showErrorToast(
-                this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
-            )*/
+            /*  CustomToast.showErrorToast(
+                  this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
+              )*/
         } else {
             districtAdapter.filterList(filteredlist)
         }
     }
 
     private fun filterUlb(text: String) {
-        val filteredlist: ArrayList<ULBListItem?>? = ArrayList<ULBListItem?> ()
-        if (ulbList!=null){
+        val filteredlist: ArrayList<ULBListItem?>? = ArrayList<ULBListItem?>()
+        if (ulbList != null) {
             for (item in ulbList!!) {
-                if (item?.uLBName?.lowercase()?.contains(text.lowercase(Locale.getDefault())) == true) {
+                if (item?.uLBName?.lowercase()
+                        ?.contains(text.lowercase(Locale.getDefault())) == true
+                ) {
                     filteredlist?.add(item)
                 }
             }
         }
 
         if (filteredlist?.isEmpty() == true) {
-        /*    CustomToast.showErrorToast(
-                this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
-            )*/
+            /*    CustomToast.showErrorToast(
+                    this@AddCityActivity, resources.getString(R.string.no_archived_data_error)
+                )*/
         } else {
             ulbAdapter.filterList(filteredlist)
         }
@@ -321,6 +332,12 @@ class AddCityActivity : AppCompatActivity() {
             LanguageConfig.changeLanguage(context, selectedLanguageId.toString())
         }
         super.attachBaseContext(newBase)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        // Only process single-touch events
+        if (ev.pointerCount > 1) return true
+        return super.dispatchTouchEvent(ev)
     }
 
 }

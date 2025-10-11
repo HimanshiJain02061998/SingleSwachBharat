@@ -121,7 +121,6 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
 
     private fun initSpinner() {
 
-        //month spinner
         val monthAdapter = ArrayAdapter(
             this,
             R.layout.drop_down_item,

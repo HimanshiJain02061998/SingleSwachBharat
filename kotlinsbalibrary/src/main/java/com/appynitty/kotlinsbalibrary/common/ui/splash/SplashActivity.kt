@@ -11,7 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
-import com.appynitty.kotlinsbalibrary.common.ui.addCity.AddCityActivity
+import com.appynitty.kotlinsbalibrary.common.ui.addUlb.AddUlbActivity
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
@@ -95,7 +95,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun navigateToSelectUlbScreen() {
-        val intent = Intent(this, AddCityActivity::class.java)
+        val intent = Intent(this, AddUlbActivity::class.java)
         startAnotherActivity(intent)
     }
 

@@ -42,16 +42,18 @@
         android:windowDisablePreview="true"
         tools:targetApi="31">
         <activity
-            android:name=".common.ui.select_ulb_module.SelectUlb"
-            android:windowSoftInputMode="adjustPan"
+            android:name=".common.ui.addUlb.selectCommon.SelectCommonActivity"
+            android:exported="false" />
+        <activity
+            android:name=".common.ui.addUlb.AddUlbActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
             tools:ignore="LockedOrientationActivity"
             android:exported="false" />
-
         <activity
             android:name=".common.ui.addCity.AddCityActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".common.ui.my_location.MyLocationActivity"
             android:configChanges="orientation"

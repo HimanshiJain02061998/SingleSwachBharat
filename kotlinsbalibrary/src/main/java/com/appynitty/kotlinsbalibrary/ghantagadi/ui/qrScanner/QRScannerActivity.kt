@@ -25,7 +25,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
-import com.appynitty.kotlinsbalibrary.common.ui.addCity.AddCityActivity
+import com.appynitty.kotlinsbalibrary.common.ui.addUlb.AddUlbActivity
 import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
 import com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel.UserDetailsViewModel
 import com.appynitty.kotlinsbalibrary.common.utils.AirplaneModeChangeReceiver
@@ -223,7 +223,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
     private fun navigateToLoginScreen() {
         userDetailsViewModel.deleteAllUserDataFromRoom()
-        val intent = Intent(this@QRScannerActivity, AddCityActivity::class.java).apply {
+        val intent = Intent(this@QRScannerActivity, AddUlbActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)

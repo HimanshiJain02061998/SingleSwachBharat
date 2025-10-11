@@ -1,4 +1,4 @@
-package com.appynitty.kotlinsbalibrary.common.ui.addCity.viewModel
+package com.appynitty.kotlinsbalibrary.common.ui.addUlb.selectCommon.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -21,28 +21,28 @@ import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class AddCityViewModel @Inject constructor(
+class SelectCommonViewmodel @Inject constructor(
     private val getUlbDetailsRepository: GetUlbDetailsRepository,
     private val userDataStore: UserDataStore
 ) : ViewModel() {
 
-    private val addCityEventChannel = Channel<AddCityEvent>()
-    val addCityEventsFlow = addCityEventChannel.receiveAsFlow()
+    private val selectCommonEventChannel = Channel<SelectCommonEvent>()
+    val selectCommonEventsFlow = selectCommonEventChannel.receiveAsFlow()
 
     fun getDistrictList(
     ) = viewModelScope.launch {
 
-        addCityEventChannel.send(AddCityEvent.ShowProgressBar)
+        selectCommonEventChannel.send(SelectCommonEvent.ShowProgressBar)
         try {
 
             val response = getUlbDetailsRepository.getDistrictList()
             getDistrictListResponse(response)
 
         } catch (t: Throwable) {
-            addCityEventChannel.send(AddCityEvent.HideProgressBar)
+            selectCommonEventChannel.send(SelectCommonEvent.HideProgressBar)
             when (t) {
-                is IOException -> addCityEventChannel.send(AddCityEvent.ShowFailureMessage("Connection Timeout"))
-                else -> addCityEventChannel.send(AddCityEvent.ShowFailureMessage("Conversion Error"))
+                is IOException -> selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessage("Connection Timeout"))
+                else -> selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessage("Conversion Error"))
             }
 
         }
@@ -53,7 +53,7 @@ class AddCityViewModel @Inject constructor(
         response: Response<GetDistrictListResponse>,
     ) =
         viewModelScope.launch {
-            addCityEventChannel.send(AddCityEvent.HideProgressBar)
+            selectCommonEventChannel.send(SelectCommonEvent.HideProgressBar)
             if (response.isSuccessful) {
 
                 if (response.body() != null) {
@@ -61,8 +61,8 @@ class AddCityViewModel @Inject constructor(
 
                     if (it?.status == CommonUtils.GIS_STATUS_SUCCESS) {
 
-                        addCityEventChannel.send(
-                            AddCityEvent.DistrictListResponse(
+                        selectCommonEventChannel.send(
+                            SelectCommonEvent.DistrictListResponse(
                                 it.districtList
                             )
                         )
@@ -70,8 +70,8 @@ class AddCityViewModel @Inject constructor(
 
 
                     } else if (it?.status == CommonUtils.STATUS_ERROR) {
-                        addCityEventChannel.send(
-                            AddCityEvent.ShowResponseErrorMessage(
+                        selectCommonEventChannel.send(
+                            SelectCommonEvent.ShowResponseErrorMessage(
                                 it.message,
                                 it.messageMar
                             )
@@ -85,17 +85,17 @@ class AddCityViewModel @Inject constructor(
         disId: Int
     ) = viewModelScope.launch {
 
-        addCityEventChannel.send(AddCityEvent.ShowProgressBar)
+        selectCommonEventChannel.send(SelectCommonEvent.ShowProgressBar)
         try {
 
             val response = getUlbDetailsRepository.getUlbList(disId)
             getUlbListResponse(response)
 
         } catch (t: Throwable) {
-            addCityEventChannel.send(AddCityEvent.HideProgressBar)
+            selectCommonEventChannel.send(SelectCommonEvent.HideProgressBar)
             when (t) {
-                is IOException -> addCityEventChannel.send(AddCityEvent.ShowFailureMessage("Connection Timeout"))
-                else -> addCityEventChannel.send(AddCityEvent.ShowFailureMessage("Conversion Error"))
+                is IOException -> selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessage("Connection Timeout"))
+                else -> selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessage("Conversion Error"))
             }
 
         }
@@ -106,7 +106,7 @@ class AddCityViewModel @Inject constructor(
         response: Response<GetUlbListResponse>,
     ) =
         viewModelScope.launch {
-            addCityEventChannel.send(AddCityEvent.HideProgressBar)
+            selectCommonEventChannel.send(SelectCommonEvent.HideProgressBar)
             if (response.isSuccessful) {
 
                 if (response.body() != null) {
@@ -114,15 +114,15 @@ class AddCityViewModel @Inject constructor(
 
                     if (it?.status == CommonUtils.GIS_STATUS_SUCCESS) {
 
-                        addCityEventChannel.send(
-                            AddCityEvent.UlbListResponse(
+                        selectCommonEventChannel.send(
+                            SelectCommonEvent.UlbListResponse(
                                 it.uLBList
                             )
                         )
 
                     } else if (it?.status == CommonUtils.STATUS_ERROR) {
-                        addCityEventChannel.send(
-                            AddCityEvent.ShowResponseErrorMessage(
+                        selectCommonEventChannel.send(
+                            SelectCommonEvent.ShowResponseErrorMessage(
                                 it.message,
                                 it.messageMar
                             )
@@ -133,22 +133,22 @@ class AddCityViewModel @Inject constructor(
         }
 
     fun validateUlb(dist: String,ulb: String): Boolean {
-            return when {
-                dist.isEmpty() || dist == "" -> {
-                    viewModelScope.launch {
-                        addCityEventChannel.send(AddCityEvent.ShowFailureMessageRes(R.string.please_select_a_district_first))
-                    }
-                    false
+        return when {
+            dist.isEmpty() || dist == "" -> {
+                viewModelScope.launch {
+                    selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessageRes(R.string.please_select_a_district_first))
                 }
-                ulb.isEmpty() || ulb == "" -> {
-                    viewModelScope.launch {
-                        addCityEventChannel.send(AddCityEvent.ShowFailureMessageRes(R.string.please_select_a_ulb_before_continuing))
-                    }
-                    false
-                }
-                else -> true
+                false
             }
+            ulb.isEmpty() || ulb == "" -> {
+                viewModelScope.launch {
+                    selectCommonEventChannel.send(SelectCommonEvent.ShowFailureMessageRes(R.string.please_select_a_ulb_before_continuing))
+                }
+                false
+            }
+            else -> true
         }
+    }
 
     fun selectUlb(selectedAppId: String?,ulbName: String?){
         viewModelScope.launch {
@@ -159,26 +159,24 @@ class AddCityViewModel @Inject constructor(
                 ulbName?.let { ulb -> MyApplication.ULB_NAME = ulb  }
             }
 
-            addCityEventChannel.send(AddCityEvent.ShowSuccessMessage(R.string.ulb_selected_successfully))
-            addCityEventChannel.send(
-                AddCityEvent.NavigateToLogin
+            selectCommonEventChannel.send(SelectCommonEvent.ShowSuccessMessage(R.string.ulb_selected_successfully))
+            selectCommonEventChannel.send(
+                SelectCommonEvent.NavigateToLogin
             )
         }
     }
 
-    sealed class AddCityEvent {
-        object ShowProgressBar : AddCityEvent()
-        object HideProgressBar : AddCityEvent()
-        object NavigateToLogin : AddCityEvent()
-        data class ShowFailureMessage(val msg: String) : AddCityEvent()
-        data class ShowFailureMessageRes(val resourceId: Int) : AddCityEvent()
-        data class UlbListResponse(val uLbList: List<ULBListItem?>?) : AddCityEvent()
-        data class DistrictListResponse(val districtList: List<DistrictListItem?>?) : AddCityEvent()
-        data class ShowResponseSuccessMessage(val msg: String?, val msgMr: String?) : AddCityEvent()
-        data class ShowResponseErrorMessage(val msg: String?, val msgMr: String?) : AddCityEvent()
-        data class ShowSuccessMessage(val resourceId: Int) : AddCityEvent()
+    sealed class SelectCommonEvent {
+        object ShowProgressBar : SelectCommonEvent()
+        object HideProgressBar : SelectCommonEvent()
+        object NavigateToLogin : SelectCommonEvent()
+        data class ShowFailureMessage(val msg: String) : SelectCommonEvent()
+        data class ShowFailureMessageRes(val resourceId: Int) : SelectCommonEvent()
+        data class UlbListResponse(val uLbList: List<ULBListItem?>?) : SelectCommonEvent()
+        data class DistrictListResponse(val districtList: List<DistrictListItem?>?) : SelectCommonEvent()
+        data class ShowResponseSuccessMessage(val msg: String?, val msgMr: String?) : SelectCommonEvent()
+        data class ShowResponseErrorMessage(val msg: String?, val msgMr: String?) : SelectCommonEvent()
+        data class ShowSuccessMessage(val resourceId: Int) : SelectCommonEvent()
     }
 
 }
-
-
