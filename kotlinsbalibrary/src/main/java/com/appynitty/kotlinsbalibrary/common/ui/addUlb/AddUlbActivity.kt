@@ -3,7 +3,10 @@ package com.appynitty.kotlinsbalibrary.common.ui.addUlb
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -20,13 +23,16 @@ import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
+import com.appynitty.kotlinsbalibrary.common.utils.dialogs.LanguageBottomSheetFrag
 import com.appynitty.kotlinsbalibrary.databinding.ActivityAddUlbBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.getValue
 
 @AndroidEntryPoint
-class AddUlbActivity : AppCompatActivity() {
+class AddUlbActivity : AppCompatActivity(),LanguageBottomSheetFrag.LanguageDialogCallbacks {
     private val viewModel: AddUlbViewModel by viewModels()
     private lateinit var binding: ActivityAddUlbBinding
     private var isInternetOn = false
@@ -37,6 +43,7 @@ class AddUlbActivity : AppCompatActivity() {
     var ulbName = ""
     var distName = ""
     var distId = -1
+    private lateinit var languageBottomSheet: LanguageBottomSheetFrag
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +55,7 @@ class AddUlbActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        languageBottomSheet = LanguageBottomSheetFrag()
         binding.rlUlb.isEnabled = false
         subscribeLiveData()
         setOnClickListner()
@@ -97,6 +105,16 @@ class AddUlbActivity : AppCompatActivity() {
                 )
             ) {
                 viewModel.selectUlb(ulbId.toString(), ulbName)
+            }
+        }
+        binding.btnChangeLang.setOnClickListener {
+
+            if (!languageBottomSheet.isAdded) {
+
+                languageBottomSheet.setListener(this)
+                languageBottomSheet.show(supportFragmentManager, LanguageBottomSheetFrag.TAG)
+                if (selectedLanguage != null)
+                    languageBottomSheet.setPreferredLang(selectedLanguage!!)
             }
         }
     }
@@ -155,6 +173,24 @@ class AddUlbActivity : AppCompatActivity() {
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.pointerCount > 1) return true
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onSubmitLanguageDialog(appLanguage: AppLanguage) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            languageDataStore.savePreferredLanguage(appLanguage)
+        }
+        binding.loginProgressBar.visibility = View.VISIBLE
+
+        val intent = intent
+        startActivity(intent)
+        overridePendingTransition(0, 0)
+        finish()
+        overridePendingTransition(0, 0)
+
+        Handler(Looper.myLooper()!!).postDelayed({
+            binding.loginProgressBar.visibility = View.GONE
+        }, 300)
+        languageBottomSheet.dismiss()
     }
 
 }

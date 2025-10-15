@@ -47,19 +47,6 @@
         android:textStyle="bold"
         android:textSize="18sp" />
 
-    <!-- Subtitle -->
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/please_select_your_ulb_to_help"
-        android:textColor="#7A7A7A"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:lineSpacingExtra="2dp"
-        android:textSize="12sp" />
-
 
         <RelativeLayout
             android:id="@+id/rlDist"

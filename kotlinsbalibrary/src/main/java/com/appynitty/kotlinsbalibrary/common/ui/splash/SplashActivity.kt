@@ -1,6 +1,7 @@
 package com.appynitty.kotlinsbalibrary.common.ui.splash
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -114,19 +115,40 @@ class SplashActivity : AppCompatActivity() {
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
 
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-            ) {
-                val appUpdateOptions = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
-                    .setAllowAssetPackDeletion(true)
-                    .build()
+            when {
+                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                        appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
 
-                appUpdateManager.startUpdateFlowForResult(
-                    appUpdateInfo,
-                    this, // Activity
-                    appUpdateOptions,
-                    UPDATE_REQUEST_CODE
-                )
+                    val options = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
+                        .setAllowAssetPackDeletion(true)
+                        .build()
+
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        this,
+                        options,
+                        UPDATE_REQUEST_CODE
+                    )
+                }
+
+                appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        this,
+                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                        UPDATE_REQUEST_CODE
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == UPDATE_REQUEST_CODE) {
+            if (resultCode != Activity.RESULT_OK) {
+                finishAffinity()
             }
         }
     }
@@ -134,19 +156,6 @@ class SplashActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Resume update if already in progress
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                val appUpdateOptions = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
-                    .setAllowAssetPackDeletion(true)
-                    .build()
-
-                appUpdateManager.startUpdateFlowForResult(
-                    appUpdateInfo,
-                    this,
-                    appUpdateOptions,
-                    UPDATE_REQUEST_CODE
-                )
-            }
-        }
+        checkForImmediateUpdate()
     }
 }

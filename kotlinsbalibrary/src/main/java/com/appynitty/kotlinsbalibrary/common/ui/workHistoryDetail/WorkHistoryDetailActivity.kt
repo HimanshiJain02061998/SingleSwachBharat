@@ -150,7 +150,6 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
         if (userType == 0) {
             viewModel.workHistoryDetailsResponseLiveData.observe(this) {
-
                 when (it) {
                     is ApiResponseListener.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
@@ -163,19 +162,16 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
                     is ApiResponseListener.Success -> {
                         if (it.data != null) {
                             if (it.data.isNotEmpty()) {
-
                                 binding.recyclerView.layoutAnimation = controller
                                 adapter.submitList(it.data)
                                 binding.progressBar.visibility = View.GONE
                                 binding.lineView.visibility = View.VISIBLE
-
                             }
                         }
                     }
                 }
             }
         } else if (userType == 1) {
-
             viewModel.empWorkHistoryDetailsResponseLiveData.observe(this) {
 
                 when (it) {
@@ -232,7 +228,6 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
             }
         }
-
     }
 
     private fun getHistoryDetailsData() {
