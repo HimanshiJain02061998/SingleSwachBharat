@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Type"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:gravity="center"
+        android:paddingBottom="12dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:gravity="start">
+
+        <RadioButton
+            android:id="@+id/radioSingle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Single" />
+
+        <RadioButton
+            android:id="@+id/radioTeam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Team" />
+    </RadioGroup>
+
+</LinearLayout>

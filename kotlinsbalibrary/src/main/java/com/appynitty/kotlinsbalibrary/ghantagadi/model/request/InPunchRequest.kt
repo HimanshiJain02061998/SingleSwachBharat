@@ -1,5 +1,6 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.model.request
 
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.google.gson.annotations.SerializedName
 
 data class InPunchRequest(
@@ -15,7 +16,7 @@ data class InPunchRequest(
     var vehicleNumber: String?,
     @SerializedName("EmpType")
     val empType: String?,
-    var ReferanceId: String? = null
+    var ReferanceId: String? = null,
+    @SerializedName("memberUserIds")
+    val memberUserIds: List<Int>? = null // ✅ Only list of Ints
 )
-
-

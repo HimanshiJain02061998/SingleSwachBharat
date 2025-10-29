@@ -198,6 +198,21 @@
                         app:layout_constraintStart_toStartOf="@+id/user_attendance_status"
                         app:layout_constraintTop_toBottomOf="@+id/user_attendance_status" />
 
+                    <TextView
+                        android:id="@+id/view_team_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="128dp"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:paddingVertical="@dimen/_4sdp"
+                        android:text="View Team...."
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/user_vehicle_type"
+                        app:layout_constraintTop_toBottomOf="@+id/user_vehicle_type" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -2,7 +2,9 @@ package com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.ActivityManager
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +23,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -70,6 +74,7 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.DumpYardIds
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -90,6 +95,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.EmployeeViewModel
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.SelectMembers
 
 
 /**
@@ -97,6 +104,7 @@ import javax.inject.Inject
  */
 private const val TAG = "DashboardActivity"
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedInterface,
     PopUpDialogFragment.PopUpDialogFragmentClickListeners,
@@ -105,7 +113,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     private val viewModel: DashboardViewModel by viewModels()
     private val userDetailsViewModel: UserDetailsViewModel by viewModels()
-
+    private val employeeViewModel: EmployeeViewModel by viewModels()
     //garbage viewModel has an application scope as it is used for syncing functionality
     //it is required in two activities dashboard and sync offline
     @Inject
@@ -154,6 +162,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private lateinit var alertMessageDialogFrag: AlertMessageDialogFrag
     private var isDutyOnToggleClicked = false
 
+    private lateinit var selectedEmployeeSpinner: Spinner
+    private var selectedTeamMembers: ArrayList<AvailableEmpItem>? = null
+
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra("message")
@@ -181,9 +192,29 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             }else{
                 enableDutyToggle()
             }
-
-
         }
+    private val selectMembersLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+
+                selectedTeamMembers =
+                    result.data?.getParcelableArrayListExtra("SELECTED_MEMBERS")
+
+                Log.d("SelectMembersLauncher", "Selected team members: $selectedTeamMembers")
+
+                viewModel.setTeamSelected(true)
+
+                binding.viewTeamButton.visibility = View.VISIBLE
+                binding.viewTeamButton.setOnClickListener {
+                    showSelectedTeamDialog()
+                }
+
+            } else {
+                enableDutyToggle()
+
+            }
+        }
+
 
     private fun useTheResult(liquidQr: String?) {
 
@@ -469,7 +500,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     DashboardViewModel.DashboardEvent.NavigateToMyLocationScreen -> {
                         val mapsIntent =
                             Intent(this@DashboardActivity, MyLocationActivity::class.java)
-                        if (latitude != null && latitude?.isNotEmpty() == true){
+                        if (latitude != null && latitude?.isNotEmpty() == true) {
                             mapsIntent.putExtra("latitude", latitude?.toDouble())
                             mapsIntent.putExtra("longitude", longitude?.toDouble())
 
@@ -484,11 +515,20 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                         getUserDetailsUpdateFromApi()
 
                     }
+
+                    DashboardViewModel.DashboardEvent.ShowLiquidEmployeeDialog -> {
+                        showSelectTypeDialog()
+                    }
+
+                    is DashboardViewModel.DashboardEvent.TeamON -> {
+                        viewModel.setTeamSelected(true)
+
+                        //          binding.viewTeamButton.visibility = if (event.status) View.VISIBLE else View.GONE
+                    }
                 }
 
             }
         }
-
         lifecycleScope.launchWhenStarted {
             garbageCollectionViewModel.garbageCollectionEventsFlow.collect { event ->
                 when (event) {
@@ -502,6 +542,94 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 }
             }
         }
+    }
+
+    private fun showSelectTypeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_type, null)
+        val radioGroup = dialogView.findViewById<RadioGroup>(R.id.radioGroupType)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .setPositiveButton("OK", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val selectedId = radioGroup.checkedRadioButtonId
+            if (selectedId == -1) {
+                Toast.makeText(this, "Please select an option", Toast.LENGTH_SHORT)
+                    .show()
+                return@setOnClickListener
+            }
+
+            when (selectedId) {
+                R.id.radioSingle -> {
+                    val inPunchRequest = userId?.let {
+                        empType?.let { employeeType ->
+                            InPunchRequest(
+                                DateTimeUtils.getServerTime(),
+                                DateTimeUtils.getYyyyMMddDate(),
+                                latitude!!,
+                                longitude!!,
+                                it,
+                                "1",
+                                "1",
+                                employeeType,
+
+                                )
+                        }
+                    }
+                    inPunchRequest?.let { it1 ->
+                        viewModel.saveInPunchLiquid(
+                            userId = userId,
+                            batteryStatus = CommonUtils.getBatteryStatus(application),
+                            memberUserIds = emptyList(),
+                            latitude = latitude?.toDoubleOrNull(),
+                            longitude = longitude?.toDoubleOrNull(),
+                            it1,
+                            null
+                        )
+                    }
+                    Toast.makeText(
+                        this,
+                        "Duty started (Single Mode)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                R.id.radioTeam -> {
+                    val mapsIntent =
+                        Intent(this@DashboardActivity, SelectMembers::class.java)
+                    mapsIntent.putExtra("USER_ID", userId)
+                    mapsIntent.putExtra("latitude", latitude?.toDouble() ?: 0.0)
+                    mapsIntent.putExtra("longitude", longitude?.toDouble() ?: 0.0)
+                    selectMembersLauncher.launch(mapsIntent)
+                }
+            }
+
+            dialog.dismiss()
+        }
+    }
+
+    private fun showSelectedTeamDialog() {
+        if (selectedTeamMembers.isNullOrEmpty()) {
+            Toast.makeText(this, "No team members selected", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val memberNames = selectedTeamMembers!!.joinToString("\n") { member ->
+            "- ${member.EmployeeName ?: "Unknown"}"
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Selected Team Members")
+            .setMessage(memberNames)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun startLocationTracking() {
@@ -646,7 +774,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         list.let {
             val mList = ArrayList<String>()
-            list.forEach{
+            list.forEach {
                 mList.add(it.dyId)
             }
             dialog.setDumpYardIds(mList)
@@ -707,22 +835,24 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             isGpsOn = it
         })
 
-        garbageCollectionViewModel.garbageCollectionResponseLiveData.observe(this, Observer {
-            when (it) {
-                is ApiResponseListener.Loading -> {}
-                is ApiResponseListener.Success -> {
-                    CustomToast.showSuccessToast(this, "Batch Synced Successfully")
-                }
+        garbageCollectionViewModel.garbageCollectionResponseLiveData.observe(
+            this,
+            Observer {
+                when (it) {
+                    is ApiResponseListener.Loading -> {}
+                    is ApiResponseListener.Success -> {
+                        CustomToast.showSuccessToast(this, "Batch Synced Successfully")
+                    }
 
-                is ApiResponseListener.Failure -> {
-                    CustomToast.showErrorToast(this, it.message.toString())
-                }
+                    is ApiResponseListener.Failure -> {
+                        CustomToast.showErrorToast(this, it.message.toString())
+                    }
 
-                null -> {
-                    //take care
+                    null -> {
+                        //take care
+                    }
                 }
-            }
-        })
+            })
 
         viewModel.userVehicleDetailsFlow.observe(this, Observer {
 
@@ -730,7 +860,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             userVehicleDetailsDataStore = it
 
 
-            if (it.vehicleTypeName != ""){
+            if (it.vehicleTypeName != "") {
                 binding.userVehicleType.text = buildString {
                     append("(")
                     append(it.vehicleTypeName)
@@ -738,7 +868,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     append(vehicleNumber)
                     append(")")
                 }
-            }else {
+            } else {
                 if (empType == "D") {
                     binding.userVehicleType.text = buildString {
                         append("(")
@@ -750,7 +880,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 }
             }
 
-            Log.i("VEHICLE_TYPE_CHECK", "subscribeLiveData: ${binding.userVehicleType.text}")
+            Log.i(
+                "VEHICLE_TYPE_CHECK",
+                "subscribeLiveData: ${binding.userVehicleType.text}"
+            )
 
         })
 
@@ -765,7 +898,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                         R.color.colorONDutyGreen, null
                     )
                 )
-                binding.userAttendanceStatus.text = resources.getString(R.string.status_on_duty)
+                binding.userAttendanceStatus.text =
+                    resources.getString(R.string.status_on_duty)
                 binding.userVehicleType.visibility = View.VISIBLE
             } else {
                 binding.userAttendanceStatus.setTextColor(
@@ -832,6 +966,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         return powerManager.isIgnoringBatteryOptimizations(name)
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun initVars() {
         /*   startNetworkSpeedMonitor { speed ->
                binding.internetSpeed.text = "Internet Speed: $speed"
@@ -845,7 +980,12 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         languageBottomSheet = LanguageBottomSheetFrag()
 
         val garbageCollectionViewModelFactory = GarbageCollectionViewModelFactory(
-            application, garbageCollectionRepo, garbageCollectionDao, archivedDao,tripRepository, sessionDataStore
+            application,
+            garbageCollectionRepo,
+            garbageCollectionDao,
+            archivedDao,
+            tripRepository,
+            sessionDataStore
         )
 
         garbageCollectionViewModel = ViewModelProvider(
@@ -873,7 +1013,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 Context.RECEIVER_NOT_EXPORTED // or RECEIVER_EXPORTED based on your use case
             )
         } else {
-            registerReceiver(serviceReceiver, IntentFilter("com.appynitty.LOGOUT_EVENT"))
+            registerReceiver(
+                serviceReceiver,
+                IntentFilter("com.appynitty.LOGOUT_EVENT")
+            )
         }
     }
 
@@ -931,6 +1074,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     CommonUtils.getBatteryStatus(application),
                     outPunchRequest
                 )
+                binding.viewTeamButton.visibility = View.GONE
             }
         }
     }
@@ -945,7 +1089,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             lifecycleScope.launch {
 
                 if (viewModel.checkSameUserLogin()) {
-                    Log.d("tempId","Temp id is ${viewModel.checkSameUserLogin()}")
+                    Log.d("tempId", "Temp id is ${viewModel.checkSameUserLogin()}")
 
                     val gcCount = garbageCollectionViewModel.getGcCount()
                     if (gcCount > 0) {
@@ -1003,7 +1147,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         val fullName = userData.userName
         val maxLength = 20
 
-        if (fullName?.length?:0 > maxLength) {
+        if (fullName?.length ?: 0 > maxLength) {
             binding.userFullName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
 
         } else {
@@ -1019,19 +1163,23 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         when (userData.employeeType) {
             "N" -> {
-                binding.userEmployeeTypeTv.text = resources.getString(R.string.waste_employee)
+                binding.userEmployeeTypeTv.text =
+                    resources.getString(R.string.waste_employee)
             }
 
             "S" -> {
-                binding.userEmployeeTypeTv.text = resources.getString(R.string.street_employee)
+                binding.userEmployeeTypeTv.text =
+                    resources.getString(R.string.street_employee)
             }
 
             "L" -> {
-                binding.userEmployeeTypeTv.text = resources.getString(R.string.liquid_employee)
+                binding.userEmployeeTypeTv.text =
+                    resources.getString(R.string.liquid_employee)
             }
 
             "D" -> {
-                binding.userEmployeeTypeTv.text = resources.getString(R.string.dump_yard_supervisor)
+                binding.userEmployeeTypeTv.text =
+                    resources.getString(R.string.dump_yard_supervisor)
             }
         }
 
@@ -1074,10 +1222,16 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     }
 
-    private fun showAlertDialog(titleResId: Int, messageResId: Int, dialogType: String) {
+    private fun showAlertDialog(
+        titleResId: Int,
+        messageResId: Int,
+        dialogType: String
+    ) {
 
         alertMessageDialogFrag.setTitleAndMsg(
-            resources.getString(titleResId), resources.getString(messageResId), dialogType
+            resources.getString(titleResId),
+            resources.getString(messageResId),
+            dialogType
         )
 
         if (!alertMessageDialogFrag.isAdded)
@@ -1103,8 +1257,13 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         if (!languageBottomSheet.isAdded) {
             languageBottomSheet.setListener(this)
-            languageBottomSheet.show(supportFragmentManager, LanguageBottomSheetFrag.TAG)
-            if (selectedLanguage != null) languageBottomSheet.setPreferredLang(selectedLanguage!!)
+            languageBottomSheet.show(
+                supportFragmentManager,
+                LanguageBottomSheetFrag.TAG
+            )
+            if (selectedLanguage != null) languageBottomSheet.setPreferredLang(
+                selectedLanguage!!
+            )
 
         }
     }
@@ -1270,7 +1429,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             val userData1 = userDataFlow.first()
             val employeeType1 = userData1?.employeeType
 
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 mList.add(
                     DashboardMenu(
                         resources.getString(R.string.title_activity_qrcode_scanner),
@@ -1288,7 +1447,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
                 mList.add(
                     DashboardMenu(
-                        resources.getString(R.string.title_activity_history_page), R.drawable.ic_history
+                        resources.getString(R.string.title_activity_history_page),
+                        R.drawable.ic_history
                     )
                 )
 
@@ -1361,7 +1521,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         vehicleId: String, vehicleTypeName: String, vehicleNumber: String
     ) {
 
-        userVehicleDetailsTemp = UserVehicleDetails(vehicleId, vehicleTypeName, vehicleNumber)
+        userVehicleDetailsTemp =
+            UserVehicleDetails(vehicleId, vehicleTypeName, vehicleNumber)
 
         if (latitude == null && longitude == null) {
             CustomToast.showWarningToast(this, "Couldn't find location")
@@ -1392,7 +1553,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         }
     }
 
-    override fun onVehicleDialogItemClicked(vehicleId: String, vehicleTypeName: String) {
+    override fun onVehicleDialogItemClicked(
+        vehicleId: String,
+        vehicleTypeName: String
+    ) {
         Log.i("VEHICLE_CHECK", "onDialogItemClicked: $vehicleTypeName")
         viewModel.getVehicleNumberList(
             CommonUtils.APP_ID, CommonUtils.CONTENT_TYPE, vehicleId
@@ -1426,7 +1590,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         }
         if (inPunchRequest != null) {
 
-            val userVehicleDetails = UserVehicleDetails("1","",dumpYardId)
+            val userVehicleDetails = UserVehicleDetails("1", "", dumpYardId)
             viewModel.saveInPunchDetails(
                 CommonUtils.APP_ID,
                 CommonUtils.CONTENT_TYPE,
@@ -1499,7 +1663,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
                     viewModel.saveUserLocation(
                         UserLatLong(
-                            location.latitude.toString(), location.longitude.toString(), ""
+                            location.latitude.toString(),
+                            location.longitude.toString(),
+                            ""
                         )
                     )
             }
@@ -1667,14 +1833,16 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 )
             }
         } else {
-            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (isAllFabVisible) {
-                        shrinkFab()
-                        enableClickOnOtherViews()
-                    } else BackBtnPressedUtil.exitOnBackPressed(this@DashboardActivity)
-                }
-            })
+            onBackPressedDispatcher.addCallback(
+                this,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (isAllFabVisible) {
+                            shrinkFab()
+                            enableClickOnOtherViews()
+                        } else BackBtnPressedUtil.exitOnBackPressed(this@DashboardActivity)
+                    }
+                })
         }
     }
 
@@ -1697,7 +1865,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 val currentRxBytes = TrafficStats.getTotalRxBytes()
                 val currentTxBytes = TrafficStats.getTotalTxBytes()
 
-                val downloadSpeed = (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
+                val downloadSpeed =
+                    (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
                 val uploadSpeed = (currentTxBytes - previousTxBytes) * 8 / 1024 // Kbps
 
                 previousRxBytes = currentRxBytes

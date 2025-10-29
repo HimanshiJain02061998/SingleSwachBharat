@@ -9,6 +9,7 @@ import com.appynitty.kotlinsbalibrary.common.database.SbaDatabase
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.DutyApi
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.EmployeeApiService
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.ScanQrApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.WorkHistoryApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.network.DumpYardTripApi
@@ -276,6 +277,10 @@ object AppModule {
         return retrofit.create(MasterPlateApi::class.java)
     }
 
+    @Provides
+    fun provideEmployeeApiService(@Named("Authorize") retrofit: Retrofit): EmployeeApiService {
+        return retrofit.create(EmployeeApiService::class.java)
+    }
 
     @Provides
     fun provideGetUlbDetailsApi(@Named("Authorize") retrofit: Retrofit): GetUlbDetails {

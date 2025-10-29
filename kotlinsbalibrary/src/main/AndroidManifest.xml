@@ -55,6 +55,9 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ghantagadi.ui.dashboard.addMemberModule.SelectMembers"
+            android:exported="false" />
+        <activity
             android:name=".common.ui.my_location.MyLocationActivity"
             android:configChanges="orientation"
             android:exported="false"

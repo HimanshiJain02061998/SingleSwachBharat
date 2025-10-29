@@ -45,8 +45,18 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val DIS_ID_KEY = intPreferencesKey(name = "dis_id_key")
         private val APP_ID = stringPreferencesKey(name = "app_id")
         private val ULB_NAME = stringPreferencesKey(name = "ulb_name")
-
+        private val SELECTED_TEAM = booleanPreferencesKey(name = "selected_team")
     }
+    suspend fun saveVewTeam(isBifurcationOn: Boolean) {
+        userDataStore.edit { preferences ->
+            preferences[SELECTED_TEAM] = isBifurcationOn
+        }
+    }
+
+    val getVewTeam: Flow<Boolean> = userDataStore.data
+        .map {
+            it[SELECTED_TEAM] ?: false
+        }
     suspend fun saveAppId(appId: String) {
         clearAppId()
         userDataStore.edit { preferences ->
