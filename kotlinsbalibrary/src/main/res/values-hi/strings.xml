@@ -197,5 +197,7 @@
     <string name="please_select_a_district_first">कृपया पहले एक जिला चुनें</string>
     <string name="please_select_a_ulb_before_continuing">कृपया आगे बढ़ने से पहले एक ULB चुनें</string>
     <string name="ulb_selected_successfully">यूएलबी सफलतापूर्वक चयनित</string>
+    <string name="street_sweeping_completed">सड़क सफाई पूरी हुई</string>
+    <string name="liquid_cleaning_completed">तरल सफाई पूरी हुई</string>
 
 </resources>

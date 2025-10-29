@@ -692,8 +692,19 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         //set data to views
         houseOwnerName.text = referenceId
 
-        if (viewModel.submitDialogTitleText == "Dump yard Id" || viewModel.submitDialogTitleText == "Vehicle Id") collectionStatus.text =
+        if (viewModel.submitDialogTitleText == "Dump yard Id"
+            || viewModel.submitDialogTitleText == "Vehicle Id"
+        ) collectionStatus.text =
             resources.getString(R.string.collectionStatus)
+
+        if(empType == "S")
+            collectionStatus.text =
+                (getString(R.string.street_sweeping_completed))
+
+        else if(empType == "L")
+            collectionStatus.text =
+                (getString(R.string.liquid_cleaning_completed))
+
 
         houseTitle.text = viewModel.submitDialogTitleText
 

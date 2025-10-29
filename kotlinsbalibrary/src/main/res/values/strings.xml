@@ -240,5 +240,7 @@
     <string name="please_select_a_district_first">Please select a District first</string>
     <string name="please_select_a_ulb_before_continuing">Please select a ULB before continuing</string>
     <string name="ulb_selected_successfully">ULB selected successfully</string>
+    <string name="street_sweeping_completed">Street Sweeping Completed</string>
+    <string name="liquid_cleaning_completed">Liquid Cleaning Completed</string>
 
 </resources>
