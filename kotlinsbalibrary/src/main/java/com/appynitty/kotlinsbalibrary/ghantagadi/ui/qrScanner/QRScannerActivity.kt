@@ -97,7 +97,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         if (isDialogVisible) {
             outState.putBoolean("SHOULD_FINISH_THE_ACTIVITY", true)
         }
@@ -135,7 +134,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun subscribeChannelEvents() {
-
         lifecycleScope.launchWhenStarted {
             viewModel.qrScannerEventsFlow.collect { event ->
 
@@ -286,7 +284,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun showGarbageTypeDialog() {
-
         val garbageTypePopUp = GarbageTypeDialogFragment()
         garbageTypePopUp.setListener(this)
         garbageTypePopUp.show(supportFragmentManager, GarbageTypeDialogFragment.TAG)
@@ -306,7 +303,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun initVars() {
-
         empType = intent.getStringExtra("empType")
         isAttendanceRequest = intent.getBooleanExtra("isAttendanceRequest",false)
         comment = intent.getStringExtra("comment")
@@ -325,7 +321,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
         receiver = AirplaneModeChangeReceiver()
         viewModel.getDeviceId(this)
-
     }
 
 
@@ -334,7 +329,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun setUpFlashFab() {
-
         binding.flashToggle.setOnClickListener {
 
             if (hasFlash()) {
@@ -428,9 +422,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         scannerView.setStatusText("")
     }
 
-
     private fun subscribeLiveData() {
-
         receiver.airplaneModeLiveData.observe(this) {
 
             if (!it) {
@@ -473,8 +465,8 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
                 "0"
             else
                 it.distance
-        }
 
+        }
     }
 
     private fun deleteImagesAfterUploaded() {
@@ -505,7 +497,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     private val resolutionForResult = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { activityResult ->
-
         if (activityResult.resultCode == RESULT_OK) {
             binding.scannerView.gpsProgressLayout.visibility = View.VISIBLE
 
@@ -626,7 +617,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         beepManager = BeepManager(this)
     }
 
-
     private val callback: BarcodeCallback = object : BarcodeCallback {
 
         override fun barcodeResult(result: BarcodeResult) {
@@ -669,7 +659,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
             empType?.let { viewModel.validateScannedQrCode(it, result.text) }
         }
     }
-
 
     override fun onSubmitGarbageTypeDialog(garbageType: String?, note: String?) {
 
@@ -723,17 +712,13 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         dryWeight: String?,
         totalWeight: String?,
     ) {
-
         /** trip blockchain */
-
         garbageType?.let { viewModel.insertTripHouse(it) }
-
         val batteryStatus = CommonUtils.getBatteryStatus(application).toString()
         val garbageCollectionData: GarbageCollectionData?
         val intBatteryStatus = batteryStatus.toInt()
 
         if (isInternetOn) {
-
             val beforeAfterImagesMap = CameraUtils.prepareBeforeAfterImages(
                 offlineFirstImagePath,
                 offlineSecondImagePath,

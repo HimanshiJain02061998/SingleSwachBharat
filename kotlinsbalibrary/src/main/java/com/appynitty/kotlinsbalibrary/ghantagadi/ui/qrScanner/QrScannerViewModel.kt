@@ -24,7 +24,6 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel.DashboardEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -73,9 +72,7 @@ class QrScannerViewModel @Inject constructor(
     private var deviceIdCon: String? = null
 
     fun validateScannedQrCode(empType: String, result: String) = viewModelScope.launch {
-
         if (result.length >= 5) {
-
             referenceId = result
 
             qrScannerEventChannel.send(QrScannerEvent.PauseScanner)
@@ -324,8 +321,6 @@ class QrScannerViewModel @Inject constructor(
             qrScannerEventChannel.send(QrScannerEvent.ShowSuccessToast(R.string.saved_offline))
             qrScannerEventChannel.send(
                 QrScannerEvent.FinishActivity
-
-
             )
         }
 

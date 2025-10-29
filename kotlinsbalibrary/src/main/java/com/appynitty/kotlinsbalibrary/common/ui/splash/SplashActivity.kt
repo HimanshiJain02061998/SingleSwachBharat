@@ -13,7 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.addUlb.AddUlbActivity
+import com.appynitty.kotlinsbalibrary.common.ui.inAppUpdate.UpdateDialogFragment
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
@@ -53,6 +55,14 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        versionCode = (CommonUtils.VERSION_CODE).toInt()
+        val versionName = "$versionCode.0"
+
+        versionCodeTv = findViewById(R.id.versionCodeTv)
+        versionCodeTv.text = buildString {
+            append("Version : ")
+            append(versionName)
+        }
         checkForImmediateUpdate()
         viewModel.checkWhereToNavigate()
         // listening to events sent by viewModel

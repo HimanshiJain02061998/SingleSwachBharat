@@ -130,7 +130,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
 
     private fun initVars() {
-
         empType = intent.getStringExtra("empType").toString()
         userTypeId = intent.getStringExtra("userTypeId").toString()
         languageId = intent.getStringExtra("languageId")
@@ -138,7 +137,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         garbageCollectionAdapter = GarbageCollectionAdapter()
         garbageCollectionAdapter.empType = empType
         garbageCollectionAdapter.setHistoryCardClickListener(this)
-
 
         val garbageCollectionViewModelFactory = GarbageCollectionViewModelFactory(
             application,
@@ -158,7 +156,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerView.adapter = garbageCollectionAdapter
         binding.recyclerView.itemAnimator = null
-
 
         // ALERT DIALOG CREATION TO SHOW SYNCING STATUS
         val builder = AlertDialog.Builder(this)
@@ -224,9 +221,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                     CommonUtils.getBatteryStatus(application),
                     CommonUtils.CONTENT_TYPE,
                 )
-
             }
-
         }
     }
 
@@ -239,14 +234,11 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         remainingCountTv?.text = stringBuffer
 
         if (!alertDialog!!.isShowing) alertDialog?.show()
-
         binding.syncOfflineBtn.visibility = View.GONE
     }
 
     private fun subscribeLiveData() {
-
         garbageCollectionViewModel.isSyncingOnLiveData.observe(this) {
-
             isSyncingOn = it
 
             if (it) {
