@@ -206,7 +206,7 @@
                         android:layout_marginTop="@dimen/_3sdp"
                         android:paddingHorizontal="@dimen/_8sdp"
                         android:paddingVertical="@dimen/_4sdp"
-                        android:text="View Team...."
+                        android:text="@string/view_team"
                         android:textColor="@color/colorAccent"
                         android:textStyle="bold"
                         android:visibility="gone"

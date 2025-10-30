@@ -13,7 +13,7 @@
         android:background="@color/colorPrimary"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@android:color/white"
-        app:title="Select Member"
+        app:title="@string/select_member"
         app:titleTextColor="@android:color/white"
         app:titleCentered="true" />
 
@@ -21,7 +21,7 @@
         android:id="@+id/searchViewMembers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Search employee..."
+        android:queryHint="@string/search_employee"
         android:iconifiedByDefault="false"
         android:layout_marginBottom="10dp"/>
 
@@ -32,7 +32,7 @@
         android:layout_gravity="end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
-        android:text="Selected: 0"
+        android:text="@string/selected_0"
         android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold"
         android:textSize="16sp" />
@@ -49,7 +49,7 @@
         android:id="@+id/btnConfirmSelection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confirm Selection"
+        android:text="@string/confirm_selection"
         android:textAllCaps="false"
         android:backgroundTint="@color/colorPrimary"
         android:textColor="@android:color/white"

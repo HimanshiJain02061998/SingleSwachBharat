@@ -36,12 +36,10 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleNumberRes
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.DutyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.io.IOException
 import java.util.UUID
@@ -212,12 +210,9 @@ class DashboardViewModel @Inject constructor(
         try {
             // Show progress bar event on main thread
             dashboardEventChannel.trySend(DashboardEvent.ShowProgressBar)
-
-            val response = withContext(Dispatchers.IO) {
-                dutyRepository.saveInPunchDetails(
+            val response = dutyRepository.saveInPunchDetails(
                 appId, content_type, batteryStatus, deviceIdCon, inPunchRequest
             )
-            }
             handleAttendanceOnResponse(response, userVehicleDetails)
         } catch (t: Throwable) {
             dashboardEventChannel.trySend(DashboardEvent.HideProgressBar)
@@ -231,7 +226,6 @@ class DashboardViewModel @Inject constructor(
     /**
      * METHOD TO GET VEHICLE QR DETAILS
      */
-
     fun getVehicleQrDetails(
         appId: String,
         contentType: String,
@@ -244,18 +238,14 @@ class DashboardViewModel @Inject constructor(
     ) = viewModelScope.launch {
         dashboardEventChannel.send(DashboardEvent.ShowProgressBar)
         try {
-
             if (empType == "D") {
-
                 val userVehicleDetails = UserVehicleDetails(
                     "1",
                     "",
                     referenceId
                 )
-
                 inPunchRequest.vehicleType = "1"
                 inPunchRequest.vehicleNumber = "1"
-
                 saveInPunchDetails(
                     CommonUtils.APP_ID,
                     CommonUtils.CONTENT_TYPE,
@@ -263,21 +253,17 @@ class DashboardViewModel @Inject constructor(
                     inPunchRequest,
                     userVehicleDetails
                 )
-
             } else {
                 val response = dutyRepository.getVehicleQrDetails(
                     appId, contentType, referenceId, empType, currentLat, currentLon
                 )
-
                 handleVehicleQrDetailsResponse(response, batteryStatus, inPunchRequest)
             }
-
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> DashboardEvent.ShowFailureMessage(
                     "Connection Timeout"
                 )
-
                 else -> DashboardEvent.ShowFailureMessage(
                     "Conversion Error"
                 )
@@ -301,17 +287,14 @@ class DashboardViewModel @Inject constructor(
                 response.body()?.let {
                     if (it.status == STATUS_SUCCESS) {
 
-
                         if (response.body() != null) {
                             val userVehicleDetails = UserVehicleDetails(
                                 response.body()!!.vtId,
                                 response.body()!!.vehicleType,
                                 response.body()!!.vehicleNumber
                             )
-
                             inPunchRequest.vehicleType = response.body()!!.vtId
                             inPunchRequest.vehicleNumber = response.body()!!.vehicleNumber
-
                             saveInPunchDetails(
                                 CommonUtils.APP_ID,
                                 CommonUtils.CONTENT_TYPE,
@@ -319,9 +302,7 @@ class DashboardViewModel @Inject constructor(
                                 inPunchRequest,
                                 userVehicleDetails
                             )
-
                         }
-
 
                     } else {
                         dashboardEventChannel.send(
@@ -361,17 +342,13 @@ class DashboardViewModel @Inject constructor(
                     if (userVehicleDetails == null) {
                         dashboardEventChannel.trySend(DashboardEvent.SaveVehicleDetails)
                     } else {
-                        withContext(Dispatchers.IO) {
                             saveUserVehicleDetails(userVehicleDetails)
-                        }
                     }
 
-                    withContext(Dispatchers.IO) {
-                        saveUserIsDutyOn(true)
-                        saveUserDutyOnDate(DateTimeUtils.getServerDate())
-                        saveGisTrailId(UUID.randomUUID().toString())
-                        saveGisStartTs(DateTimeUtils.getGisServiceTimeStamp())
-                    }
+                    saveUserIsDutyOn(true)
+                    saveUserDutyOnDate(DateTimeUtils.getServerDate())
+                    saveGisTrailId(UUID.randomUUID().toString())
+                    saveGisStartTs(DateTimeUtils.getGisServiceTimeStamp())
 
                     dashboardEventChannel.trySend(DashboardEvent.UserDetailsUpdate)
 
@@ -397,18 +374,13 @@ class DashboardViewModel @Inject constructor(
     }
 
     private val _isTeamSelected = MutableLiveData(false)
-    val isTeamSelected: LiveData<Boolean> get() = _isTeamSelected
-
-//    fun setTeamSelected(selected: Boolean) {
-//        viewModelScope.launch {
-//            userDataStore.saveVewTeam(selected)
-//        }
-//    }
+    val isTeamSelected: LiveData<Boolean>
+        get() =
+            _isTeamSelected
 
     fun setTeamSelected(selected: Boolean) {
         viewModelScope.launch {
             userDataStore.saveVewTeam(selected)
-            dashboardEventChannel.send(DashboardEvent.TeamON(selected))
         }
     }
 
@@ -416,11 +388,11 @@ class DashboardViewModel @Inject constructor(
     fun getTeam() {
         viewModelScope.launch {
             userDataStore.getVewTeam.collect { value ->
-//                _isTeamSelected.postValue(value)
-                dashboardEventChannel.send(DashboardEvent.TeamON(value))
+                _isTeamSelected.value = value
             }
         }
     }
+
     /**
      *  METHOD TO SAVE ATTENDANCE OFF TO API
      */
@@ -442,7 +414,6 @@ class DashboardViewModel @Inject constructor(
                 appId, content_type, batteryStatus, trailId, deviceIdCon, outPunchRequest
             )
             handleAttendanceOffResponse(response)
-
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> DashboardEvent.ShowFailureMessage(
@@ -779,6 +750,7 @@ class DashboardViewModel @Inject constructor(
 
     fun onLanguageDialogSubmitBtnClicked(appLanguage: AppLanguage) = viewModelScope.launch {
         languageDataStore.savePreferredLanguage(appLanguage)
+        dashboardEventChannel.send(DashboardEvent.RestartDashboardActivity)
         dashboardEventChannel.send(DashboardEvent.RestartDashboardActivity)
         dashboardEventChannel.send(DashboardEvent.DismissLanguageDialog)
     }

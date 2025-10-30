@@ -9,7 +9,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Type"
+        android:text="@string/select_type"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/colorPrimary"
@@ -28,13 +28,13 @@
             android:id="@+id/radioSingle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Single" />
+            android:text="@string/single_login" />
 
         <RadioButton
             android:id="@+id/radioTeam"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Team" />
+            android:text="@string/with_team_login" />
     </RadioGroup>
 
 </LinearLayout>

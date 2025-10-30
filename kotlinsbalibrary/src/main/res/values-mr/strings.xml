@@ -203,5 +203,16 @@
     <string name="ulb_selected_successfully">ULB यशस्वीरित्या निवडले</string>
     <string name="street_sweeping_completed">रस्त्याची सफाई पूर्ण झाली</string>
     <string name="liquid_cleaning_completed">द्रव स्वच्छता पूर्ण झाली</string>
-
+    <string name="single_login">सिंगल लॉगिन</string>
+    <string name="with_team_login">टीम सहित लॉगिन</string>
+    <string name="select_type">प्रकार निवडा</string>
+    <string name="selected_0">निवडलेले: 0</string>
+    <string name="search_employee">कर्मचारी शोधा...</string>
+    <string name="select_member">सदस्य निवडा</string>
+    <string name="confirm_selection">निवड पुष्टी करा</string>
+    <string name="view_team">टीम पाहा....</string>
+    <string name="no_team_members_selected">कोणतेही टीम सदस्य निवडले नाहीत</string>
+    <string name="please_select_one_option">कृपया एक पर्याय निवडा</string>
+    <string name="user_id_not_found">वापरकर्ता आयडी सापडली नाही</string>
+    <string name="please_select_at_least_one_member">कृपया किमान एक सदस्य निवडा</string>
 </resources>

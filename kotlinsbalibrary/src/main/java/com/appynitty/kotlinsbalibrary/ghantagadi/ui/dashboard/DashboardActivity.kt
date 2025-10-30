@@ -78,6 +78,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.DumpYardIds
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.EmployeeViewModel
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.SelectMembers
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.qrScanner.QRScannerActivity
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline.GarbageCollectionViewModel
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline.GarbageCollectionViewModelFactory
@@ -95,8 +97,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.EmployeeViewModel
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.SelectMembers
 
 
 /**
@@ -200,8 +200,33 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 selectedTeamMembers =
                     result.data?.getParcelableArrayListExtra("SELECTED_MEMBERS")
 
-                Log.d("SelectMembersLauncher", "Selected team members: $selectedTeamMembers")
+                val selectedMemberIds = selectedTeamMembers?.map { it.userid }
+                val userVehicleDetails = UserVehicleDetails("1", "", "1")
 
+                val inPunchRequest = InPunchRequest(
+                    DateTimeUtils.getServerTime(),
+                    DateTimeUtils.getYyyyMMddDate(),
+                    latitude.toString(),
+                    longitude.toString(),
+                    userId,
+                    "1",
+                    "1",
+                    empType,
+                    "",
+                    selectedMemberIds
+                )
+
+                selectedMemberIds?.let {
+                    viewModel.saveInPunchLiquid(
+                        userId = userId,
+                        batteryStatus = CommonUtils.getBatteryStatus(application),
+                        memberUserIds = it,
+                        latitude = latitude?.toDouble(),
+                        longitude = longitude?.toDouble(),
+                        inPunchRequest = inPunchRequest,
+                        userVehicleDetails = userVehicleDetails
+                    )
+                }
                 viewModel.setTeamSelected(true)
 
                 binding.viewTeamButton.visibility = View.VISIBLE
@@ -522,8 +547,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
                     is DashboardViewModel.DashboardEvent.TeamON -> {
                         viewModel.setTeamSelected(true)
-
-                        //          binding.viewTeamButton.visibility = if (event.status) View.VISIBLE else View.GONE
                     }
                 }
 
@@ -561,13 +584,13 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val selectedId = radioGroup.checkedRadioButtonId
             if (selectedId == -1) {
-                Toast.makeText(this, "Please select an option", Toast.LENGTH_SHORT)
-                    .show()
+                CustomToast.showWarningToast(this, getString(R.string.please_select_one_option))
                 return@setOnClickListener
             }
 
             when (selectedId) {
                 R.id.radioSingle -> {
+                    viewModel.setTeamSelected(false)
                     val inPunchRequest = userId?.let {
                         empType?.let { employeeType ->
                             InPunchRequest(
@@ -594,11 +617,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                             null
                         )
                     }
-                    Toast.makeText(
-                        this,
-                        "Duty started (Single Mode)",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
 
                 R.id.radioTeam -> {
@@ -617,7 +635,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     private fun showSelectedTeamDialog() {
         if (selectedTeamMembers.isNullOrEmpty()) {
-            Toast.makeText(this, "No team members selected", Toast.LENGTH_SHORT).show()
+            CustomToast.showWarningToast(this, getString(R.string.no_team_members_selected))
             return
         }
 
@@ -1018,6 +1036,12 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 IntentFilter("com.appynitty.LOGOUT_EVENT")
             )
         }
+
+        viewModel.isTeamSelected.observe(this, Observer {
+            if (it == true && isDutyOn) {
+                binding.viewTeamButton.visibility = View.VISIBLE
+            }
+        })
     }
 
     @SuppressLint("ClickableViewAccessibility")

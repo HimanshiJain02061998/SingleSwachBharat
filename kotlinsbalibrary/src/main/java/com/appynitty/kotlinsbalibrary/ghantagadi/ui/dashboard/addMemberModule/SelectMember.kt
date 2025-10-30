@@ -4,18 +4,18 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
 import com.appynitty.kotlinsbalibrary.databinding.ActivitySelectMembersBinding
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
-import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -27,7 +27,6 @@ class SelectMembers : AppCompatActivity() {
 
     private lateinit var binding: ActivitySelectMembersBinding
     private val employeeViewModel: EmployeeViewModel by viewModels()
-    private val dashboardViewModel: DashboardViewModel by viewModels()
     private lateinit var adapter: MemberAdapter
     private var userId: String? = null
     private var latitude: String? = null
@@ -43,7 +42,7 @@ class SelectMembers : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        userId = intent.getStringExtra("USER_ID") // ✅ same key used when passing
+        userId = intent.getStringExtra("USER_ID")
         latitude = intent.getDoubleExtra("latitude", 0.0).toString()
         longitude = intent.getDoubleExtra("longitude", 0.0).toString()
 
@@ -52,12 +51,19 @@ class SelectMembers : AppCompatActivity() {
         adapter = MemberAdapter(mutableListOf())
         binding.recyclerMembers.adapter = adapter
 
+        binding.tvSelectedCount.text = buildString {
+            append(getString(R.string.selected_0))
+            append(0)
+        }
 
         employeeViewModel.employeeList.observe(this) { employees ->
             adapter.updateList(employees)
         }
         adapter.onSelectionChanged = { count ->
-            binding.tvSelectedCount.text = "Selected: $count"
+            binding.tvSelectedCount.text = buildString {
+                append(getString(R.string.selected_0))
+                append(count)
+            }
         }
 
 
@@ -77,54 +83,19 @@ class SelectMembers : AppCompatActivity() {
         binding.btnConfirmSelection.setOnClickListener {
             val selectedMembers = adapter.getSelectedMembers()
             if (selectedMembers.isEmpty()) {
-                Toast.makeText(this, "Please select at least one member", Toast.LENGTH_SHORT).show()
+                CustomToast.showWarningToast(this, getString(R.string.please_select_at_least_one_member))
                 return@setOnClickListener
             }
-
-            val selectedMemberIds = selectedMembers.mapNotNull { it.userid }
 
             if (userId.isNullOrEmpty()) {
-                Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
+                CustomToast.showWarningToast(this, getString(R.string.user_id_not_found))
                 return@setOnClickListener
             }
 
-            val userVehicleDetails = UserVehicleDetails("1", "", "1")
-
-            // Launch a coroutine to call suspend functions
             lifecycleScope.launch {
-                // Safe call to suspend function
-                val employeeType = userDataStore.getUserEssentials.first().employeeType
-
-                val inPunchRequest = InPunchRequest(
-                    DateTimeUtils.getServerTime(),
-                    DateTimeUtils.getYyyyMMddDate(),
-                    latitude.toString(),
-                    longitude.toString(),
-                    userId,
-                    "1",
-                    "1",
-                    employeeType,
-                    "",
-                    selectedMemberIds
-                )
-
-                dashboardViewModel.saveInPunchLiquid(
-                    userId = userId,
-                    batteryStatus = CommonUtils.getBatteryStatus(application),
-                    memberUserIds = selectedMemberIds,
-                    latitude = latitude?.toDouble(),
-                    longitude = longitude?.toDouble(),
-                    inPunchRequest = inPunchRequest,
-                    userVehicleDetails = userVehicleDetails
-                )
                 val resultIntent = Intent()
                 resultIntent.putParcelableArrayListExtra("SELECTED_MEMBERS", ArrayList(selectedMembers))
                 setResult(Activity.RESULT_OK, resultIntent)
-                Toast.makeText(
-                    this@SelectMembers,
-                    "Team duty started with ${selectedMembers.size} members",
-                    Toast.LENGTH_SHORT
-                ).show()
                 finish()
             }
         }
