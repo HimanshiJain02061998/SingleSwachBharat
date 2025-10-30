@@ -11,7 +11,7 @@ class CoreApplication : MyApplication() {
         super.onCreate()
 
      //   APP_ID = "3098"
-        VERSION_CODE = BuildConfig.VERSION_CODE.toString()
+        VERSION_CODE = BuildConfig.VERSION_NAME.toString()
         PACKAGE_NAME = BuildConfig.APPLICATION_ID
     }
 }

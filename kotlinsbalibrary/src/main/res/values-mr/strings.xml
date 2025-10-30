@@ -201,8 +201,8 @@
     <string name="please_select_a_district_first">कृपया प्रथम जिल्हा निवडा.</string>
     <string name="please_select_a_ulb_before_continuing">पुढे जाण्यापूर्वी कृपया एक ULB निवडा.</string>
     <string name="ulb_selected_successfully">ULB यशस्वीरित्या निवडले</string>
-    <string name="street_sweeping_completed">रस्त्याची सफाई पूर्ण झाली</string>
-    <string name="liquid_cleaning_completed">द्रव स्वच्छता पूर्ण झाली</string>
+    <string name="street_sweeping_completed">स्ट्रीट सफाई कार्य पूर्ण झाले</string>
+    <string name="liquid_cleaning_completed">लिक्विड सफाई कार्य पूर्ण झाले</string>
     <string name="single_login">सिंगल लॉगिन</string>
     <string name="with_team_login">टीम सहित लॉगिन</string>
     <string name="select_type">प्रकार निवडा</string>

@@ -9,6 +9,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -45,7 +48,10 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val DIS_ID_KEY = intPreferencesKey(name = "dis_id_key")
         private val APP_ID = stringPreferencesKey(name = "app_id")
         private val ULB_NAME = stringPreferencesKey(name = "ulb_name")
-        private val SELECTED_TEAM = booleanPreferencesKey(name = "selected_team")
+        private val SELECTED_TEAM = booleanPreferencesKey(name = "is_selected_team")
+
+        private val SELECTED_MEMBERS = stringPreferencesKey("selected_members")
+
     }
     suspend fun saveVewTeam(isBifurcationOn: Boolean) {
         userDataStore.edit { preferences ->
@@ -53,10 +59,28 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         }
     }
 
+    suspend fun saveSelectedMembers(selectedMembers: List<AvailableEmpItem>) {
+        val json = Gson().toJson(selectedMembers)
+        userDataStore.edit { preferences ->
+            preferences[SELECTED_MEMBERS] = json
+        }
+    }
+
     val getVewTeam: Flow<Boolean> = userDataStore.data
         .map {
             it[SELECTED_TEAM] ?: false
         }
+
+    val getSelectedMembersFlow: Flow<List<AvailableEmpItem>> = userDataStore.data
+        .map { preferences ->
+            val json = preferences[SELECTED_MEMBERS]
+            if (json != null) {
+                Gson().fromJson(json, object : TypeToken<List<AvailableEmpItem>>() {}.type)
+            } else {
+                emptyList()
+            }
+        }
+
     suspend fun saveAppId(appId: String) {
         clearAppId()
         userDataStore.edit { preferences ->

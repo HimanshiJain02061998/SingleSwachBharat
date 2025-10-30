@@ -163,7 +163,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private var isDutyOnToggleClicked = false
 
     private lateinit var selectedEmployeeSpinner: Spinner
-    private var selectedTeamMembers: ArrayList<AvailableEmpItem>? = null
+    private var selectedTeamMembers: List<AvailableEmpItem>? = null
 
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -228,11 +228,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     )
                 }
                 viewModel.setTeamSelected(true)
-
-                binding.viewTeamButton.visibility = View.VISIBLE
-                binding.viewTeamButton.setOnClickListener {
-                    showSelectedTeamDialog()
-                }
 
             } else {
                 enableDutyToggle()
@@ -1040,8 +1035,18 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         viewModel.isTeamSelected.observe(this, Observer {
             if (it == true && isDutyOn) {
                 binding.viewTeamButton.visibility = View.VISIBLE
+            }else{
+                binding.viewTeamButton.visibility = View.GONE
             }
         })
+
+        viewModel.teamMembersSelected.observe(this, Observer {
+            if(it != null){
+                selectedTeamMembers = it
+
+            }
+        })
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1069,6 +1074,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             event.actionMasked == MotionEvent.ACTION_MOVE
         }
 
+        binding.viewTeamButton.setOnClickListener {
+            showSelectedTeamDialog()
+        }
     }
 
     private fun turnDutyOff() {

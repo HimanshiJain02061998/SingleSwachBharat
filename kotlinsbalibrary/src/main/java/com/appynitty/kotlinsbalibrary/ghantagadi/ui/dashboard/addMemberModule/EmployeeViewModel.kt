@@ -10,11 +10,9 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.EmployeeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject // ← import this
+import javax.inject.Inject
 
 @HiltViewModel
 class EmployeeViewModel @Inject constructor(
@@ -33,6 +31,12 @@ class EmployeeViewModel @Inject constructor(
             employees?.let {
                 _employeeList.postValue(it)
             }
+        }
+    }
+
+    fun setMemberSelected(list: List<AvailableEmpItem>) {
+        viewModelScope.launch {
+            userDataStore.saveSelectedMembers(list)
         }
     }
 }

@@ -69,6 +69,8 @@ class WorkHistoryDetailAdapter :
                                 append("  ")
                                 append(Refid)
                             }
+                            historyDetailsVehicle.visibility = android.view.View.GONE
+
                         }
 
                         "5" -> {
@@ -79,6 +81,8 @@ class WorkHistoryDetailAdapter :
                                 append("  ")
                                 append(Refid)
                             }
+
+                            historyDetailsVehicle.visibility = android.view.View.GONE
                         }
 
                         "6" -> {

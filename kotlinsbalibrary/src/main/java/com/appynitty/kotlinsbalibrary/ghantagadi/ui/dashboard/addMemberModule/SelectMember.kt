@@ -9,16 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appynitty.kotlinsbalibrary.R
-import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
-import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
-import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
 import com.appynitty.kotlinsbalibrary.databinding.ActivitySelectMembersBinding
-import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -82,6 +76,7 @@ class SelectMembers : AppCompatActivity() {
 
         binding.btnConfirmSelection.setOnClickListener {
             val selectedMembers = adapter.getSelectedMembers()
+            employeeViewModel.setMemberSelected(selectedMembers)
             if (selectedMembers.isEmpty()) {
                 CustomToast.showWarningToast(this, getString(R.string.please_select_at_least_one_member))
                 return@setOnClickListener

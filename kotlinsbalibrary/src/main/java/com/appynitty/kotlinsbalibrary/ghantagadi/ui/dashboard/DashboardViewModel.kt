@@ -63,10 +63,22 @@ class DashboardViewModel @Inject constructor(
     private val dashboardEventChannel = Channel<DashboardEvent>(Channel.BUFFERED)
     val dashboardEventsFlow = dashboardEventChannel.receiveAsFlow()
 
+    private val _isTeamSelected = MutableLiveData(false)
+    val isTeamSelected: LiveData<Boolean>
+        get() =
+            _isTeamSelected
+
+    private val _teamMembersSelected = MutableLiveData(emptyList<AvailableEmpItem>())
+    val teamMembersSelected: LiveData<List<AvailableEmpItem>>
+        get() =
+            _teamMembersSelected
+
+
     private var deviceIdCon: String? = null
 
     init {
         getTeam()
+        getSelectedTeam()
     }
 
     /**
@@ -373,11 +385,6 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private val _isTeamSelected = MutableLiveData(false)
-    val isTeamSelected: LiveData<Boolean>
-        get() =
-            _isTeamSelected
-
     fun setTeamSelected(selected: Boolean) {
         viewModelScope.launch {
             userDataStore.saveVewTeam(selected)
@@ -389,6 +396,14 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             userDataStore.getVewTeam.collect { value ->
                 _isTeamSelected.value = value
+            }
+        }
+    }
+
+    fun getSelectedTeam() {
+        viewModelScope.launch {
+            userDataStore.getSelectedMembersFlow.collect { value ->
+                _teamMembersSelected.value = value
             }
         }
     }
