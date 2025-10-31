@@ -161,7 +161,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private var isSyncingOn = false
     private lateinit var alertMessageDialogFrag: AlertMessageDialogFrag
     private var isDutyOnToggleClicked = false
-
     private lateinit var selectedEmployeeSpinner: Spinner
     private var selectedTeamMembers: List<AvailableEmpItem>? = null
 
@@ -231,7 +230,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
             } else {
                 enableDutyToggle()
-
             }
         }
 
@@ -639,7 +637,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Selected Team Members")
+            .setTitle(getString(R.string.selected_team_members))
             .setMessage(memberNames)
             .setPositiveButton("OK", null)
             .show()
@@ -1439,7 +1437,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     private fun initToolBar() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_action_icon)
-        binding.toolbar.title = resources.getString(R.string.app_name)
+        binding.toolbar.title = MyApplication.ULB_NAME
         setSupportActionBar(binding.toolbar)
     }
 

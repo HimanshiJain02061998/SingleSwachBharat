@@ -215,4 +215,5 @@
     <string name="please_select_one_option">कृपया एक पर्याय निवडा</string>
     <string name="user_id_not_found">वापरकर्ता आयडी सापडली नाही</string>
     <string name="please_select_at_least_one_member">कृपया किमान एक सदस्य निवडा</string>
+    <string name="selected_team_members">निवडलेले टीम सदस्य</string>
 </resources>
