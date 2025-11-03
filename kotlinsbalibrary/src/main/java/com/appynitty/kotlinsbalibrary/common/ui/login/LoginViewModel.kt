@@ -1,10 +1,13 @@
 package com.appynitty.kotlinsbalibrary.common.ui.login
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.dao.UserDetailsDao
 import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.model.request.LoginRequest
+import com.appynitty.kotlinsbalibrary.common.model.response.AppAssetsResponse
 import com.appynitty.kotlinsbalibrary.common.model.response.LoginResponse
 import com.appynitty.kotlinsbalibrary.common.model.response.UserDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.repository.LoginRepository
@@ -36,12 +39,14 @@ class LoginViewModel @Inject constructor(
     private val loginEventChannel = Channel<LoginEvent>()
     val loginEventsFlow = loginEventChannel.receiveAsFlow()
 
+    private val _iconUrl = MutableLiveData<String>()
+    val iconUrl: LiveData<String> get() = _iconUrl
+
     fun saveLoginDetails(
         appId: String,
         contentType: String,
         loginRequest: LoginRequest
     ) = viewModelScope.launch {
-
         loginEventChannel.send(LoginEvent.ShowProgressBar)
         loginEventChannel.send(LoginEvent.DisableLoginButton)
         try {
@@ -173,6 +178,40 @@ class LoginViewModel @Inject constructor(
         sessionDataStore.saveUserLoginSession(true)
     }
 
+    fun getAppAssets(appId: String) = viewModelScope.launch {
+        try {
+            // Show progress bar before API call
+            loginEventChannel.send(LoginEvent.ShowProgressBar)
+
+            val response = loginRepository.getAppAssetsByAppId(appId)
+
+            if (response.isSuccessful && response.body() != null) {
+                val appAssets = response.body()
+                handleAppAssetsResult(appAssets)
+            } else {
+                loginEventChannel.send(LoginEvent.ShowFailureMessage("Failed to fetch assets"))
+            }
+        } catch (t: Throwable) {
+            loginEventChannel.send(LoginEvent.HideProgressBar)
+            when (t) {
+                is IOException -> loginEventChannel.send(LoginEvent.ShowFailureMessage("Connection Timeout"))
+                else -> loginEventChannel.send(LoginEvent.ShowFailureMessage("Conversion Error"))
+            }
+        } finally {
+            // Always hide progress bar after API call
+            loginEventChannel.send(LoginEvent.HideProgressBar)
+        }
+    }
+
+    private suspend fun handleAppAssetsResult(appAssetsResponse: AppAssetsResponse?) {
+        appAssetsResponse?.let {
+            if (it.Code == 200 && it.Status == "Success") {
+                _iconUrl.value = it.AppAssetsList.appIcon
+            } else {
+                loginEventChannel.send(LoginEvent.ShowFailureMessage(it.Message))
+            }
+        }
+    }
 
     sealed class LoginEvent {
 

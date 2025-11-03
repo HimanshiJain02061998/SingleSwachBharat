@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.MyApplication
@@ -27,14 +28,13 @@ import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
 import com.appynitty.kotlinsbalibrary.common.utils.LanguageConfig
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
-import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.LanguageBottomSheetFrag
 import com.appynitty.kotlinsbalibrary.databinding.ActivityLoginBinding
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.DashboardActivity
 import com.appynitty.kotlinsbalibrary.housescanify.ui.empDashboard.EmpDashboardActivity
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -57,8 +57,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
     private var selectedLanguageId: String? = null
     private var isInternetOn = false
     private lateinit var userDataStore: UserDataStore
-    private lateinit var archivedDao: ArchivedDao
-    private lateinit var sessionDataStore: SessionDataStore
 
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -262,7 +260,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
     }
 
     override fun attachBaseContext(newBase: Context?) {
-
         newBase?.let { context ->
             languageDataStore = LanguageDataStore(newBase.applicationContext)
             val appLanguage = languageDataStore.currentLanguage
@@ -275,21 +272,27 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
 
     //function to initialize variables
     private fun initVars() {
-
         languageBottomSheet = LanguageBottomSheetFrag()
-
         //setting emp type auto complete text view ( exposed drop down menu )
         val empTypesArray = resources.getStringArray(R.array.employee_types)
         val arrayAdapter = ArrayAdapter(this, R.layout.drop_down_emp_type, empTypesArray)
         binding.etEmpType.setAdapter(arrayAdapter)
-
+        lifecycleScope.launch {
+            viewModel.getAppAssets(userDataStore.getAppId.first())
+        }
     }
 
     private fun subscribeLiveData() {
-
         ConnectivityStatus(this).observe(this) {
             isInternetOn = it
         }
+
+        viewModel.iconUrl.observe(this, Observer {
+            Glide.with(this)
+                .load(it)
+                .placeholder(R.drawable.app_icon_white) // optional
+                .into(binding.imgLogo)
+        })
 
     }
 
@@ -383,7 +386,7 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
                 empType = "D"
             }
         }
-        //getting device id from android device ( kinda imei )
+        // getting device id from android device ( kinda imei )
 //        val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 //        var deviceId: String? = CommonUtils.getAndroidId(this)
 //
@@ -417,7 +420,7 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
             loginRequest = LoginRequest(empType, password, userName, deviceId)
 
             lifecycleScope.launch {
-                val appId = userDataStore.getAppId.first() ?: ""
+                val appId = userDataStore.getAppId.first()
                 viewModel.saveLoginDetails(
                     appId,
                     CommonUtils.CONTENT_TYPE,

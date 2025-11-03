@@ -17,4 +17,9 @@ class LoginRepository @Inject constructor(
         loginRequest: LoginRequest
     ) = loginAPI.saveLoginDetails(appId, contentType, loginRequest)
 
+        suspend fun getAppAssetsByAppId(
+            appId: String
+        ) = loginAPI.getAppAssetsByAppId(
+            appId = appId
+        )
 }
