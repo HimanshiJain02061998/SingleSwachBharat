@@ -290,10 +290,9 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
         viewModel.iconUrl.observe(this, Observer {
             Glide.with(this)
                 .load(it)
-                .placeholder(R.drawable.app_icon_white) // optional
+                .placeholder(R.drawable.app_icon_white)
                 .into(binding.imgLogo)
         })
-
     }
 
     //function to register click events
@@ -366,7 +365,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
 
     @SuppressLint("HardwareIds")
     private fun logUserIn(userName: String, password: String, employeeType: String) {
-
         var empType = ""
 
         when (employeeType) {

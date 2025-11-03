@@ -573,7 +573,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
-
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+            enableDutyToggle()
+            dialog.dismiss()
+        }
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val selectedId = radioGroup.checkedRadioButtonId
             if (selectedId == -1) {
