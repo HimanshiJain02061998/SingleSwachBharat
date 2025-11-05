@@ -66,6 +66,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.dialogs.AlertMessageDialogFra
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.LanguageBottomSheetFrag
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.PopUpDialogFragment
 import com.appynitty.kotlinsbalibrary.common.utils.dialogs.SettingBottomSheetFrag
+import com.appynitty.kotlinsbalibrary.common.utils.dialogs.SettingTeamsBottomSheetFrag
 import com.appynitty.kotlinsbalibrary.common.utils.permission.LocationPermission
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import com.appynitty.kotlinsbalibrary.databinding.ActivityDashboardBinding
@@ -109,7 +110,7 @@ private const val TAG = "DashboardActivity"
 class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedInterface,
     PopUpDialogFragment.PopUpDialogFragmentClickListeners,
     LanguageBottomSheetFrag.LanguageDialogCallbacks, SettingBottomSheetFrag.SettingsCallBack,
-    AlertMessageDialogFrag.AlertMessageDialogCallBacks {
+    AlertMessageDialogFrag.AlertMessageDialogCallBacks, SettingTeamsBottomSheetFrag.SettingsTeamCallBack {
 
     private val viewModel: DashboardViewModel by viewModels()
     private val userDetailsViewModel: UserDetailsViewModel by viewModels()
@@ -151,8 +152,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private var userVehicleDetailsTemp: UserVehicleDetails? = null
     private var userVehicleDetailsDataStore: UserVehicleDetails? = null
     private var isBifurcationOn = true
+    private var isTeamSelected = true
     private var isVehicleScanOn = false
     private lateinit var settingsBottomSheet: SettingBottomSheetFrag
+    private lateinit var settingsTeamBottomSheet: SettingTeamsBottomSheetFrag
     private var isGpsOn = false
     private var isDutyToggleChecked = false
     private var isInternetOn = true
@@ -527,19 +530,25 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     }
 
                     DashboardViewModel.DashboardEvent.UserDetailsUpdate -> {
-
                         // User Details Update
-
                         getUserDetailsUpdateFromApi()
 
                     }
 
                     DashboardViewModel.DashboardEvent.ShowLiquidEmployeeDialog -> {
-                        showSelectTypeDialog()
+                     //   showSelectTypeDialog()
+                        val mapsIntent =
+                            Intent(this@DashboardActivity, SelectMembers::class.java)
+                        mapsIntent.putExtra("USER_ID", userId)
+                        selectMembersLauncher.launch(mapsIntent)
                     }
 
                     is DashboardViewModel.DashboardEvent.TeamON -> {
                         viewModel.setTeamSelected(true)
+                    }
+
+                    DashboardViewModel.DashboardEvent.ShowSettingTeamScreen -> {
+                        showSettingsTeamBottomSheet()
                     }
                 }
 
@@ -619,8 +628,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     val mapsIntent =
                         Intent(this@DashboardActivity, SelectMembers::class.java)
                     mapsIntent.putExtra("USER_ID", userId)
-                    mapsIntent.putExtra("latitude", latitude?.toDouble() ?: 0.0)
-                    mapsIntent.putExtra("longitude", longitude?.toDouble() ?: 0.0)
                     selectMembersLauncher.launch(mapsIntent)
                 }
             }
@@ -827,6 +834,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             isBifurcationOn = it
         })
 
+        viewModel.isTeamSelected.observe(this, Observer {
+            isTeamSelected = it
+        })
+
         viewModel.isVehicleScanOnLiveData.observe(this, Observer {
             isVehicleScanOn = it
         })
@@ -991,6 +1002,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         alertMessageDialogFrag = AlertMessageDialogFrag()
         alertMessageDialogFrag.setListener(this)
         settingsBottomSheet = SettingBottomSheetFrag()
+        settingsTeamBottomSheet = SettingTeamsBottomSheetFrag()
         languageBottomSheet = LanguageBottomSheetFrag()
 
         val garbageCollectionViewModelFactory = GarbageCollectionViewModelFactory(
@@ -1286,6 +1298,15 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     }
 
+    private fun showSettingsTeamBottomSheet() {
+        if (!settingsTeamBottomSheet.isAdded) {
+            settingsTeamBottomSheet.show(supportFragmentManager, SettingTeamsBottomSheetFrag.TAG)
+            settingsTeamBottomSheet.setIsTeamsOn(isTeamSelected)
+            settingsTeamBottomSheet.setListener(this)
+        }
+
+    }
+
     private fun showChangeLanguageBottomSheet() {
 
         if (!languageBottomSheet.isAdded) {
@@ -1308,11 +1329,13 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         binding.fabLogoutText.isClickable = true
         binding.fabSettingText.isClickable = true
         binding.fabPrivacyPolicyText.isClickable = true
+        binding.fabSettingTeamText.isClickable = true
 
         binding.fabLanguage.isClickable = true
         binding.fabLogout.isClickable = true
         binding.fabSetting.isClickable = true
         binding.fabPrivacyPolicy.isClickable = true
+        binding.fabSettingTeam.isClickable = true
 
         lifecycleScope.launch(Dispatchers.IO) {
 
@@ -1344,10 +1367,19 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     binding.fabSettingText.startAnimation(
                         fabOpenAnim
                     )
-
+                    binding.fabSettingTeam.visibility = View.GONE
+                    binding.fabSettingTeamText.visibility = View.GONE
                 } else {
+                    binding.fabSettingTeamText.startAnimation(
+                        fabOpenAnim
+                    )
+                    binding.fabSettingTeam.startAnimation(
+                        fabOpenAnim
+                    )
                     binding.fabSetting.visibility = View.GONE
                     binding.fabSettingText.visibility = View.GONE
+                    binding.fabSettingTeam.visibility = View.VISIBLE
+                    binding.fabSettingTeamText.visibility = View.VISIBLE
                 }
 
                 binding.fabPrivacyPolicy.startAnimation(
@@ -1377,11 +1409,13 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         binding.fabLogoutText.isClickable = false
         binding.fabSettingText.isClickable = false
         binding.fabPrivacyPolicyText.isClickable = false
+        binding.fabSettingTeamText.isClickable = false
 
         binding.fabLanguage.isClickable = false
         binding.fabLogout.isClickable = false
         binding.fabSetting.isClickable = false
         binding.fabPrivacyPolicy.isClickable = false
+        binding.fabSettingTeam.isClickable = false
 
         lifecycleScope.launch(Dispatchers.IO) {
 
@@ -1410,7 +1444,15 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     binding.fabSettingText.startAnimation(
                         fabCloseAnim
                     )
+                    binding.fabSettingTeamText.visibility = View.GONE
+                    binding.fabSettingTeam.visibility = View.GONE
                 } else {
+                    binding.fabSettingTeamText.startAnimation(
+                        fabCloseAnim
+                    )
+                    binding.fabSettingTeam.startAnimation(
+                        fabCloseAnim
+                    )
                     binding.fabSetting.visibility = View.GONE
                     binding.fabSettingText.visibility = View.GONE
                 }
@@ -1640,8 +1682,19 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         viewModel.onLanguageDialogSubmitBtnClicked(appLanguage)
     }
 
-    override fun onBifurcationValueChanged(isBifurcationOn: Boolean) {
+    override fun onSelectTeamsValueChanged(teamsOn: Boolean) {
+        showProgressBar()
+        viewModel.setTeamSelected(teamsOn)
+        settingsTeamBottomSheet.dismiss()
+        shrinkFab()
+        hideProgressBar()
+      /*  CustomToast.showSuccessToast(
+            this, resources.getString(R.string.bifurcation_setting_changed)
+        )*/
 
+    }
+
+    override fun onBifurcationValueChanged(isBifurcationOn: Boolean) {
         showProgressBar()
         viewModel.saveIsBifurcationOn(isBifurcationOn)
         settingsBottomSheet.dismiss()
@@ -1650,7 +1703,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         CustomToast.showSuccessToast(
             this, resources.getString(R.string.bifurcation_setting_changed)
         )
-
     }
 
     override fun onVehicleScanValueChanged(isVehicleScanOn: Boolean) {
@@ -1848,6 +1900,12 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         }
         binding.fabPrivacyPolicyText.setOnClickListener {
             viewModel.onPrivacyPolicyFabMenuClicked()
+        }
+        binding.fabSettingTeamText.setOnClickListener {
+            viewModel.onSettingTeamFabMenuClicked()
+        }
+        binding.fabSettingTeam.setOnClickListener {
+            viewModel.onSettingTeamFabMenuClicked()
         }
 
     }

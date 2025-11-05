@@ -464,7 +464,6 @@
                 app:layout_constraintEnd_toStartOf="@+id/fab_setting"
                 app:layout_constraintTop_toTopOf="@+id/fab_setting" />
 
-
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_privacy_policy"
                 android:layout_width="wrap_content"
@@ -502,6 +501,45 @@
                 app:layout_constraintBottom_toBottomOf="@+id/fab_privacy_policy"
                 app:layout_constraintEnd_toStartOf="@+id/fab_privacy_policy"
                 app:layout_constraintTop_toTopOf="@+id/fab_privacy_policy" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_setting_team"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dim_5_dp"
+                android:clickable="true"
+                android:elevation="16dp"
+                android:focusable="true"
+                app:backgroundTint="@color/colorAccent"
+                app:fabCustomSize="@dimen/_40sdp"
+                app:fabSize="normal"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/fab_privacy_policy"
+                app:layout_constraintEnd_toEndOf="@+id/fab_privacy_policy"
+                app:layout_constraintStart_toStartOf="@+id/fab_privacy_policy"
+                app:pressedTranslationZ="12dp"
+                app:srcCompat="@drawable/ic_settings_white"
+                app:tint="@color/white" />
+
+
+            <TextView
+                android:id="@+id/fab_setting_team_Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fab_bg"
+                android:clickable="true"
+                android:elevation="8dp"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="@string/setting"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/fab_setting_team"
+                app:layout_constraintEnd_toStartOf="@+id/fab_setting_team"
+                app:layout_constraintTop_toTopOf="@+id/fab_setting_team" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

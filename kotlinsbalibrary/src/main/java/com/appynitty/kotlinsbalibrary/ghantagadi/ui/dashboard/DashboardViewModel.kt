@@ -618,6 +618,10 @@ class DashboardViewModel @Inject constructor(
         dashboardEventChannel.send(DashboardEvent.ShowSettingScreen)
     }
 
+    fun onSettingTeamFabMenuClicked() = viewModelScope.launch {
+        dashboardEventChannel.send(DashboardEvent.ShowSettingTeamScreen)
+    }
+
     fun onChangeLanguageFabMenuClicked() = viewModelScope.launch {
         dashboardEventChannel.send(DashboardEvent.ShowChangeLanguageScreen)
     }
@@ -655,57 +659,90 @@ class DashboardViewModel @Inject constructor(
 
                     when (val empType = userDataStore.getUserEssentials.first().employeeType) {
                         "N" -> {
-//                            if (!isVehicleScanOn) dashboardEventChannel.send(DashboardEvent.GetVehiclesData)
+//                            if
+                            //                            (!isVehicleScanOn) dashboardEventChannel.send(DashboardEvent.GetVehiclesData)
 //                            else
                             dashboardEventChannel.send(DashboardEvent.StartVehicleQrScanner)
                             // dashboardEventChannel.send(DashboardEvent.GetVehiclesData)
                         }
 
                         "D" -> {
+
                             if (!isVehicleScanOn) dashboardEventChannel.send(DashboardEvent.GetVehiclesData)
                             else dashboardEventChannel.send(DashboardEvent.StartVehicleQrScanner)
                         }
 
-                        "L" -> {
-                            dashboardEventChannel.send(DashboardEvent.ShowLiquidEmployeeDialog)
-                        }
-
-                        "S" -> {
-                            dashboardEventChannel.send(DashboardEvent.ShowLiquidEmployeeDialog)
-                        }
-
                         else -> {
-                            val userVehicleDetails = UserVehicleDetails(
-                                "1",
-                                "",
-                                "1"
-                            )
+                            if (userDataStore.getUserEssentials.first().employeeType == "S" || userDataStore.getUserEssentials.first().employeeType == "L") {
+                                if (isTeamSelected.value == true) {
+                                    dashboardEventChannel.send(DashboardEvent.ShowLiquidEmployeeDialog)
+                                } else {
+                                    val userVehicleDetails = UserVehicleDetails(
+                                        "1",
+                                        "",
+                                        "1"
+                                    )
 
-                            val latitude = userLocationLiveData.value?.latitude
-                            val longitude = userLocationLiveData.value?.longitude
-                            val memberIds = memberIds.value
-                            val inPunchRequest = userId?.let {
-                                InPunchRequest(
-                                    DateTimeUtils.getServerTime(),
-                                    DateTimeUtils.getYyyyMMddDate(),
-                                    latitude!!,
-                                    longitude!!,
-                                    it,
-                                    "1",
-                                    "1",
-                                    empType,
-                                    ""
-                                )
-                            }
+                                    val latitude = userLocationLiveData.value?.latitude
+                                    val longitude = userLocationLiveData.value?.longitude
+                                    val memberIds = memberIds.value
+                                    val inPunchRequest = userId?.let {
+                                        InPunchRequest(
+                                            DateTimeUtils.getServerTime(),
+                                            DateTimeUtils.getYyyyMMddDate(),
+                                            latitude!!,
+                                            longitude!!,
+                                            it,
+                                            "1",
+                                            "1",
+                                            empType,
+                                            ""
+                                        )
+                                    }
 
-                            if (inPunchRequest != null) {
-                                saveInPunchDetails(
-                                    CommonUtils.APP_ID,
-                                    CommonUtils.CONTENT_TYPE,
-                                    batteryStatus,
-                                    inPunchRequest,
-                                    userVehicleDetails
+                                    if (inPunchRequest != null) {
+                                        saveInPunchDetails(
+                                            CommonUtils.APP_ID,
+                                            CommonUtils.CONTENT_TYPE,
+                                            batteryStatus,
+                                            inPunchRequest,
+                                            userVehicleDetails
+                                        )
+                                    }
+                                }
+                            } else {
+                                val userVehicleDetails = UserVehicleDetails(
+                                    "1",
+                                    "",
+                                    "1"
                                 )
+
+                                val latitude = userLocationLiveData.value?.latitude
+                                val longitude = userLocationLiveData.value?.longitude
+                                val memberIds = memberIds.value
+                                val inPunchRequest = userId?.let {
+                                    InPunchRequest(
+                                        DateTimeUtils.getServerTime(),
+                                        DateTimeUtils.getYyyyMMddDate(),
+                                        latitude!!,
+                                        longitude!!,
+                                        it,
+                                        "1",
+                                        "1",
+                                        empType,
+                                        ""
+                                    )
+                                }
+
+                                if (inPunchRequest != null) {
+                                    saveInPunchDetails(
+                                        CommonUtils.APP_ID,
+                                        CommonUtils.CONTENT_TYPE,
+                                        batteryStatus,
+                                        inPunchRequest,
+                                        userVehicleDetails
+                                    )
+                                }
                             }
                         }
                     }
@@ -860,6 +897,7 @@ class DashboardViewModel @Inject constructor(
         object NavigateToLoginScreen : DashboardEvent()
         object NavigateToSelectUlbScreen : DashboardEvent()
         object ShowSettingScreen : DashboardEvent()
+        object ShowSettingTeamScreen : DashboardEvent()
         object ShowChangeLanguageScreen : DashboardEvent()
         object DismissAlertDialogFrag : DashboardEvent()
         object EnableDutyToggle : DashboardEvent()

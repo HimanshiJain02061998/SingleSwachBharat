@@ -23,8 +23,6 @@ class SelectMembers : AppCompatActivity() {
     private val employeeViewModel: EmployeeViewModel by viewModels()
     private lateinit var adapter: MemberAdapter
     private var userId: String? = null
-    private var latitude: String? = null
-    private var longitude: String? = null
     @Inject
     lateinit var userDataStore: UserDataStore
 
@@ -37,8 +35,6 @@ class SelectMembers : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
         userId = intent.getStringExtra("USER_ID")
-        latitude = intent.getDoubleExtra("latitude", 0.0).toString()
-        longitude = intent.getDoubleExtra("longitude", 0.0).toString()
 
 
         binding.recyclerMembers.layoutManager = LinearLayoutManager(this)
@@ -70,9 +66,6 @@ class SelectMembers : AppCompatActivity() {
                 return true
             }
         })
-
-        latitude = intent.getDoubleExtra("latitude", 0.0).toString()
-        longitude = intent.getDoubleExtra("longitude", 0.0).toString()
 
         binding.btnConfirmSelection.setOnClickListener {
             val selectedMembers = adapter.getSelectedMembers()

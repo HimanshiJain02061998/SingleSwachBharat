@@ -98,6 +98,5 @@ class SettingBottomSheetFrag : BottomSheetDialogFragment() {
     interface SettingsCallBack {
         fun onBifurcationValueChanged(isBifurcationOn: Boolean)
         fun onVehicleScanValueChanged(isVehicleScanOn: Boolean)
-
     }
 }
