@@ -181,9 +181,9 @@
                         android:id="@+id/user_attendance_toggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="Duty toggle"
                         app:layout_constraintBottom_toBottomOf="@+id/user_attendance_status"
                         app:layout_constraintEnd_toEndOf="parent"
-                        android:contentDescription="Duty toggle"
                         app:layout_constraintTop_toTopOf="@+id/user_attendance_status" />
 
                     <TextView
@@ -213,9 +213,21 @@
                         app:layout_constraintStart_toStartOf="@+id/user_vehicle_type"
                         app:layout_constraintTop_toBottomOf="@+id/user_vehicle_type" />
 
+                    <TextView
+                        android:id="@+id/team_note"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:paddingVertical="@dimen/_4sdp"
+                        android:visibility="gone"
+                        android:text="Note: Team setting is on"
+                        android:textColor="@color/colorGray"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/user_profile_pic"
+                        app:layout_constraintTop_toBottomOf="@+id/user_attendance_toggle" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"

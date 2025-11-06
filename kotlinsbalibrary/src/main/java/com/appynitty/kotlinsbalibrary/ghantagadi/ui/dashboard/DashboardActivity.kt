@@ -335,7 +335,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         registerClickedEvents()
         setUpFabBtn()
         handleBackBtnInDashboard()
-
     }
 
 
@@ -548,7 +547,13 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     }
 
                     DashboardViewModel.DashboardEvent.ShowSettingTeamScreen -> {
-                        showSettingsTeamBottomSheet()
+                        if (isDutyOn) {
+                            CustomToast.showWarningToast(
+                                this@DashboardActivity,
+                                getString(R.string.off_duty_warning)
+                            )
+                        } else
+                            showSettingsTeamBottomSheet()
                     }
                 }
 
@@ -1050,6 +1055,11 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 binding.viewTeamButton.visibility = View.VISIBLE
             }else{
                 binding.viewTeamButton.visibility = View.GONE
+            }
+            if(it == true){
+                binding.teamNote.visibility = View.VISIBLE
+            }else{
+                binding.teamNote.visibility = View.GONE
             }
         })
 
