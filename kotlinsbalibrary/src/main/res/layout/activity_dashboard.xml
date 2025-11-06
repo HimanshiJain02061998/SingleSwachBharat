@@ -68,7 +68,6 @@
                     android:paddingHorizontal="@dimen/dim_12_dp"
                     android:paddingVertical="@dimen/_8sdp">
 
-
                     <!--                    <Button-->
                     <!--                        android:layout_width="wrap_content"-->
                     <!--                        android:layout_height="wrap_content"-->
@@ -176,7 +175,6 @@
                         app:layout_constraintStart_toStartOf="@+id/userEmployeeType"
                         app:layout_constraintTop_toBottomOf="@+id/userEmployeeType" />
 
-
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/user_attendance_toggle"
                         android:layout_width="wrap_content"
@@ -202,29 +200,25 @@
                         android:id="@+id/view_team_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="128dp"
                         android:layout_marginTop="@dimen/_3sdp"
-                        android:paddingHorizontal="@dimen/_8sdp"
-                        android:paddingVertical="@dimen/_4sdp"
                         android:text="@string/view_team"
                         android:textColor="@color/colorAccent"
                         android:textStyle="bold"
                         android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="@+id/user_vehicle_type"
-                        app:layout_constraintTop_toBottomOf="@+id/user_vehicle_type" />
+                        app:layout_constraintBottom_toTopOf="@+id/team_note"
+                        app:layout_constraintStart_toStartOf="@+id/team_note"
+                        app:layout_constraintTop_toBottomOf="@id/user_attendance_toggle" />
 
                     <TextView
                         android:id="@+id/team_note"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/_8sdp"
-                        android:paddingVertical="@dimen/_4sdp"
-                        android:visibility="gone"
-                        android:text="Note: Team setting is on"
+                        android:text="@string/note_team_setting_is_on"
+                        android:paddingTop="10dp"
                         android:textColor="@color/colorGray"
+                        android:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/user_profile_pic"
-                        app:layout_constraintTop_toBottomOf="@+id/user_attendance_toggle" />
+                        app:layout_constraintStart_toEndOf="@id/user_profile_pic" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>

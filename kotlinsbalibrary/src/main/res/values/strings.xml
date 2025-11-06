@@ -249,10 +249,11 @@
     <string name="search_employee">Search employee...</string>
     <string name="select_member">Select Member</string>
     <string name="confirm_selection">Confirm Selection</string>
-    <string name="view_team">View Team....</string>
+    <string name="view_team">View Team</string>
     <string name="no_team_members_selected">No team members selected</string>
     <string name="please_select_one_option">Please select one option</string>
     <string name="user_id_not_found">User ID not found</string>
     <string name="please_select_at_least_one_member">Please select at least one member</string>
     <string name="selected_team_members">Selected Team Members</string>
+    <string name="note_team_setting_is_on">(Note: Team setting is on)</string>
 </resources>
