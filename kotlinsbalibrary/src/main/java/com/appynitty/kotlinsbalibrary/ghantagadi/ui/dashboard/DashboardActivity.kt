@@ -1074,9 +1074,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     @SuppressLint("ClickableViewAccessibility")
     private fun registerClickedEvents() {
-
         binding.userAttendanceToggle.setOnClickListener {
-
+            locationPermission.initFineLocationPermission(this)
             isDutyToggleChecked = binding.userAttendanceToggle.isChecked
             getInstantLocation()
             binding.userAttendanceToggle.isChecked = isDutyOn
