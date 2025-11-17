@@ -25,11 +25,10 @@ class CommonUtils {
         val PACKAGE_NAME = MyApplication.PACKAGE_NAME
 
         //const val BASE_URL = "http://202.65.157.254:7570/"
-        const val BASE_URL = /*"https://ictcoreapi.ictsbm.com/"*/"https://testapi.ictsbm.com"
+        const val BASE_URL = "https://ictcoreapi.ictsbm.com/"//"https://testapi.ictsbm.com"
 //        const val BASE_URL = "https://testapi.ictsbm.com"
         //  const val BASE_URL = "http://124.153.94.110:1010/"
         // const val BASE_URL = "http://202.65.157.254:7570/"
-
         //  const val BASE_URL = "http://103.241.147.9:1010"
 
         const val CONTENT_TYPE = "application/json"

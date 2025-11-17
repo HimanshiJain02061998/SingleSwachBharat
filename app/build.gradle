@@ -15,8 +15,8 @@ android {
         applicationId "com.appynitty.ghantagadi"
         minSdk 24
         targetSdk 35
-        versionCode 12
-        versionName '4'
+        versionCode 17
+        versionName '5.3'
 
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -24,6 +24,12 @@ android {
         buildConfigField 'int', 'VERSION_CODE', "${versionCode}"
         buildConfigField "String", "VERSION_NAME", "\"${versionName}\""
         buildConfigField "String", "PACKAGE_NAME", "\"${applicationId}\""
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 
     buildFeatures {

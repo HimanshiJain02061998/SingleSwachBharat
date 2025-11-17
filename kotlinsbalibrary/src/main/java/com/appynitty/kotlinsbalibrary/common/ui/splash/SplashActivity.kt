@@ -38,7 +38,7 @@ class SplashActivity : AppCompatActivity() {
     }
     private val viewModel: SplashViewModel by viewModels()
     private lateinit var versionCodeTv: TextView
-    private var versionCode: Int = 0
+    private var versionCode: String = ""
 
     //setting app language ( by default it will be marathi if user doesn't change language )
     override fun attachBaseContext(newBase: Context?) {
@@ -55,8 +55,8 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        versionCode = (CommonUtils.VERSION_CODE).toInt()
-        val versionName = "$versionCode.0"
+        versionCode = CommonUtils.VERSION_CODE
+        val versionName = "$versionCode"
 
         versionCodeTv = findViewById(R.id.versionCodeTv)
         versionCodeTv.text = buildString {
