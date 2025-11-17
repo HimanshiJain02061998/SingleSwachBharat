@@ -3,8 +3,11 @@ package com.appynitty.kotlinsbalibrary.common.utils.permission
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -12,88 +15,129 @@ import androidx.core.app.ActivityCompat
 
 class LocationPermission(private val activity: AppCompatActivity) {
 
-
     fun initFineLocationPermission(context: Context) {
 
-        if (ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-                if (ActivityCompat.checkSelfPermission(
-                        context, Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    initBackgroundLocationPermission()
-                } else if (ActivityCompat.checkSelfPermission(
-                        context, Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-//                      LocationUtils.startLocationTracking(context)
-//                    LocationUtils.startGisLocationTracking(context)
-                }
-            } else {
-//                  LocationUtils.startLocationTracking(context)
-//                LocationUtils.startGisLocationTracking(context)
+        when {
+            isGranted(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                requestBackgroundIfNeeded()
             }
-        } else if (ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            showPermissionRequestDialog()
+
+            shouldShowRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                showFineLocationRationale()
+            }
+
+            else -> {
+                // User pressed “Don't ask again”
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         }
     }
 
-    private fun initBackgroundLocationPermission() {
+    // Check if granted
+    private fun isGranted(permission: String): Boolean {
+        return ActivityCompat.checkSelfPermission(activity, permission) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    // Check rationale
+    private fun shouldShowRationale(permission: String): Boolean {
+        return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+    }
+
+    // Ask for background location after fine location granted
+    private fun requestBackgroundIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+
+            when {
+                isGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION) -> {
+                    // LocationUtils.startLocationTracking(activity)
+                }
+
+                shouldShowRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION) -> {
+                    showBackgroundLocationRationale()
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+            }
         }
     }
 
-    private val requestPermissionLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            if (ActivityCompat.checkSelfPermission(
-                    activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-//                LocationUtils.startGisLocationTracking(activity)
-                //               LocationUtils.startLocationTracking(activity)
+    private val requestPermissionLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+
+            if (granted) {
+                requestBackgroundIfNeeded()
 
             } else {
-                Toast.makeText(activity, "Select : Allow all the time", Toast.LENGTH_SHORT).show()
-                initBackgroundLocationPermission()
-            }
-        } else {
-            if (ActivityCompat.checkSelfPermission(
-                    activity, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                showPermissionRequestDialog()
+                // Permission denied
+                if (!shouldShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // PERMANENTLY DENIED → Open Settings
+                    showSettingsRedirectDialog()
+                } else {
+                    showFineLocationRationale()
+                }
             }
         }
-    }
 
-
-    private fun showPermissionRequestDialog() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                activity, Manifest.permission.ACCESS_FINE_LOCATION
+    // Force user strongly to grant Fine Location
+    private fun showFineLocationRationale() {
+        AlertDialog.Builder(activity)
+            .setTitle("Location Permission Required")
+            .setMessage(
+                "This app requires location permission to function properly. " +
+                        "Please tap ALLOW to continue."
             )
-        ) {
-            AlertDialog.Builder(activity).setTitle("ACCESS_FINE_LOCATION")
-                .setMessage("Location permission required").setPositiveButton(
-                    "OK"
-                ) { _, _ ->
-                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }.create().show()
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-
+            .setCancelable(false)
+            .setPositiveButton("Allow") { _, _ ->
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            .setNegativeButton("Exit App") { _, _ ->
+                activity.finish()
+            }
+            .show()
     }
 
+    // Forceful dialog for background location
+    private fun showBackgroundLocationRationale() {
+        AlertDialog.Builder(activity)
+            .setTitle("Background Location Required")
+            .setMessage(
+                "Please select **Allow all the time** for accurate tracking in background."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Grant") { _, _ ->
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+            .setNegativeButton("Exit App") { _, _ ->
+                activity.finish()
+            }
+            .show()
+    }
 
+    // When user permanently denies
+    private fun showSettingsRedirectDialog() {
+        AlertDialog.Builder(activity)
+            .setTitle("Permission Needed")
+            .setMessage(
+                "You have permanently denied the permission.\n\n" +
+                        "Go to Settings → Permissions → Allow Location."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Open Settings") { _, _ ->
+                openAppSettings()
+            }
+            .setNegativeButton("Exit App") { _, _ ->
+                activity.finish()
+            }
+            .show()
+    }
+
+    // Redirect to app settings
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        intent.data = Uri.fromParts("package", activity.packageName, null)
+        activity.startActivity(intent)
+    }
 }
