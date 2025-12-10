@@ -190,9 +190,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     }
 
     private fun registerClickEvents() {
-
         alertDialog!!.setOnCancelListener {
-
             if (isSyncingOn) {
                 showCountDialog()
                 binding.syncOfflineBtn.visibility = View.GONE
@@ -212,7 +210,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         }
 
         binding.syncOfflineBtn.setOnClickListener {
-
             sessionDataStore
             if (syncOfflineList.isNotEmpty()) {
                 garbageCollectionViewModel.saveGarbageCollectionOfflineDataToApi(
@@ -226,7 +223,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     }
 
     private fun showCountDialog() {
-
         val stringBuffer = StringBuffer()
         stringBuffer.append(totalOfflineCount)
         stringBuffer.append(" ")
@@ -240,7 +236,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     private fun subscribeLiveData() {
         garbageCollectionViewModel.isSyncingOnLiveData.observe(this) {
             isSyncingOn = it
-
             if (it) {
                 showCountDialog()
             } else {
@@ -305,13 +300,11 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 if (alertDialog != null) if (alertDialog!!.isShowing) alertDialog?.dismiss()
                 binding.syncOfflineBtn.visibility = View.GONE
                 binding.showErrorOfflineData.visibility = View.VISIBLE
-
             }
             prepareData(it)
         }
 
         garbageCollectionViewModel.garbageCollectionResponseLiveData.observe(this) {
-
             when (it) {
 
                 is ApiResponseListener.Loading -> {
@@ -351,7 +344,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
     //searching by date
     private fun prepareData(mList: List<GarbageCollectionData>) {
-
         val offlineSyncShowList = ArrayList<SyncOfflineData>()
         var offlineGarbageCollectionCount: Int
         var offlineDumpCount: Int

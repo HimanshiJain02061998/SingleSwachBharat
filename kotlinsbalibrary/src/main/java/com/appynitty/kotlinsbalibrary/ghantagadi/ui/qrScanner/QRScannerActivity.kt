@@ -400,7 +400,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
     override fun onResume() {
         super.onResume()
-
         if (viewModel.referenceId == "") {
             resumeScanner()
         }
