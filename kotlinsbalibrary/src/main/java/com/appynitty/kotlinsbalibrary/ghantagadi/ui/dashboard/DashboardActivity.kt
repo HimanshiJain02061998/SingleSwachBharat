@@ -1973,7 +1973,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 previousTxBytes = currentTxBytes
 
                 withContext(Dispatchers.Main) {
-                    onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
+                 //   onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
+                    onSpeedUpdate("↑ $uploadSpeed Kbps")
                 }
             }
         }

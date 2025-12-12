@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraAccessException
+import android.net.TrafficStats
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -53,8 +54,11 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 private const val TAG = "QRScannerActivity"
@@ -267,11 +271,13 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
     private fun hideLoading() {
         binding.scannerView.progressBar.visibility = View.GONE
+        binding.scannerView.internetSpeed.visibility = View.GONE
         binding.scannerView.transparentWhiteBg.visibility = View.GONE
         binding.flashToggle.visibility = View.VISIBLE
     }
 
     private fun showLoading() {
+        binding.scannerView.internetSpeed.visibility = View.VISIBLE
         binding.scannerView.progressBar.visibility = View.VISIBLE
         binding.scannerView.transparentWhiteBg.visibility = View.VISIBLE
         binding.flashToggle.visibility = View.INVISIBLE
@@ -303,6 +309,9 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun initVars() {
+        startNetworkSpeedMonitor { speed ->
+            binding.scannerView.internetSpeed.text = "Internet Speed: $speed"
+        }
         empType = intent.getStringExtra("empType")
         isAttendanceRequest = intent.getBooleanExtra("isAttendanceRequest",false)
         comment = intent.getStringExtra("comment")
@@ -837,6 +846,31 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
             unregisterReceiver(receiver)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()
+        }
+    }
+
+    fun startNetworkSpeedMonitor(onSpeedUpdate: (String) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var previousRxBytes = TrafficStats.getTotalRxBytes()
+            var previousTxBytes = TrafficStats.getTotalTxBytes()
+
+            while (true) {
+                delay(1000) // every second
+                val currentRxBytes = TrafficStats.getTotalRxBytes()
+                val currentTxBytes = TrafficStats.getTotalTxBytes()
+
+                val downloadSpeed =
+                    (currentRxBytes - previousRxBytes) * 8 / 1024 // Kbps
+                val uploadSpeed = (currentTxBytes - previousTxBytes) * 8 / 1024 // Kbps
+
+                previousRxBytes = currentRxBytes
+                previousTxBytes = currentTxBytes
+
+                withContext(Dispatchers.Main) {
+                    //   onSpeedUpdate("↓ $downloadSpeed Kbps | ↑ $uploadSpeed Kbps")
+                    onSpeedUpdate("↑ $uploadSpeed Kbps")
+                }
+            }
         }
     }
 }

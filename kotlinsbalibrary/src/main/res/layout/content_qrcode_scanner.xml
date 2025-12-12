@@ -30,6 +30,16 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_gravity="center"/>
+    <TextView
+        android:id="@+id/internet_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/hyphen"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/gpsProgressLayout"
