@@ -25,7 +25,6 @@ import com.appynitty.kotlinsbalibrary.databinding.ActivityCameraBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
 import com.swapy.imagecompressor.ImageCompressor
-
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -33,29 +32,27 @@ import java.util.concurrent.Executors
 class CameraActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCameraBinding
+
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+    private var cameraProvider: ProcessCameraProvider? = null
+
     private var imageCapture: ImageCapture? = null
+    private var preview: Preview? = null
+
     private lateinit var imgCaptureExecutor: ExecutorService
 
     private val cameraPermissionResult =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
-            if (permissionGranted) {
-                startCamera()
-            } else {
-                Snackbar.make(
-                    binding.root,
-                    "The camera permission is necessary",
-                    Snackbar.LENGTH_INDEFINITE
-                ).show()
-            }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { permitted ->
+            if (permitted) startCamera()
+            else Snackbar.make(
+                binding.root,
+                "Camera permission required",
+                Snackbar.LENGTH_INDEFINITE
+            ).show()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (savedInstanceState != null) {
-            finish()
-        }
 
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -74,68 +71,76 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun takePhoto() {
-        imageCapture?.let {
-            val fileName = getFileNameTimeStamp() + ".jpeg"
-            val file = File(externalMediaDirs[0], fileName)
-            val outputFileOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-            it.takePicture(
-                outputFileOptions,
-                imgCaptureExecutor,
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        Log.e(TAG, "onImageSaved: ${file.absolutePath}")
-                        val compressedImagePath = ImageCompressor.compressImage(file.absolutePath)
-
-                        val intent = Intent().apply {
-                            putExtra(IMAGE_PATH, compressedImagePath)
-                            putExtra(REQUEST_ID, intent.getIntExtra(REQUEST_ID, 0))
-                        }
-
-                        runOnUiThread {
-                            CustomToast.showSuccessToast(
-                                this@CameraActivity,
-                                resources.getString(R.string.photo_clicked)
-                            )
-                        }
-                        setResult(Activity.RESULT_OK, intent)
-                        finish()
-                    }
-                    override fun onError(exception: ImageCaptureException) {
-
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@CameraActivity,
-                                "Error occurred!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            binding.imgCaptureBtn.visibility = View.VISIBLE
-
-                        }
-                    }
-                })
-        }
-    }
-
     private fun startCamera() {
-        val preview = Preview.Builder().build().also {
-            it.setSurfaceProvider(binding.preview.surfaceProvider)
+
+        preview = Preview.Builder().build().also { p ->
+            p.setSurfaceProvider(binding.preview.surfaceProvider)
         }
+
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            imageCapture = ImageCapture.Builder().build()
+            cameraProvider = cameraProviderFuture.get()
+            val provider = cameraProvider ?: return@addListener
+
+            imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
+
             try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                provider.unbindAll()
+                provider.bindToLifecycle(
                     this,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
                     imageCapture
                 )
             } catch (e: Exception) {
-                Log.d(TAG, "Use case binding failed")
+                Log.e(TAG, "Camera binding error: ${e.message}")
             }
+
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun takePhoto() {
+        val capture = imageCapture ?: return
+
+        val file = File(externalMediaDirs.first(), getFileNameTimeStamp() + ".jpeg")
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+
+        capture.takePicture(
+            outputOptions, imgCaptureExecutor,
+            object : ImageCapture.OnImageSavedCallback {
+
+                override fun onImageSaved(result: ImageCapture.OutputFileResults) {
+                    val compressedPath = ImageCompressor.compressImage(file.absolutePath)
+
+                    val outputIntent = Intent().apply {
+                        putExtra(IMAGE_PATH, compressedPath)
+                        putExtra(REQUEST_ID, intent.getIntExtra(REQUEST_ID, 0))
+                    }
+
+                    runOnUiThread {
+                        CustomToast.showSuccessToast(
+                            this@CameraActivity,
+                            getString(R.string.photo_clicked)
+                        )
+                    }
+
+                    setResult(Activity.RESULT_OK, outputIntent)
+                    finish()
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@CameraActivity,
+                            "Error capturing photo",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.imgCaptureBtn.visibility = View.VISIBLE
+                    }
+                }
+            }
+        )
     }
 
     private fun animateFlash() {
@@ -147,19 +152,36 @@ class CameraActivity : AppCompatActivity() {
         }, 100)
     }
 
+    // IMPORTANT: Prevent VIVO freeze by releasing camera COMPLETELY
+    override fun onDestroy() {
+        super.onDestroy()
+
+        try {
+            cameraProvider?.unbindAll()
+        } catch (_: Exception) {
+        }
+        try {
+            preview?.setSurfaceProvider(null)
+        } catch (_: Exception) {
+        }
+        try {
+            imgCaptureExecutor.shutdown()
+        } catch (_: Exception) {
+        }
+    }
+
     companion object {
         private const val TAG = "CameraActivity"
         const val REQUEST_ID = "REQUEST_ID"
 
-        fun getIntent(context: Context, postId: Int): Intent {
+        fun getIntent(context: Context, requestId: Int): Intent {
             return Intent(context, CameraActivity::class.java).apply {
-                putExtra(REQUEST_ID, postId)
+                putExtra(REQUEST_ID, requestId)
             }
         }
     }
 
     override fun finish() {
-
         overridePendingTransition(
             R.anim.slide_in_left,
             R.anim.slide_out_right

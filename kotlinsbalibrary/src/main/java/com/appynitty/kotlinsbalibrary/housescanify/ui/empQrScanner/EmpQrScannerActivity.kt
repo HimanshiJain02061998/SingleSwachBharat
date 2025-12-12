@@ -87,7 +87,7 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
     private var shouldResumeScanner: Boolean = false
     private lateinit var photoSubmitDialogFrag: PhotoSubmitDialogFrag
     private var propertyTypeList = mutableListOf<PropertyType>()
-
+    private var isClosing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -239,6 +239,7 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
     }
 
     private fun startMapActivityForResults() {
+        isClosing = true
         val mapsIntent = Intent(this, MapsActivity::class.java)
         mapsIntent.putExtra("latitude", latitude?.toDouble())
         mapsIntent.putExtra("longitude", longitude?.toDouble())
@@ -558,6 +559,9 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
 
                     //  openCameraActivity.launch(CameraActivity.getIntent(this, 10))
                 }
+                else{
+
+                }
             } else {
                 shouldResumeScanner = true
             }
@@ -569,7 +573,6 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
 
         if (activityResult.resultCode == RESULT_OK) {
             binding.scannerView.gpsProgressLayout.visibility = View.VISIBLE
-
             Handler(Looper.myLooper()!!).postDelayed({
                 if (isGpsOn) {
                     binding.scannerView.gpsProgressLayout.visibility = View.GONE
@@ -609,10 +612,8 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
         beepManager = BeepManager(this)
     }
 
-
     override fun onResume() {
         super.onResume()
-
 
         if (referenceId == null) {
             resumeScanner()
@@ -643,26 +644,19 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
     }
 
     private fun initVars() {
-
-
         lifecycleScope.launch {
             propertyTypeList = viewModel.propertyTypeList.first().toMutableList()
         }
 
         photoSubmitDialogFrag = PhotoSubmitDialogFrag()
-
         photoSubmitDialogFrag.setListener(this)
-
         //getting data from dashboard screen
         empType = intent.getStringExtra("empType")
         languageId = intent.getStringExtra("languageId")
         userId = intent.getStringExtra("userId")
         userTypeId = intent.getStringExtra("userTypeId")
-
         scannerView = binding.scannerView.qrScanner1
         userDataStore = UserDataStore(applicationContext)
-
-
     }
 
     private fun hasFlash(): Boolean {
@@ -671,9 +665,7 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
 
 
     private fun setUpFlashFab() {
-
         binding.flashToggle.setOnClickListener {
-
             if (hasFlash()) {
                 if (!isFlashLightOn) {
                     try {
@@ -719,6 +711,8 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
 
 
     override fun finish() {
+        isClosing = true
+        pauseScanner()
         super.finish()
         try {
             // true sets the torch in OFF mode
@@ -728,11 +722,9 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
                     resources, R.drawable.ic_flash_off, null
                 )
             )
-
             scannerView.setTorchOff()
             // Inform the user about the flashlight
             // status using Toast message
-
         } catch (e: CameraAccessException) {
             // prints stack trace on standard error
             // output error stream
@@ -774,6 +766,7 @@ class EmpQrScannerActivity : AppCompatActivity(), PhotoSubmitDialogFrag.PhotoSub
     override fun onDestroy() {
         super.onDestroy()
         try {
+            binding.scannerView.qrScanner1.pause()
             unregisterReceiver(receiver)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()

@@ -119,8 +119,11 @@ class MapsActivity : AppCompatActivity(), SensorEventListener,
         registerMapListeners()
         observerLiveData()
         BackBtnPressedUtil.handleBackBtnPressed(this, this, this)
+    }
 
+    override fun finish() {
 
+        super.finish()
     }
 
     private fun registerMapListeners() {
