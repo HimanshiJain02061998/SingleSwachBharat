@@ -453,43 +453,104 @@ class DashboardViewModel @Inject constructor(
     ) = viewModelScope.launch {
 
         if (response.isSuccessful) {
-            response.body()?.let {
+
+            response.body()?.let { it ->
+
                 if (it.status == STATUS_SUCCESS) {
+
+                    // Success case
                     dashboardEventChannel.send(
-                        DashboardEvent.ShowResponseSuccessMessage(
-                            it.message, it.messageMar
-                        )
+                        DashboardEvent.ShowResponseSuccessMessage(it.message, it.messageMar)
                     )
                     dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
-                    //  dashboardEventChannel.send(DashboardEvent.HitGisServer)
                     saveUserIsDutyOn(false)
 
                 } else {
+
+                    // ERROR case but API returns valid body
                     dashboardEventChannel.send(
-                        DashboardEvent.ShowResponseErrorMessage(
-                            it.message, it.messageMar
-                        )
+                        DashboardEvent.ShowResponseErrorMessage(it.message, it.messageMar)
                     )
+
+                    // 🛑 FORCEFUL CHECKOUT CONDITIONS
+                    if (it.referenceID == null ||
+                        it.isAttendenceOff == false ||
+                        it.dutyStatus == null
+                    ) {
+
+                        // Force logout
+                        userDataStore.clearUserDatastore()
+                        sessionDataStore.clearSessionDatastore()
+                        dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
+
+                        // Navigate to Select ULB
+                        dashboardEventChannel.send(
+                            DashboardEvent.NavigateToSelectUlbScreen
+                        )
+                        return@launch
+                    }
                 }
             }
+
         } else if (response.code() == 422) {
-            Log.d("messgeboy", "message s ${response.body()}")
+
             dashboardEventChannel.send(
-                DashboardEvent.ShowResponseErrorMessage(
-                    "Invalid IMEI No", "अवैध IMEI No"
-                )
+                DashboardEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No")
             )
             performForcefullyLogout()
+
         } else {
             dashboardEventChannel.send(
-                DashboardEvent.ShowFailureMessage(
-                    response.code().toString()
-                )
+                DashboardEvent.ShowFailureMessage(response.code().toString())
             )
         }
+
         dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
         dashboardEventChannel.send(DashboardEvent.HideProgressBar)
     }
+
+//    private fun handleAttendanceOffResponse(
+//        response: Response<AttendanceResponse>
+//    ) = viewModelScope.launch {
+//
+//        if (response.isSuccessful) {
+//            response.body()?.let {
+//                if (it.status == STATUS_SUCCESS) {
+//                    dashboardEventChannel.send(
+//                        DashboardEvent.ShowResponseSuccessMessage(
+//                            it.message, it.messageMar
+//                        )
+//                    )
+//                    dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
+//                    //  dashboardEventChannel.send(DashboardEvent.HitGisServer)
+//                    saveUserIsDutyOn(false)
+//
+//                } else {
+//                    dashboardEventChannel.send(
+//                        DashboardEvent.ShowResponseErrorMessage(
+//                            it.message, it.messageMar
+//                        )
+//                    )
+//                }
+//            }
+//        } else if (response.code() == 422) {
+//            Log.d("messgeboy", "message s ${response.body()}")
+//            dashboardEventChannel.send(
+//                DashboardEvent.ShowResponseErrorMessage(
+//                    "Invalid IMEI No", "अवैध IMEI No"
+//                )
+//            )
+//            performForcefullyLogout()
+//        } else {
+//            dashboardEventChannel.send(
+//                DashboardEvent.ShowFailureMessage(
+//                    response.code().toString()
+//                )
+//            )
+//        }
+//        dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
+//        dashboardEventChannel.send(DashboardEvent.HideProgressBar)
+//    }
 
     val userVehicleDetailsFlow = userDataStore.getUserVehicleDetails.asLiveData()
     val isBifurcationOnLiveData = userDataStore.getIsBifurcationOn.asLiveData()
