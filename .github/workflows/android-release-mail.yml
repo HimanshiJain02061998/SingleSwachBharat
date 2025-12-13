@@ -3,7 +3,7 @@ name: Android Release Build & Mail
 on:
   push:
     branches:
-      - select_duty_members
+      - send_release_build_ci_cd
   workflow_dispatch:
 
 jobs:
