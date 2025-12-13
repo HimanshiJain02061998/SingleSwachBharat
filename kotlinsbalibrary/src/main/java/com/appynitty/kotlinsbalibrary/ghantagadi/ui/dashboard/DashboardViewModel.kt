@@ -472,7 +472,7 @@ class DashboardViewModel @Inject constructor(
                         DashboardEvent.ShowResponseErrorMessage(it.message, it.messageMar)
                     )
 
-                    // 🛑 FORCEFUL CHECKOUT CONDITIONS
+                    //  FORCEFUL CHECKOUT CONDITIONS
                     if (it.referenceID == null ||
                         it.isAttendenceOff == false ||
                         it.dutyStatus == null
