@@ -474,20 +474,11 @@ class DashboardViewModel @Inject constructor(
 
                     // 🛑 FORCEFUL CHECKOUT CONDITIONS
                     if (it.referenceID == null ||
-                        it.isAttendenceOff == false ||
+                        it.isAttendenceOff == null ||
                         it.dutyStatus == null
                     ) {
-
-                        // Force logout
-                        userDataStore.clearUserDatastore()
-                        sessionDataStore.clearSessionDatastore()
                         dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
-
-                        // Navigate to Select ULB
-                        dashboardEventChannel.send(
-                            DashboardEvent.NavigateToSelectUlbScreen
-                        )
-                        return@launch
+                        saveUserIsDutyOn(false)
                     }
                 }
             }
