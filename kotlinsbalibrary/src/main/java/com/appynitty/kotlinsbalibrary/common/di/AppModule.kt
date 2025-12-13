@@ -3,6 +3,7 @@ package com.appynitty.kotlinsbalibrary.common.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.appynitty.kotlinsbalibrary.BuildConfig.BASE_URL
 import com.appynitty.kotlinsbalibrary.common.MyApplication
 import com.appynitty.kotlinsbalibrary.common.api.*
 import com.appynitty.kotlinsbalibrary.common.database.SbaDatabase
@@ -112,7 +113,7 @@ object AppModule {
         converterFactory: Converter.Factory,
         scalarsConverterFactory: ScalarsConverterFactory
     ): Retrofit =
-        Retrofit.Builder().baseUrl(CommonUtils.BASE_URL)
+        Retrofit.Builder().baseUrl(BASE_URL)
             .addConverterFactory(scalarsConverterFactory)
             .addConverterFactory(converterFactory)
             .client(client).build()
@@ -162,7 +163,7 @@ object AppModule {
         @Named("Authorize") client: OkHttpClient, converterFactory: Converter.Factory,
         scalarsConverterFactory: ScalarsConverterFactory
     ): Retrofit =
-        Retrofit.Builder().baseUrl(CommonUtils.BASE_URL)
+        Retrofit.Builder().baseUrl(BASE_URL)
             .addConverterFactory(scalarsConverterFactory)
             .addConverterFactory(converterFactory)
             .client(client).build()
