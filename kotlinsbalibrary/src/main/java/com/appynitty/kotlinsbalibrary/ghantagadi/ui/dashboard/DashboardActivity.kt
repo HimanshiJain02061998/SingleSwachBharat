@@ -480,7 +480,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                         viewModel.shouldStartLocationService(
                             isMyServiceRunning(
                                 GisLocationService::class.java
-                            )
+                            ),
+                            this@DashboardActivity
                         )
                     }
 

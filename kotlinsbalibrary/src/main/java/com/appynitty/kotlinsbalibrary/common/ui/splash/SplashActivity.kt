@@ -141,6 +141,7 @@ class SplashActivity : AppCompatActivity() {
                     )
                 }
 
+
                 appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,

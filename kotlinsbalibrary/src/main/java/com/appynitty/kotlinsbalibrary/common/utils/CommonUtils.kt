@@ -36,6 +36,7 @@ class CommonUtils {
         // const val BASE_URL = "http://202.65.157.254:7570/"
         //  const val BASE_URL = "http://103.241.147.9:1010"
 
+        const val ACTION_START_LOCATION_HEALTH_CHECK = "com.appynitty.ACTION_START_LOCATION_HEALTH_CHECK"
         const val CONTENT_TYPE = "application/json"
         const val STATUS_SUCCESS = "success"
         const val GIS_STATUS_SUCCESS = "Success"

@@ -2,6 +2,7 @@ package com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard
 
 import android.content.Context
 import android.content.Context.TELEPHONY_SERVICE
+import android.content.Intent
 import android.os.Build
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -15,6 +16,7 @@ import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.model.response.AttendanceResponse
 import com.appynitty.kotlinsbalibrary.common.model.response.VehicleQrDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.ACTION_START_LOCATION_HEALTH_CHECK
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.STATUS_SUCCESS
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
@@ -611,14 +613,19 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun shouldStartLocationService(isServiceRunning: Boolean) = viewModelScope.launch {
+    fun shouldStartLocationService(isServiceRunning: Boolean, activity: DashboardActivity) = viewModelScope.launch {
 
+        Log.d("permissionCheck","service is $isServiceRunning")
         val isDutyOn = sessionDataStore.getIsUserDutyOn.first()
 
         if (isDutyOn) {
             if (!isServiceRunning) {
 
                 dashboardEventChannel.send(DashboardEvent.StartLocationTracking)
+            }else{
+//                activity.sendBroadcast(
+//                    Intent(ACTION_START_LOCATION_HEALTH_CHECK)
+//                )
             }
         } else {
             if (isServiceRunning) dashboardEventChannel.send(DashboardEvent.StopLocationTracking)

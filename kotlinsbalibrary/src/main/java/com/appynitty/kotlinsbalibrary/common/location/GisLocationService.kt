@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.hardware.Sensor
@@ -36,6 +38,7 @@ import com.appynitty.kotlinsbalibrary.common.model.response.NearestLatLng
 import com.appynitty.kotlinsbalibrary.common.repository.LocationRepository
 import com.appynitty.kotlinsbalibrary.common.repository.NearestLatLngRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.ACTION_START_LOCATION_HEALTH_CHECK
 import com.appynitty.kotlinsbalibrary.common.utils.ConnectivityStatus
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
@@ -75,6 +78,8 @@ private const val TAG = "GisLocationServiceTest"
 @AndroidEntryPoint
 class GisLocationService : LifecycleService(), SensorEventListener {
 
+    @Volatile
+    private var lastLocationUpdateTime: Long = 0L
     @Inject
     lateinit var garbageCollectionRepo: GarbageCollectionRepo
 
@@ -169,7 +174,11 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
             val location = locationResult.lastLocation
             if (location != null) {
+                lastLocationUpdateTime = System.currentTimeMillis()
                 val requiredAccuracyInMeter = 15// adjust your need
+                Toast.makeText(this@GisLocationService,"loation getting lat ${location.latitude}",
+                    Toast.LENGTH_SHORT).show()
+                Log.d("permissionCheck","location is ${location.latitude}")
                 if (location.hasAccuracy() && location.accuracy <= requiredAccuracyInMeter) {
 
                     latitude = location.latitude.toString()
@@ -323,11 +332,23 @@ class GisLocationService : LifecycleService(), SensorEventListener {
         }
     }
 
+    private val locationHealthReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == ACTION_START_LOCATION_HEALTH_CHECK) {
+                startLocationHealthCheck()
+            }
+        }
+    }
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {
 
         super.onCreate()
+
+        registerReceiver(
+            locationHealthReceiver,
+            IntentFilter(ACTION_START_LOCATION_HEALTH_CHECK)
+        )
 
         userDataStore = UserDataStore(this)
         sessionDataStore = SessionDataStore(this)
@@ -412,6 +433,38 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
     }
 
+    private fun startLocationHealthCheck() {
+        scope.launch {
+                val diff = System.currentTimeMillis() - lastLocationUpdateTime
+
+                if (diff > 30_000) { // no update for 30 sec
+                    Log.e("LocationCheck", "Location NOT updating")
+                    restartLocationUpdatesSafely()
+                }
+        }
+    }
+
+    private fun restartLocationUpdatesSafely() {
+        val hasLocationPermission =
+            ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasLocationPermission) {
+
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
+
+    }
     private fun sendBroadCast(){
         val message = "LOG_OUT"
         // Send broadcast
@@ -452,12 +505,25 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                 .setSmallIcon(R.drawable.ic_noti_icon)
                 .setColor(resources.getColor(R.color.colorPrimary, resources.newTheme())).build()
 
-        startForeground(2, notification)
+        val hasLocationPermission =
+            ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasLocationPermission) {
+            Log.d("permissionCheck","permission permitted")
+            startForeground(2, notification)
+        }else{
+            Log.d("permissionCheck","permission not permitted")
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-
+       Log.d("permissionCheck","check recreate")
         mTimer = Timer()
         mTimer!!.schedule(
             TimerTaskToSendGisLocation(), 10, gisNotifyInterval
@@ -469,6 +535,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(locationHealthReceiver)
         fusedLocationClient.removeLocationUpdates(locationCallback)
         mSensorManager.unregisterListener(this)
         if (internetLiveData != null) internetLiveData?.removeObservers(this)
@@ -502,6 +569,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
         scope.launch {
             val userType = userDataStore.getUserEssentials.first()
             if (userType.userTypeId == "0" && userType.employeeType == "N") {
+                Toast.makeText(applicationContext,"location getting", Toast.LENGTH_SHORT).show()
                 val lastScannedHouseLocation = userDataStore.getLastGhantaGadiScanLatLong.first()
                 if (lastScannedHouseLocation.latitude.isNotEmpty() && lastScannedHouseLocation.longitude.isNotEmpty()) {
                     val prevLocation = Location("LastGhantaGadiLocation")
@@ -522,6 +590,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
         }
 
     private fun getNearestHouseLocation() = scope.launch {
+        Toast.makeText(applicationContext,"nearest house", Toast.LENGTH_SHORT).show()
         val userId = userDataStore.getUserEssentials.first().userId
         val userLatLng = userDataStore.getUserLatLong.first()
         val latitude = userLatLng.latitude
@@ -662,7 +731,6 @@ class GisLocationService : LifecycleService(), SensorEventListener {
             sendBroadCast()
         }
     }
-
     private fun prepareData() {
         scope.launch {
             userDetailsDao.gerUserData().collect {
