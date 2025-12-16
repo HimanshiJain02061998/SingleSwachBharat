@@ -14,6 +14,7 @@ android {
     defaultConfig {
         applicationId "com.appynitty.ghantagadi"
         minSdk 24
+
         targetSdk 35
         versionCode 18
         versionName '5.5'
