@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.addUlb.AddUlbActivity
-import com.appynitty.kotlinsbalibrary.common.ui.inAppUpdate.UpdateDialogFragment
 import com.appynitty.kotlinsbalibrary.common.ui.login.LoginActivity
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CustomToast
@@ -122,34 +121,37 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkForImmediateUpdate() {
-        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        try {
+            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
 
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            when {
-                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                        appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
+            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+                when {
+                    appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                            appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
 
-                    val options = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
-                        .setAllowAssetPackDeletion(true)
-                        .build()
+                        val options = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
+                            .setAllowAssetPackDeletion(true)
+                            .build()
 
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        this,
-                        options,
-                        UPDATE_REQUEST_CODE
-                    )
-                }
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            this,
+                            options,
+                            UPDATE_REQUEST_CODE
+                        )
+                    }
 
-                appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        this,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                        UPDATE_REQUEST_CODE
-                    )
+                    appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            this,
+                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                            UPDATE_REQUEST_CODE
+                        )
+                    }
                 }
             }
+        } catch (e: Exception) {
         }
     }
 
