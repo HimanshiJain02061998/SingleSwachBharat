@@ -67,7 +67,6 @@ class DashboardViewModel @Inject constructor(
     private val nearestLatLngDao: NearestLatLngDao,
     private val userTravelLocDao: UserTravelLocDao,
     private val garbageCollectionDao: GarbageCollectionDao,
-    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tempUserDataStore: TempUserDataStore,
     @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
@@ -86,16 +85,12 @@ class DashboardViewModel @Inject constructor(
 
     private var deviceIdCon: String? = null
 
-    private val _isOfflineUi = MutableLiveData(false)
-    val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
-    private val _isOffline = MutableLiveData(false)
+
 
 
     init {
         getTeam()
         getSelectedTeam()
-        getIsOfflineMode()
-        loadOfflineModeOnce()
     }
 
 
@@ -137,33 +132,6 @@ class DashboardViewModel @Inject constructor(
          }
     }
 
-    fun loadOfflineModeOnce() {
-        viewModelScope.launch {
-            val value = userDataStore.getIsOfflineMode.first()
-            _isOfflineUi.value = value
-            Log.d("checkStatus", "status is $value")
-        }
-    }
-    fun getIsOfflineMode() {
-        viewModelScope.launch {
-            Log.d("checkStatus","status is ${userDataStore.getIsOfflineMode.first()}")
-            userDataStore.getIsOfflineMode.collect { value ->
-                _isOffline.value = value
-                if(!value) deleteDataFromTempGarbage()
-            }
-        }
-    }
-    private fun deleteDataFromTempGarbage(){
-        Log.d("checkStatus","delete gc called")
-        viewModelScope.launch(Dispatchers.IO) {
-           val garbageCollectionList = garbageCollectionDaoTemp.getGarbageCollectionData().first()
-            garbageCollectionList
-                .filter { it.isUploaded == true }
-                .forEach {
-                    garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
-                }
-        }
-    }
 
     suspend fun checkSameUserLogin(): Boolean {
         val tempUser = tempUserDataStore.getUserEssentials.first()
@@ -1003,7 +971,6 @@ class DashboardViewModel @Inject constructor(
             userTravelLocDao.deleteAllUserTravelLatLongs()
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
-            garbageCollectionDaoTemp.deleteAllGarbageCollection()
         }
     }
 

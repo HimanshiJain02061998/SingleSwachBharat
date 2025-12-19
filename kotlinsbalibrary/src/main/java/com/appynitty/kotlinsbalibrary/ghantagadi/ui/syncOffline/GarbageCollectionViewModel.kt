@@ -46,7 +46,6 @@ class GarbageCollectionViewModel(
     application: Application,
     private val garbageCollectionRepo: GarbageCollectionRepo,
     private val garbageCollectionDao: GarbageCollectionDao,
-    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val archivedDao: ArchivedDao,
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
@@ -66,54 +65,11 @@ class GarbageCollectionViewModel(
     private var isDumpTripSyncOn = false
     private var deviceIdCon: String? = null
 
-    private val _isOfflineUi = MutableLiveData(false)
-    val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
-
-
-    init {
-
-        viewModelScope.launch {
-            isDumpTripSyncFlow.collect {
-                isDumpTripSyncOn = it
-            }
-        }
-       // loadOfflineModeOnce()
-        getIsOfflineMode()
-    }
-
-    fun getIsOfflineMode() {
-        viewModelScope.launch {
-            userDataStore.getIsOfflineMode.collect { value ->
-                _isOfflineUi.value = value
-                if(!value) deleteDataFromTempGarbage()
-            }
-        }
-    }
-
-    private fun deleteDataFromTempGarbage(){
-        Log.d("checkStatus","delete gc called")
-        viewModelScope.launch(Dispatchers.IO) {
-            val garbageCollectionList = garbageCollectionDaoTemp.getGarbageCollectionData().first()
-            garbageCollectionList
-                .filter { it.isUploaded == true }
-                .forEach {
-                    garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
-                }
-        }
-    }
-
     fun setSyncingLiveDataToNull() {
         garbageCollectionResponseLiveData.postValue(null)
         isSyncingOnLiveData.postValue(false)
     }
 
-    fun loadOfflineModeOnce() {
-        viewModelScope.launch {
-            val value = userDataStore.getIsOfflineMode.first()
-            _isOfflineUi.value = value
-            Log.d("checkStatus", "status is $value")
-        }
-    }
 
     fun saveGarbageCollectionOfflineDataToApi(
         appId: String,
@@ -296,13 +252,11 @@ class GarbageCollectionViewModel(
             garbageCollectionDao.deleteGCById(
                 offlineId
             )
-           garbageCollectionDaoTemp.deleteGCById(offlineId)
         }
     }
 
 
     fun getGarbageCollectionListFromRoom() = garbageCollectionDao.getGarbageCollectionData()
-    fun getGarbageCollectionListFromRoomTemp() = garbageCollectionDaoTemp.getGarbageCollectionData()
 
     suspend fun getGcCount(): Int {
 

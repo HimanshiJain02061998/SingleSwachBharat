@@ -844,9 +844,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     private fun subscribeLiveData() {
 
-        viewModel.isOfflineUi.observe(this, Observer {
-           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
-        })
 
         viewModel.isBifurcationOnLiveData.observe(this, Observer {
             isBifurcationOn = it

@@ -25,7 +25,7 @@ class GarbageCollectionViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GarbageCollectionViewModel(
-            application, repository, garbageCollectionDao,garbageCollectionDaoTemp, archivedDao,
+            application, repository, garbageCollectionDao, archivedDao,
             tripRepository, sessionDataStore,userDataStore
         ) as T
     }

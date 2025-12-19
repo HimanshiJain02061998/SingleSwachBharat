@@ -247,10 +247,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
     private fun subscribeLiveData() {
 
-        garbageCollectionViewModel.isOfflineUi.observe(this, Observer {
-            isOfflineMode = it
-        })
-
         garbageCollectionViewModel.isSyncingOnLiveData.observe(this) {
             isSyncingOn = it
             if (it) {
@@ -301,38 +297,8 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
 
             if (it.isNotEmpty()) {
-                syncOfflineListMain.clear()
-                syncOfflineListMain.addAll(it)
-            }
-            /*    binding.syncOfflineBtn.isEnabled = true
-                syncOfflineListMain.clear()
-                syncOfflineListMain.addAll(it)
-                if (isInternetOn ) {
-                    if (alertDialog != null && alertDialog!!.isShowing) binding.syncOfflineBtn.visibility =
-                        View.GONE
-                    else {
-                        if (it.isNotEmpty()) binding.syncOfflineBtn.visibility = View.VISIBLE
-                    }
-
-                } else binding.syncOfflineBtn.visibility = View.GONE
-
-                Log.d("TAG", "subscribeLiveData: $it")
-            } else {
-                if (alertDialog != null) if (alertDialog!!.isShowing) alertDialog?.dismiss()
-                binding.syncOfflineBtn.visibility = View.GONE
-                binding.showErrorOfflineData.visibility = View.VISIBLE
-            }*/
-
-        }
-
-        garbageCollectionViewModel.getGarbageCollectionListFromRoomTemp().asLiveData().observe(this) {
-
-            totalGcCount = it.size
-            val mainList = it.toMainList()
-
-            if (it.isNotEmpty()) {
                 syncOfflineList.clear()
-                syncOfflineList.addAll(mainList)
+                syncOfflineList.addAll(it)
                 binding.syncOfflineBtn.isEnabled = true
 
                 totalOfflineCount = it.size
@@ -357,8 +323,10 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 binding.syncOfflineBtn.visibility = View.GONE
                 binding.showErrorOfflineData.visibility = View.VISIBLE
             }
-            prepareData(mainList)
+            prepareData(it)
+
         }
+
 
         garbageCollectionViewModel.garbageCollectionResponseLiveData.observe(this) {
             when (it) {

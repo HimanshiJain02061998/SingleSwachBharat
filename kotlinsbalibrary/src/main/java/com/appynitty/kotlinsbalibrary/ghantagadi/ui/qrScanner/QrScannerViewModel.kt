@@ -48,7 +48,6 @@ private const val TAG = "QrScannerViewModel"
 class QrScannerViewModel @Inject constructor(
     private val garbageCollectionRepo: GarbageCollectionRepo,
     private val garbageCollectionDao: GarbageCollectionDao,
-    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
     private val userDataStore: UserDataStore,
@@ -337,13 +336,11 @@ class QrScannerViewModel @Inject constructor(
                 tempList.forEach {
                     if (garbageCollectionData.referenceId == it.referenceId) {
                         garbageCollectionDao.deleteGCById(it.offlineId.toString())
-                        garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
                     }
                 }
             }
-           val garbageCollectionDataTemp =  garbageCollectionData.toTempEntity()
+
             garbageCollectionDao.insertGarbageCollection(garbageCollectionData)
-            garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
             qrScannerEventChannel.send(QrScannerEvent.ShowSuccessToast(R.string.saved_offline))
             qrScannerEventChannel.send(
                 QrScannerEvent.FinishActivity
