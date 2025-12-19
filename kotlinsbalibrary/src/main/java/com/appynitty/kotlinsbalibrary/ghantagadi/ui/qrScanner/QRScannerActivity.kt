@@ -22,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
@@ -93,6 +94,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     private var comment: String? = null
     private var distance = "0"
     private var isDialogVisible = false
+    private var isOfflineMode = false
 
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -422,6 +424,11 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     private fun subscribeLiveData() {
+
+        viewModel.isOffline.observe(this, Observer {
+            isOfflineMode = it
+        })
+
         receiver.airplaneModeLiveData.observe(this) {
 
             if (!it) {
@@ -728,59 +735,9 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         val garbageCollectionData: GarbageCollectionData?
         val intBatteryStatus = batteryStatus.toInt()
 
-        if (isInternetOn) {
-            val beforeAfterImagesMap = CameraUtils.prepareBeforeAfterImages(
-                offlineFirstImagePath,
-                offlineSecondImagePath,
-                referenceId,
-                latitude!!,
-                longitude!!,
-                DateTimeUtils.getSimpleDateTime()
-            )
+        if (isOfflineMode) {
 
-            var beforeImageBase64: String? = null
-            var afterImageBase64: String? = null
 
-            if (offlineFirstImagePath != null) beforeImageBase64 =
-                beforeAfterImagesMap["beforeImageBase64"]
-
-            if (offlineSecondImagePath != null) afterImageBase64 =
-                beforeAfterImagesMap["afterImageBase64"]
-
-            garbageCollectionData = GarbageCollectionData(
-                0,
-                referenceId,
-                userId!!,
-                latitude!!,
-                longitude!!,
-                vehicleNumber!!,
-                gcType,
-                garbageType,
-                DateTimeUtils.getScanningServerDate(),
-                batteryStatus,
-                distance,
-                isLocation = false,
-                isOffline = false,
-                empType!!,
-                note,
-                beforeImageBase64,
-                afterImageBase64,
-                null,
-                totalWeight,
-                dryWeight,
-                wetWeight
-            )
-
-            Log.d(TAG, "saveScannedQrData: $garbageCollectionData")
-            viewModel.saveGarbageCollectionOnlineDataToApi(
-                CommonUtils.APP_ID,
-                userTypeId!!,
-                intBatteryStatus,
-                CommonUtils.CONTENT_TYPE,
-                garbageCollectionData
-            )
-
-        } else {
             garbageCollectionData = GarbageCollectionData(
                 0,
                 referenceId,
@@ -805,6 +762,90 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
                 totalWetWeight = wetWeight
             )
             viewModel.saveGarbageCollectionOffline(garbageCollectionData)
+
+
+
+
+        } else {
+
+            if (isInternetOn) {
+
+                val beforeAfterImagesMap = CameraUtils.prepareBeforeAfterImages(
+                    offlineFirstImagePath,
+                    offlineSecondImagePath,
+                    referenceId,
+                    latitude!!,
+                    longitude!!,
+                    DateTimeUtils.getSimpleDateTime()
+                )
+
+                var beforeImageBase64: String? = null
+                var afterImageBase64: String? = null
+
+                if (offlineFirstImagePath != null) beforeImageBase64 =
+                    beforeAfterImagesMap["beforeImageBase64"]
+
+                if (offlineSecondImagePath != null) afterImageBase64 =
+                    beforeAfterImagesMap["afterImageBase64"]
+
+                garbageCollectionData = GarbageCollectionData(
+                    0,
+                    referenceId,
+                    userId!!,
+                    latitude!!,
+                    longitude!!,
+                    vehicleNumber!!,
+                    gcType,
+                    garbageType,
+                    DateTimeUtils.getScanningServerDate(),
+                    batteryStatus,
+                    distance,
+                    isLocation = false,
+                    isOffline = false,
+                    empType!!,
+                    note,
+                    beforeImageBase64,
+                    afterImageBase64,
+                    null,
+                    totalWeight,
+                    dryWeight,
+                    wetWeight
+                )
+
+                Log.d(TAG, "saveScannedQrData: $garbageCollectionData")
+                viewModel.saveGarbageCollectionOnlineDataToApi(
+                    CommonUtils.APP_ID,
+                    userTypeId!!,
+                    intBatteryStatus,
+                    CommonUtils.CONTENT_TYPE,
+                    garbageCollectionData
+                )
+            } else {
+                garbageCollectionData = GarbageCollectionData(
+                    0,
+                    referenceId,
+                    userId!!,
+                    latitude!!,
+                    longitude!!,
+                    vehicleNumber!!,
+                    gcType,
+                    garbageType,
+                    DateTimeUtils.getScanningServerDate(),
+                    batteryStatus,
+                    distance,
+                    isLocation = false,
+                    isOffline = true,
+                    empType = empType!!,
+                    note = note,
+                    gpBeforeImage = offlineFirstImagePath,
+                    gpAfterImage = offlineSecondImagePath,
+                    gpBeforeImageTime = null,
+                    totalGcWeight = totalWeight,
+                    totalDryWeight = dryWeight,
+                    totalWetWeight = wetWeight
+                )
+                viewModel.saveGarbageCollectionOffline(garbageCollectionData)
+            }
         }
 
     }

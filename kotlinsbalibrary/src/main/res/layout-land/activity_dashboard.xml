@@ -249,7 +249,7 @@
                         android:id="@+id/tvSyncOffline"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/save_offline_data"
+                        android:text="Sync Offline Data"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:gravity="center_vertical"

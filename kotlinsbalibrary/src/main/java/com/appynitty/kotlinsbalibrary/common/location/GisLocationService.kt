@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.asLiveData
 import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.backgroundTask.BackgroundTaskHelper
 import com.appynitty.kotlinsbalibrary.common.dao.LocationDao
 import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.dao.UserDetailsDao
@@ -94,6 +95,9 @@ class GisLocationService : LifecycleService(), SensorEventListener {
     lateinit var locationDao: LocationDao
 
     @Inject
+    lateinit var backgroundTaskHelper: BackgroundTaskHelper
+
+    @Inject
     lateinit var nearestLatLngDao: NearestLatLngDao
 
     @Inject
@@ -138,6 +142,10 @@ class GisLocationService : LifecycleService(), SensorEventListener {
         50 // change this sample size as you want, higher is more precise but slow measure.
     private val threshold = 0.2 // change this threshold as you want, higher is more spike movement
 
+    private var offlineGarbageSubmit = (1000 * 60 * 2   //for 2 minutes
+            ).toLong()
+
+
     private var gisNotifyInterval = (1000 * 60 * 3   //for 2 minutes
             ).toLong()
 
@@ -154,6 +162,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
     private var isInternetOn = false
 
     private var deviceIdCon: String? = null
+
 
 
     //location request for fused location client
@@ -329,6 +338,16 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
         super.onCreate()
 
+        scope.launch {
+            imeiChanged.collect {
+                println("here forecefully worked $it")
+                if (it) {
+                 sendBroadCast()
+                    updateImeiChange(false)
+                }
+            }
+        }
+
         userDataStore = UserDataStore(this)
         sessionDataStore = SessionDataStore(this)
         getDeviceId(this)
@@ -463,6 +482,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
             TimerTaskToSendGisLocation(), 10, gisNotifyInterval
         )
         mTimer!!.schedule(TimerTaskToSendLocation(), 10, locApiNotifyInterval)
+        mTimer!!.schedule(TimerTaskUploadGarbage(), 10, offlineGarbageSubmit)
 
         return START_STICKY
     }
@@ -480,6 +500,13 @@ class GisLocationService : LifecycleService(), SensorEventListener {
             sendLocation()
         }
     }
+
+    inner class TimerTaskUploadGarbage : TimerTask() {
+        override fun run() {
+            uploadGarbage()
+        }
+    }
+
 
     inner class TimerTaskToSendGisLocation : TimerTask() {
         override fun run() {
@@ -610,8 +637,14 @@ class GisLocationService : LifecycleService(), SensorEventListener {
 
     }
 
-    private fun sendLocation() {
 
+    private fun uploadGarbage() {
+        scope.launch {
+            backgroundTaskHelper.submitOfflineData()
+        }
+    }
+
+    private fun sendLocation() {
         if (isDutyOn) {
 
             if (userData != null) {
@@ -646,7 +679,6 @@ class GisLocationService : LifecycleService(), SensorEventListener {
                 }
             }
         }
-
     }
 
     private fun handleLocationResponse(response: Response<List<LocationApiResponse>>) {

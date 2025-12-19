@@ -7,6 +7,7 @@ import android.os.Build
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.ui.archived.ArchivedData
@@ -14,11 +15,13 @@ import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -43,9 +46,11 @@ class GarbageCollectionViewModel(
     application: Application,
     private val garbageCollectionRepo: GarbageCollectionRepo,
     private val garbageCollectionDao: GarbageCollectionDao,
+    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val archivedDao: ArchivedDao,
     private val tripRepository: TripRepository,
-    private val sessionDataStore: SessionDataStore
+    private val sessionDataStore: SessionDataStore,
+    private val userDataStore: UserDataStore,
 ) : AndroidViewModel(application) {
 
     val garbageCollectionResponseLiveData: MutableLiveData<ApiResponseListener<List<GarbageCollectionResponse>>?> =
@@ -61,6 +66,10 @@ class GarbageCollectionViewModel(
     private var isDumpTripSyncOn = false
     private var deviceIdCon: String? = null
 
+    private val _isOfflineUi = MutableLiveData(false)
+    val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
+
+
     init {
 
         viewModelScope.launch {
@@ -68,12 +77,42 @@ class GarbageCollectionViewModel(
                 isDumpTripSyncOn = it
             }
         }
+       // loadOfflineModeOnce()
+        getIsOfflineMode()
+    }
 
+    fun getIsOfflineMode() {
+        viewModelScope.launch {
+            userDataStore.getIsOfflineMode.collect { value ->
+                _isOfflineUi.value = value
+                if(!value) deleteDataFromTempGarbage()
+            }
+        }
+    }
+
+    private fun deleteDataFromTempGarbage(){
+        Log.d("checkStatus","delete gc called")
+        viewModelScope.launch(Dispatchers.IO) {
+            val garbageCollectionList = garbageCollectionDaoTemp.getGarbageCollectionData().first()
+            garbageCollectionList
+                .filter { it.isUploaded == true }
+                .forEach {
+                    garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
+                }
+        }
     }
 
     fun setSyncingLiveDataToNull() {
         garbageCollectionResponseLiveData.postValue(null)
         isSyncingOnLiveData.postValue(false)
+    }
+
+    fun loadOfflineModeOnce() {
+        viewModelScope.launch {
+            val value = userDataStore.getIsOfflineMode.first()
+            _isOfflineUi.value = value
+            Log.d("checkStatus", "status is $value")
+        }
     }
 
     fun saveGarbageCollectionOfflineDataToApi(
@@ -216,6 +255,7 @@ class GarbageCollectionViewModel(
 
                             //TODO - should be taken care of
 
+
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
 
                             val archivedData = ArchivedData(
@@ -228,8 +268,10 @@ class GarbageCollectionViewModel(
 
                         }
                         garbageCollectionResponse.offlineId?.let { it1 ->
-                            if (garbageCollectionResponse.referenceID != null)
+                            if (garbageCollectionResponse.referenceID != null){
                                 deleteGcById(it1)
+
+                            }
                         }
                     }
                     deleteUploadedImages()
@@ -250,13 +292,17 @@ class GarbageCollectionViewModel(
     }
 
     private suspend fun deleteGcById(offlineId: String) {
-        garbageCollectionDao.deleteGCById(
-            offlineId
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            garbageCollectionDao.deleteGCById(
+                offlineId
+            )
+           garbageCollectionDaoTemp.deleteGCById(offlineId)
+        }
     }
 
 
     fun getGarbageCollectionListFromRoom() = garbageCollectionDao.getGarbageCollectionData()
+    fun getGarbageCollectionListFromRoomTemp() = garbageCollectionDaoTemp.getGarbageCollectionData()
 
     suspend fun getGcCount(): Int {
 

@@ -16,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.MyApplication.Companion.APP_ID
@@ -58,6 +59,8 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     private var monthPosition: Int = CommonUtils.getCurrentMonth()
     private var isInternetOn = false
     private var isInternetOnAndCanFetch = false
+
+    private var isOfflineMode = false
     private lateinit var internetConnectivity: ConnectivityStatus
 
     //multi language functionality
@@ -166,7 +169,7 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
 
     private fun getHistoryFromApi(month: String, year: String) {
 
-        if (isInternetOnAndCanFetch)
+        if (isInternetOnAndCanFetch && !isOfflineMode)
             viewModel.getWorkHistoryList(
                 CommonUtils.APP_ID, userId!!, year, month, empType!!
             )
@@ -214,6 +217,11 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     }
 
     private fun subscribeLiveData() {
+
+        viewModel.isOfflineUi.observe(this, Observer {
+            isOfflineMode = it
+        })
+
 
         val snackBar = Snackbar
             .make(

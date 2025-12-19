@@ -213,4 +213,6 @@
     <string name="please_select_at_least_one_member">कृपया कम से कम एक सदस्य चुनें</string>
     <string name="selected_team_members">चयनित टीम सदस्य</string>
     <string name="team_setting_on_note">(नोट: टीम सेटिंग चालू है)</string>
+    <string name="save_offline_data">ऑफ़लाइन डेटा सहेजें</string>
+    <string name="offline_mode">ऑफ़लाइन मोड</string>
 </resources>

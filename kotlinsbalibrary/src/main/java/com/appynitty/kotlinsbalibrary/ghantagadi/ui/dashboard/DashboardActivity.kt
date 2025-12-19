@@ -59,6 +59,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.LocationUtils
 import com.appynitty.kotlinsbalibrary.common.utils.TurnOnGps
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.AppLanguage
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
@@ -73,6 +74,7 @@ import com.appynitty.kotlinsbalibrary.databinding.ActivityDashboardBinding
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
@@ -121,11 +123,17 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     lateinit var garbageCollectionDao: GarbageCollectionDao
 
     @Inject
+    lateinit var garbageCollectionDaoTemp: GarbageCollectionDaoTemp
+
+    @Inject
     lateinit var archivedDao: ArchivedDao
     @Inject
     lateinit var tripRepository: TripRepository
     @Inject
     lateinit var sessionDataStore : SessionDataStore
+
+    @Inject
+    lateinit var userDataStore : UserDataStore
 
     @Inject
     lateinit var garbageCollectionRepo: GarbageCollectionRepo
@@ -831,9 +839,14 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             //shrinkFab()
             hideProgressBar()
         }
+
     }
 
     private fun subscribeLiveData() {
+
+        viewModel.isOfflineUi.observe(this, Observer {
+           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
+        })
 
         viewModel.isBifurcationOnLiveData.observe(this, Observer {
             isBifurcationOn = it
@@ -857,7 +870,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         ConnectivityStatus(this).observe(this, Observer {
             isInternetOn = it
             if (isInternetOn) {
-                submitOfflineData()
+//                submitOfflineData()
             }
         })
 
@@ -888,7 +901,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
             vehicleNumber = it.vehicleNumber
             userVehicleDetailsDataStore = it
-
 
             if (it.vehicleTypeName != "") {
                 binding.userVehicleType.text = buildString {
@@ -1014,9 +1026,11 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             application,
             garbageCollectionRepo,
             garbageCollectionDao,
+            garbageCollectionDaoTemp,
             archivedDao,
             tripRepository,
-            sessionDataStore
+            sessionDataStore,
+            userDataStore
         )
 
         garbageCollectionViewModel = ViewModelProvider(
@@ -1098,6 +1112,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         binding.viewTeamButton.setOnClickListener {
             showSelectedTeamDialog()
+        }
+        binding.toggleSyncOffline.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.saveIsOfflineMode(isChecked)
         }
     }
 

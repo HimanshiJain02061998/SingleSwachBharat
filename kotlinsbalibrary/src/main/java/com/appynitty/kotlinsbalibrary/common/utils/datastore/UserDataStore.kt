@@ -52,6 +52,8 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
 
         private val SELECTED_MEMBERS = stringPreferencesKey("selected_members")
 
+        private val OFFLINE_MODE = booleanPreferencesKey(name = "is_offline_mode")
+
     }
     suspend fun saveVewTeam(isBifurcationOn: Boolean) {
         userDataStore.edit { preferences ->
@@ -79,6 +81,17 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
             } else {
                 emptyList()
             }
+        }
+
+    suspend fun saveIsOfflineMode(mode: Boolean) {
+        userDataStore.edit { preferences ->
+            preferences[OFFLINE_MODE] = mode
+        }
+    }
+
+    val getIsOfflineMode: Flow<Boolean> = userDataStore.data
+        .map {
+            it[OFFLINE_MODE] ?: false
         }
 
     suspend fun saveAppId(appId: String) {

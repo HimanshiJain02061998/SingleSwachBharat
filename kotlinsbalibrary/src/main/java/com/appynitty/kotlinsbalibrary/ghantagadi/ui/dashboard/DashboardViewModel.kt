@@ -10,7 +10,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.appynitty.kotlinsbalibrary.R
+import com.appynitty.kotlinsbalibrary.common.backgroundTask.SyncWorker
 import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.model.response.AttendanceResponse
 import com.appynitty.kotlinsbalibrary.common.model.response.VehicleQrDetailsResponse
@@ -27,6 +33,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
@@ -36,6 +43,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleNumberRes
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.DutyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -43,6 +52,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val TAG = "DashboardViewModel"
@@ -57,16 +67,16 @@ class DashboardViewModel @Inject constructor(
     private val nearestLatLngDao: NearestLatLngDao,
     private val userTravelLocDao: UserTravelLocDao,
     private val garbageCollectionDao: GarbageCollectionDao,
-    private val tempUserDataStore: TempUserDataStore
+    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
+    private val tempUserDataStore: TempUserDataStore,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val dashboardEventChannel = Channel<DashboardEvent>(Channel.BUFFERED)
     val dashboardEventsFlow = dashboardEventChannel.receiveAsFlow()
 
     private val _isTeamSelected = MutableLiveData(false)
-    val isTeamSelected: LiveData<Boolean>
-        get() =
-            _isTeamSelected
+    val isTeamSelected: LiveData<Boolean> get() = _isTeamSelected
 
     private val _teamMembersSelected = MutableLiveData(emptyList<AvailableEmpItem>())
     val teamMembersSelected: LiveData<List<AvailableEmpItem>>
@@ -76,14 +86,84 @@ class DashboardViewModel @Inject constructor(
 
     private var deviceIdCon: String? = null
 
+    private val _isOfflineUi = MutableLiveData(false)
+    val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
+    private val _isOffline = MutableLiveData(false)
+
+
     init {
         getTeam()
         getSelectedTeam()
+        getIsOfflineMode()
+        loadOfflineModeOnce()
+    }
+
+
+    fun startPeriodicSync(context: Context) {
+     Log.d("serviceStatus","workmanager is running")
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val periodicWork = PeriodicWorkRequestBuilder<SyncWorker>(
+            15, TimeUnit.MINUTES   // ⛔ minimum allowed by Android
+        )
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context)
+            .enqueueUniquePeriodicWork(
+                "offline_sync_work",
+                ExistingPeriodicWorkPolicy.UPDATE,
+                periodicWork
+            )
+    }
+
+
+    fun cancelPeriodicWork(context: Context) {
+        WorkManager.getInstance(context)
+            .cancelUniqueWork("offline_sync_work")
     }
 
     /**
      *  METHOD TO GET VEHICLE TYPES FROM API
      */
+
+     fun saveIsOfflineMode(mode: Boolean){
+         Log.d("checkStatus","status is $mode")
+         viewModelScope.launch {
+             userDataStore.saveIsOfflineMode(mode)
+         }
+    }
+
+    fun loadOfflineModeOnce() {
+        viewModelScope.launch {
+            val value = userDataStore.getIsOfflineMode.first()
+            _isOfflineUi.value = value
+            Log.d("checkStatus", "status is $value")
+        }
+    }
+    fun getIsOfflineMode() {
+        viewModelScope.launch {
+            Log.d("checkStatus","status is ${userDataStore.getIsOfflineMode.first()}")
+            userDataStore.getIsOfflineMode.collect { value ->
+                _isOffline.value = value
+                if(!value) deleteDataFromTempGarbage()
+            }
+        }
+    }
+    private fun deleteDataFromTempGarbage(){
+        Log.d("checkStatus","delete gc called")
+        viewModelScope.launch(Dispatchers.IO) {
+           val garbageCollectionList = garbageCollectionDaoTemp.getGarbageCollectionData().first()
+            garbageCollectionList
+                .filter { it.isUploaded == true }
+                .forEach {
+                    garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
+                }
+        }
+    }
 
     suspend fun checkSameUserLogin(): Boolean {
         val tempUser = tempUserDataStore.getUserEssentials.first()
@@ -350,6 +430,7 @@ class DashboardViewModel @Inject constructor(
                         DashboardEvent.ShowResponseSuccessMessage(body.message, body.messageMar)
                     )
                     dashboardEventChannel.trySend(DashboardEvent.StartLocationTracking)
+//                    startPeriodicSync(appContext)
 
                     if (userVehicleDetails == null) {
                         dashboardEventChannel.trySend(DashboardEvent.SaveVehicleDetails)
@@ -922,6 +1003,7 @@ class DashboardViewModel @Inject constructor(
             userTravelLocDao.deleteAllUserTravelLatLongs()
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
+            garbageCollectionDaoTemp.deleteAllGarbageCollection()
         }
     }
 

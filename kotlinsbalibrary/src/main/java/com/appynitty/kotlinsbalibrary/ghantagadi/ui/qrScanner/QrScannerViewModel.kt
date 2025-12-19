@@ -5,12 +5,15 @@ import android.content.Context.TELEPHONY_SERVICE
 import android.os.Build
 import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.dao.NearestLatLngDao
 import com.appynitty.kotlinsbalibrary.common.repository.NearestLatLngRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.toTempEntity
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
@@ -20,8 +23,10 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,9 +48,10 @@ private const val TAG = "QrScannerViewModel"
 class QrScannerViewModel @Inject constructor(
     private val garbageCollectionRepo: GarbageCollectionRepo,
     private val garbageCollectionDao: GarbageCollectionDao,
+    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
-    userDataStore: UserDataStore,
+    private val userDataStore: UserDataStore,
     private val archivedDao: ArchivedDao,
     private val userTravelLocDao: UserTravelLocDao
 ) : ViewModel() {
@@ -56,8 +62,8 @@ class QrScannerViewModel @Inject constructor(
     @Inject
     lateinit var nearestLatLngDao: NearestLatLngDao
 
-    @Inject
-    lateinit var userDataStore: UserDataStore
+//    @Inject
+//    lateinit var userDataStore: UserDataStore
 
 
     private val qrScannerEventChannel = Channel<QrScannerEvent>()
@@ -71,6 +77,23 @@ class QrScannerViewModel @Inject constructor(
     val userLatLongFlow = userDataStore.getUserLatLong
     private var deviceIdCon: String? = null
 
+    private val _isOffline = MutableLiveData(false)
+    val isOffline: LiveData<Boolean> get() = _isOffline
+
+
+
+    init {
+        getIsOfflineMode()
+    }
+
+    fun getIsOfflineMode() {
+        viewModelScope.launch {
+            Log.d("checkStatus","status is ${userDataStore.getIsOfflineMode.first()}")
+            userDataStore.getIsOfflineMode.collect { value ->
+                _isOffline.value = value
+            }
+        }
+    }
     fun validateScannedQrCode(empType: String, result: String) = viewModelScope.launch {
         if (result.length >= 5) {
             referenceId = result
@@ -314,15 +337,21 @@ class QrScannerViewModel @Inject constructor(
                 tempList.forEach {
                     if (garbageCollectionData.referenceId == it.referenceId) {
                         garbageCollectionDao.deleteGCById(it.offlineId.toString())
+                        garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
                     }
                 }
             }
+           val garbageCollectionDataTemp =  garbageCollectionData.toTempEntity()
             garbageCollectionDao.insertGarbageCollection(garbageCollectionData)
+            garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
             qrScannerEventChannel.send(QrScannerEvent.ShowSuccessToast(R.string.saved_offline))
             qrScannerEventChannel.send(
                 QrScannerEvent.FinishActivity
             )
         }
+
+
+
 
     fun insertTripHouse(garbageType: String) = viewModelScope.launch {
         if (gcType != "3" && gcType == "1") {

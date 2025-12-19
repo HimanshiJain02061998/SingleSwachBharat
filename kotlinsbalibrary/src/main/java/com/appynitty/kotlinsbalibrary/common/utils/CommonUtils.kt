@@ -7,6 +7,8 @@ import android.os.BatteryManager
 import android.provider.Settings
 import android.util.Base64
 import com.appynitty.kotlinsbalibrary.common.MyApplication
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
 
@@ -50,7 +52,7 @@ class CommonUtils {
             )
         }
 
-        fun getBatteryStatus(application: Application): Int {
+        fun getBatteryStatus(application: Context): Int {
             val batteryManager =
                 application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
             return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
@@ -107,5 +109,64 @@ class CommonUtils {
                 Settings.Global.AIRPLANE_MODE_ON, 0
             ) != 0
         }
+
+
+        fun GarbageCollectionData.toTempEntity(): GarbageCollectionDataTemp {
+            return GarbageCollectionDataTemp(
+                offlineId = this.offlineId,
+                referenceId = this.referenceId,
+                userId = this.userId,
+                latitude = this.latitude,
+                longitude = this.longitude,
+                vehicleNumber = this.vehicleNumber,
+                gcType = this.gcType,
+                garbageType = this.garbageType,
+                gcDate = this.gcDate,
+                batteryStatus = this.batteryStatus,
+                distance = this.distance,
+                isLocation = this.isLocation,
+                isOffline = this.isOffline,
+                empType = this.empType,
+                note = this.note,
+                gpBeforeImage = this.gpBeforeImage,
+                gpAfterImage = this.gpAfterImage,
+                gpBeforeImageTime = this.gpBeforeImageTime,
+                totalGcWeight = this.totalGcWeight,
+                totalDryWeight = this.totalDryWeight,
+                totalWetWeight = this.totalWetWeight,
+                isUploaded = false
+            )
+        }
+
+        fun GarbageCollectionDataTemp.toMainEntity(): GarbageCollectionData {
+            return GarbageCollectionData(
+                offlineId = this.offlineId,           // keep same ID
+                referenceId = this.referenceId,
+                userId = this.userId,
+                latitude = this.latitude,
+                longitude = this.longitude,
+                vehicleNumber = this.vehicleNumber,
+                gcType = this.gcType,
+                garbageType = this.garbageType,
+                gcDate = this.gcDate,
+                batteryStatus = this.batteryStatus,
+                distance = this.distance,
+                isLocation = this.isLocation,
+                isOffline = this.isOffline,
+                empType = this.empType,
+                note = this.note,
+                gpBeforeImage = this.gpBeforeImage,
+                gpAfterImage = this.gpAfterImage,
+                gpBeforeImageTime = this.gpBeforeImageTime,
+                totalGcWeight = this.totalGcWeight,
+                totalDryWeight = this.totalDryWeight,
+                totalWetWeight = this.totalWetWeight
+            )
+        }
+
+        fun List<GarbageCollectionDataTemp>.toMainList(): List<GarbageCollectionData> {
+            return this.map { it.toMainEntity() }
+        }
+
     }
 }
