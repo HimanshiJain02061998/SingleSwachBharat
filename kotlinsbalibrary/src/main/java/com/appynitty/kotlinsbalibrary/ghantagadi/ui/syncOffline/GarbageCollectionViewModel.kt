@@ -21,7 +21,6 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
