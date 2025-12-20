@@ -23,7 +23,6 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp

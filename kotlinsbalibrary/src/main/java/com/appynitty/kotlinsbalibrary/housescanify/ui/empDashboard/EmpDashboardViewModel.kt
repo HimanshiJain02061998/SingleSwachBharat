@@ -20,7 +20,6 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssential
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.housescanify.dao.EmpHouseOnMapDao
 import com.appynitty.kotlinsbalibrary.housescanify.dao.PropertyTypeDao
@@ -56,7 +55,6 @@ class EmpDashboardViewModel @Inject constructor(
     private val userTravelLocDao: UserTravelLocDao,
     private val nearestLatLngDao: NearestLatLngDao,
     private val garbageCollectionDao: GarbageCollectionDao,
-    private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tempUserDataStore: TempUserDataStore,
 ) : ViewModel() {
 

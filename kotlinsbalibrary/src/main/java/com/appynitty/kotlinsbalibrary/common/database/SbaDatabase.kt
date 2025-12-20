@@ -20,7 +20,6 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripHouseData
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.UserTravelLoc
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
@@ -53,7 +52,6 @@ abstract class SbaDatabase : RoomDatabase() {
     abstract fun userTravelLocDao(): UserTravelLocDao
     abstract fun nearestLatLngDao(): NearestLatLngDao
     abstract fun garbageCollectionDao(): GarbageCollectionDao
-    abstract fun garbageCollectionDaoTemp(): GarbageCollectionDaoTemp
     abstract fun locationDao(): LocationDao
     abstract fun archivedDao(): ArchivedDao
     abstract fun gisLocationDao(): GisLocDao

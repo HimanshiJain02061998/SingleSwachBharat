@@ -9,7 +9,6 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.TempUserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +21,6 @@ class BackgroundTaskHelper @Inject constructor(private val archivedDao: Archived
                                                private val userTravelLocDao: UserTravelLocDao,
                                                private val nearestLatLngDao: NearestLatLngDao,
                                                private val garbageCollectionDao: GarbageCollectionDao,
-                                               private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
                                                private val tempUserDataStore: TempUserDataStore,
                                                private val userDataStore: UserDataStore,
                                                private val userDetailsDao: UserDetailsDao,
@@ -75,7 +73,6 @@ class BackgroundTaskHelper @Inject constructor(private val archivedDao: Archived
             userTravelLocDao.deleteAllUserTravelLatLongs()
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
-            garbageCollectionDaoTemp.deleteAllGarbageCollection()
     }
 
     private fun getUserDetailsFromRoom() {

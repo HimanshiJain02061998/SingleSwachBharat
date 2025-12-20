@@ -37,7 +37,6 @@ import com.appynitty.kotlinsbalibrary.databinding.ActivitySyncOfflineBinding
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -65,8 +64,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     //it is required in two activities dashboard and sync offline
     @Inject
     lateinit var garbageCollectionDao: GarbageCollectionDao
-    @Inject
-    lateinit var garbageCollectionDaoTemp: GarbageCollectionDaoTemp
 
     @Inject
     lateinit var sessionDataStore: SessionDataStore
@@ -152,7 +149,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             application,
             garbageCollectionRepo,
             garbageCollectionDao,
-            garbageCollectionDaoTemp,
             archivedDao,
             tripRepository,
             sessionDataStore,
@@ -266,10 +262,10 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
         internetConnectivity.observe(this) {
             isInternetOn = it
-            if (it && isOfflineMode == false) {
+            if (it) {
                 snackBar.dismiss()
                 Log.i("TotalGcCount", "subscribeLiveData: $totalGcCount")
-                if (totalGcCount > 0 ) {
+                if (totalGcCount > 0) {
                     binding.syncOfflineBtn.visibility = View.VISIBLE
                 } else {
                     binding.syncOfflineBtn.visibility = View.GONE
@@ -278,15 +274,6 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 //sync dump trip blockchain
                 // garbageCollectionViewModel.syncDumpYardTrip()
             } else {
-                if(isOfflineMode){
-                    snackBar.setText(
-                        resources.getString(R.string.save_offline_data)
-                    )
-                }else{
-                    snackBar.setText(
-                        resources.getString(R.string.no_internet_error)
-                    )
-                }
                 snackBar.show()
                 binding.syncOfflineBtn.visibility = View.GONE
             }
@@ -295,7 +282,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
         garbageCollectionViewModel.getGarbageCollectionListFromRoom().asLiveData().observe(this) {
 
-
+            totalGcCount = it.size
             if (it.isNotEmpty()) {
                 syncOfflineList.clear()
                 syncOfflineList.addAll(it)
@@ -308,7 +295,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 stringBuffer.append(resources.getString(R.string.remaining))
                 remainingCountTv?.text = stringBuffer
 
-                if (isInternetOn && !isOfflineMode ) {
+                if (isInternetOn) {
                     if (alertDialog != null && alertDialog!!.isShowing) binding.syncOfflineBtn.visibility =
                         View.GONE
                     else {
@@ -322,9 +309,9 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 if (alertDialog != null) if (alertDialog!!.isShowing) alertDialog?.dismiss()
                 binding.syncOfflineBtn.visibility = View.GONE
                 binding.showErrorOfflineData.visibility = View.VISIBLE
+
             }
             prepareData(it)
-
         }
 
 
