@@ -7,10 +7,5 @@ import androidx.room.PrimaryKey
 data class WorkHistoryNewDataTemp(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val Refid: String?,
-    val time: String?,
-    val name: String?,
-    val vehicleNumber: String?,
-    val areaName: String?,
-    val type: String?,
+    val Refid: String?
 )

@@ -160,17 +160,28 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
                     }
 
                     is ApiResponseListener.Success -> {
-                        if (it.data != null) {
-                            if (it.data.isNotEmpty()) {
-                                binding.recyclerView.layoutAnimation = controller
-                                adapter.submitList(it.data)
-                                binding.progressBar.visibility = View.GONE
-                                binding.lineView.visibility = View.VISIBLE
-                            }
-                        }
+//                        if (it.data != null) {
+//                            if (it.data.isNotEmpty()) {
+//                                binding.recyclerView.layoutAnimation = controller
+//                                adapter.submitList(it.data)
+//                                binding.progressBar.visibility = View.GONE
+//                                binding.lineView.visibility = View.VISIBLE
+//                            }
+//                        }
                     }
                 }
             }
+
+            viewModel.workHistoryDetailsLiveData.observe(this) {
+                if (it.isNotEmpty()) {
+                                binding.recyclerView.layoutAnimation = controller
+                                adapter.submitList(it)
+                                binding.progressBar.visibility = View.GONE
+                                binding.lineView.visibility = View.VISIBLE
+                            }
+            }
+
+
         } else if (userType == 1) {
             viewModel.empWorkHistoryDetailsResponseLiveData.observe(this) {
 
@@ -234,6 +245,7 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
         if (userId != null && fDate != null) {
             if (userType == 0) {
+                fDate?.let {viewModel.getWorkHistoryDetailList(it)}
                 viewModel.getWorkHistoryDetailList(
                     CommonUtils.APP_ID,
                     userId!!,

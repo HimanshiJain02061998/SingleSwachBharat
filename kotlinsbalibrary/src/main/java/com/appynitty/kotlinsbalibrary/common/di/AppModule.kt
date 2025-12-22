@@ -69,6 +69,9 @@ object AppModule {
     fun provideUserDetailsDao(db: SbaDatabase) = db.userDetailsDao()
 
     @Provides
+    fun provideWorkHistoryNotSyncedDao(db: SbaDatabase) = db.workHistoryNotSyncedDao()
+
+    @Provides
     fun provideGarbageCollectionDao(db: SbaDatabase) = db.garbageCollectionDao()
 
     @Provides
