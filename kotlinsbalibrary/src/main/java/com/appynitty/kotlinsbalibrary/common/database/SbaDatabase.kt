@@ -21,7 +21,9 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.UserTravelLoc
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
 import com.appynitty.kotlinsbalibrary.housescanify.dao.EmpGcDao
@@ -42,7 +44,8 @@ import com.appynitty.kotlinsbalibrary.housescanify.model.response.PropertyType
         NearestLatLng::class,
         PropertyType::class,
         UserTravelLoc::class,
-        GarbageCollectionDataTemp::class,    ],
+        GarbageCollectionDataTemp::class,
+        WorkHistoryData::class],
     version = 6,
     exportSchema = false
 )
@@ -53,6 +56,7 @@ abstract class SbaDatabase : RoomDatabase() {
     abstract fun nearestLatLngDao(): NearestLatLngDao
     abstract fun garbageCollectionDao(): GarbageCollectionDao
     abstract fun locationDao(): LocationDao
+    abstract fun workHistoryDao(): WorkHistoryDao
     abstract fun archivedDao(): ArchivedDao
     abstract fun gisLocationDao(): GisLocDao
     abstract fun tripDao(): TripDao

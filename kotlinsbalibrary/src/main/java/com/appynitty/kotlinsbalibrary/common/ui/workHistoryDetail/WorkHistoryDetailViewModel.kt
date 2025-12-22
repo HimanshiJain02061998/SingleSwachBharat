@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.WorkHistoryRepository
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.workHistory.InsertWorkHistoryDetailsUseCases
 import com.appynitty.kotlinsbalibrary.housescanify.model.response.EmpHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.housescanify.repository.EmpWorkHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkHistoryDetailViewModel @Inject constructor(
     private val workHistoryRepository: WorkHistoryRepository,
-    private val empWorkHistoryRepository: EmpWorkHistoryRepository
+    private val empWorkHistoryRepository: EmpWorkHistoryRepository,
+    private val insertWorkHistoryDetailsUseCases: InsertWorkHistoryDetailsUseCases,
 ) : ViewModel() {
 
     val workHistoryDetailsResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryDetailsResponse>>> =
@@ -32,7 +35,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
         userId: String,
         fDate: String,
         languageId: String
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch(Dispatchers.IO) {
 
         workHistoryDetailsResponseLiveData.postValue(ApiResponseListener.Loading())
 
@@ -40,6 +43,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
             val response =
                 workHistoryRepository.getWorkHistoryDetailList(appId, userId, fDate, languageId)
             workHistoryDetailsResponseLiveData.postValue(handleWorkHistoryDetailsResponse(response))
+//            insertWorkHistoryDetailsUseCases.invoke(response,fDate)
 
         } catch (t: Throwable) {
             when (t) {
