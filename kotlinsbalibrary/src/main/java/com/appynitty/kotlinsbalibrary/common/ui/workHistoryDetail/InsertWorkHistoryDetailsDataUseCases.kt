@@ -25,7 +25,7 @@ class InsertWorkHistoryDetailsUseCases @Inject constructor(private val workHisto
 
                         if (workHistoryNotSyncedDao.getTotalCount()>0){
                             workHistoryNotSyncedDao.getWorkHistoryNotSynced().forEach {
-                                val item = workHistoryList.find { it.Refid == "abs" }
+                                val item = workHistoryList.find { item->item.Refid == it.Refid }
                                 workHistoryDao.insertWorkHistoryDetails(WorkHistoryDetailsData(Refid=item?.Refid,time=item?.time,
                                     name=item?.name,vehicleNumber=item?.vehicleNumber, areaName = item?.areaName,
                                     type = item?.type, isSynced = true, id = 0, date = date))

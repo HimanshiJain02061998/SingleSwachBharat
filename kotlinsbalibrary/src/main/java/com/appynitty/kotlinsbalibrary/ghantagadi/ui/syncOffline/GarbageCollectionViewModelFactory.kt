@@ -8,6 +8,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
 
 class GarbageCollectionViewModelFactory(
@@ -18,13 +19,14 @@ class GarbageCollectionViewModelFactory(
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
     private val userDataStore: UserDataStore,
+    private val workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
 
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GarbageCollectionViewModel(
             application, repository, garbageCollectionDao, archivedDao,
-            tripRepository, sessionDataStore,userDataStore
+            tripRepository, sessionDataStore,userDataStore,workHistoryNotSyncedDao
         ) as T
     }
 

@@ -21,6 +21,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryNewDataTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -49,6 +51,7 @@ class GarbageCollectionViewModel(
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
     private val userDataStore: UserDataStore,
+    private val workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
 ) : AndroidViewModel(application) {
 
     val garbageCollectionResponseLiveData: MutableLiveData<ApiResponseListener<List<GarbageCollectionResponse>>?> =
@@ -209,7 +212,7 @@ class GarbageCollectionViewModel(
                         if (garbageCollectionResponse.status == CommonUtils.STATUS_SUCCESS) {
 
                             //TODO - should be taken care of
-
+                            workHistoryNotSyncedDao.insertWorkHistoryNotSynced(WorkHistoryNewDataTemp(id=0, Refid = garbageCollectionResponse.referenceID))
 
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
 
