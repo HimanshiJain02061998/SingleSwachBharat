@@ -13,5 +13,6 @@ data class LoginResponse(
     val message: String?,
     val messageMar: String?,
     val gtFeatures: Boolean,
-    val EmpType: String
+    val EmpType: String,
+    val baseUrl: String
 ) : Parcelable

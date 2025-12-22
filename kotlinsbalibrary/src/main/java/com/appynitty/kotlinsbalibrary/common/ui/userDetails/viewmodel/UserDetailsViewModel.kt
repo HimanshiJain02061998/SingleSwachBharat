@@ -1,6 +1,5 @@
 package com.appynitty.kotlinsbalibrary.common.ui.userDetails.viewmodel
 
-import android.os.Handler
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,16 +8,15 @@ import com.appynitty.kotlinsbalibrary.common.dao.UserDetailsDao
 import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.model.response.UserDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.repository.UserDetailsRepository
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
-import java.util.Locale
 import java.util.Locale.getDefault
 import javax.inject.Inject
 
@@ -147,10 +145,9 @@ class UserDetailsViewModel @Inject constructor(
     ): ApiResponseListener<UserDetailsResponse> {
         if (response.isSuccessful) {
             response.body()?.let {
-
                 if (!userFullName.trim().lowercase(getDefault()).equals(it.name?.trim()
                         ?.lowercase(getDefault()))) {
-
+                    CommonUtils.BASE_URL = it.baseUrl ?: CommonUtils.BASE_URL
                     Log.d(TAG, "handleUserDetailResult: $it")
                     val userData = UserData(
                         userId,

@@ -68,6 +68,11 @@ class DashboardViewModel @Inject constructor(
         get() =
             _isTeamSelected
 
+    private val _baseUrl = MutableLiveData(CommonUtils.BASE_URL)
+    val baseUrl: LiveData<String>
+        get() =
+            _baseUrl
+
     private val _teamMembersSelected = MutableLiveData(emptyList<AvailableEmpItem>())
     val teamMembersSelected: LiveData<List<AvailableEmpItem>>
         get() =
@@ -79,6 +84,7 @@ class DashboardViewModel @Inject constructor(
     init {
         getTeam()
         getSelectedTeam()
+        getBaseUrl()
     }
 
     /**
@@ -169,7 +175,6 @@ class DashboardViewModel @Inject constructor(
     fun getVehicleNumberList(
         appId: String, content_type: String, vehicleTypeId: String
     ) = viewModelScope.launch {
-
         try {
             dashboardEventChannel.send(DashboardEvent.ShowDialogProgressBar)
             val response = dutyRepository.getVehicleNumberList(appId, content_type, vehicleTypeId)
@@ -291,10 +296,8 @@ class DashboardViewModel @Inject constructor(
         inPunchRequest: InPunchRequest
     ) =
         viewModelScope.launch {
-
             dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
             dashboardEventChannel.send(DashboardEvent.HideProgressBar)
-
             if (response.isSuccessful) {
                 response.body()?.let {
                     if (it.status == STATUS_SUCCESS) {
@@ -315,7 +318,6 @@ class DashboardViewModel @Inject constructor(
                                 userVehicleDetails
                             )
                         }
-
                     } else {
                         dashboardEventChannel.send(
                             DashboardEvent.ShowResponseErrorMessage(
@@ -400,6 +402,15 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
+    fun getBaseUrl() {
+        viewModelScope.launch {
+            userDataStore.getUrl.collect { value ->
+                _baseUrl.value = value
+                CommonUtils.BASE_URL = value
+            }
+        }
+    }
+
     fun getSelectedTeam() {
         viewModelScope.launch {
             userDataStore.getSelectedMembersFlow.collect { value ->
@@ -414,7 +425,6 @@ class DashboardViewModel @Inject constructor(
     fun saveOutPunchDetails(
         appId: String, content_type: String, batteryStatus: Int, outPunchRequest: OutPunchRequest
     ) = viewModelScope.launch {
-
         dashboardEventChannel.send(DashboardEvent.ShowProgressBar)
         val trailId = sessionDataStore.getGisTrailId.first()
 
@@ -442,7 +452,6 @@ class DashboardViewModel @Inject constructor(
             dashboardEventChannel.send(DashboardEvent.HideProgressBar)
             dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
         }
-
     }
 
     /**
@@ -466,13 +475,12 @@ class DashboardViewModel @Inject constructor(
                     saveUserIsDutyOn(false)
 
                 } else {
-
                     // ERROR case but API returns valid body
                     dashboardEventChannel.send(
                         DashboardEvent.ShowResponseErrorMessage(it.message, it.messageMar)
                     )
 
-                    // 🛑 FORCEFUL CHECKOUT CONDITIONS
+                    // FORCEFUL CHECKOUT CONDITIONS
                     if (it.referenceID == null ||
                         it.isAttendenceOff == null ||
                         it.dutyStatus == null
@@ -823,8 +831,6 @@ class DashboardViewModel @Inject constructor(
                 dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.no_internet_error))
                 dashboardEventChannel.send(DashboardEvent.EnableDutyToggle)
             }
-
-
         }
     }
 
@@ -838,7 +844,7 @@ class DashboardViewModel @Inject constructor(
                     dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.off_duty_warning))
                     dashboardEventChannel.send(DashboardEvent.DismissAlertDialogFrag)
                 } else {
-
+                    CommonUtils.BASE_URL = CommonUtils.TEMP_URL
                     userDataStore.clearUserDatastore()
                     sessionDataStore.clearSessionDatastore()
                     archivedDao.deleteAllArchivedData()
@@ -846,7 +852,6 @@ class DashboardViewModel @Inject constructor(
 
                 }
             } else if (type == CommonUtils.CONFIRM_OFF_DUTY_DIALOG) {
-
                 dashboardEventChannel.send(DashboardEvent.TurnDutyOff)
                 dashboardEventChannel.send(DashboardEvent.DismissAlertDialogFrag)
             }
@@ -909,6 +914,7 @@ class DashboardViewModel @Inject constructor(
                     userDetails.userTypeId
                 )
             )
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
             userDataStore.clearUserDatastore()
             sessionDataStore.clearSessionDatastore()
             dashboardEventChannel.send(DashboardEvent.StopLocationTracking)

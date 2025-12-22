@@ -13,6 +13,7 @@ import com.appynitty.kotlinsbalibrary.common.model.response.UserDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.repository.LoginRepository
 import com.appynitty.kotlinsbalibrary.common.repository.UserDetailsRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.BASE_URL
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
@@ -41,6 +42,12 @@ class LoginViewModel @Inject constructor(
 
     private val _iconUrl = MutableLiveData<String>()
     val iconUrl: LiveData<String> get() = _iconUrl
+
+    fun saveBaseUrl(url: String) {
+        viewModelScope.launch {
+            userDataStore.saveUrl(url)
+        }
+    }
 
     fun saveLoginDetails(
         appId: String,
@@ -84,13 +91,16 @@ class LoginViewModel @Inject constructor(
                         val userEssentials = UserEssentials(it.userId, it.EmpType, it.typeId)
                         userDataStore.saveUserEssentials(userEssentials)
                         getUserDetails(appId, contentType, it)
-
+                        BASE_URL = ""
+                        BASE_URL = it.baseUrl
+                        saveBaseUrl(it.baseUrl)
                         loginEventChannel.send(
                             LoginEvent.ShowResponseSuccessMessage(
                                 it.message,
                                 it.messageMar
                             )
                         )
+
 
                     } else if (it?.status == CommonUtils.STATUS_ERROR) {
                         loginEventChannel.send(LoginEvent.EnableLoginButton)

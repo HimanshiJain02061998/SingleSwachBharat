@@ -92,10 +92,11 @@ class SplashActivity : AppCompatActivity() {
                     }
                 }
                 .addOnFailureListener {
-
+                    viewModel.checkWhereToNavigate()
                 }
         } catch (e: Exception) {
             e.printStackTrace()
+            viewModel.checkWhereToNavigate()
         }
     }
 

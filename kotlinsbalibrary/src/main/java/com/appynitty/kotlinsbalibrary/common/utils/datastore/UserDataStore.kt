@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
@@ -51,8 +52,21 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val SELECTED_TEAM = booleanPreferencesKey(name = "is_selected_team")
 
         private val SELECTED_MEMBERS = stringPreferencesKey("selected_members")
+        private val BASE_URL_DYNAMIC = stringPreferencesKey(name = "base_url_dynamic")
 
     }
+
+    suspend fun saveUrl(url: String) {
+        userDataStore.edit { preferences ->
+            preferences[BASE_URL_DYNAMIC] = url
+
+        }
+    }
+
+    val getUrl: Flow<String> = userDataStore.data
+        .map { preferences ->
+            preferences[BASE_URL_DYNAMIC] ?: CommonUtils.BASE_URL
+        }
     suspend fun saveVewTeam(isBifurcationOn: Boolean) {
         userDataStore.edit { preferences ->
             preferences[SELECTED_TEAM] = isBifurcationOn
