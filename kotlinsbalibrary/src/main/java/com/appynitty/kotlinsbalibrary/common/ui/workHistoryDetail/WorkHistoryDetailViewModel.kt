@@ -6,11 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
-import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
-import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryDetailsData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.WorkHistoryRepository
-import com.appynitty.kotlinsbalibrary.ghantagadi.ui.workHistory.InsertWorkHistoryDetailsUseCases
 import com.appynitty.kotlinsbalibrary.housescanify.model.response.EmpHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.housescanify.repository.EmpWorkHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
     private val workHistoryRepository: WorkHistoryRepository,
     private val empWorkHistoryRepository: EmpWorkHistoryRepository,
     private val insertWorkHistoryDetailsUseCases: InsertWorkHistoryDetailsUseCases,
-    private val workHistoryDao: WorkHistoryDao
+    private val workHistoryDao: WorkHistoryDetailsDao
 ) : ViewModel() {
 
     val workHistoryDetailsResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryDetailsResponse>>> =
@@ -43,7 +42,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
 
     fun getWorkHistoryDetailList(date: String) {
         viewModelScope.launch {
-            workHistoryDao.getWorkHistoryByDate(date)
+            workHistoryDao.getWorkHistoryDetailsByDate(date)
                 .collect { list ->
                     _workHistoryDetailsLiveData.postValue(
                         list.map { it.toResponse() }
@@ -51,7 +50,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
                 }
         }
     }
-    fun WorkHistoryData.toResponse() = WorkHistoryDetailsResponse(
+    fun WorkHistoryDetailsData.toResponse() = WorkHistoryDetailsResponse(
         time = time,
         Refid = Refid,
         name = name,

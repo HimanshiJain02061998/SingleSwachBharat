@@ -3,8 +3,8 @@ package com.appynitty.kotlinsbalibrary.ghantagadi.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "work_history_table")
-data class WorkHistoryData(
+@Entity(tableName = "work_history_details_table")
+data class WorkHistoryDetailsData(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val date: String,

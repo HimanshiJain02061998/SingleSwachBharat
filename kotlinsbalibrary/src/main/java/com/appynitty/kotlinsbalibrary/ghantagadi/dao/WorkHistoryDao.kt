@@ -1,10 +1,10 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
 import kotlinx.coroutines.flow.Flow
 
@@ -15,34 +15,31 @@ interface WorkHistoryDao {
     suspend fun insertWorkHistory(workHistoryData: WorkHistoryData)
 
     @Query("SELECT * FROM work_history_table")
-    fun getWorkHistory(): LiveData<List<WorkHistoryData>>
+    fun getWorkHistory(): Flow<List<WorkHistoryData>>
 
     @Query("DELETE FROM work_history_table")
     suspend fun deleteAllWorkHistory()
 
     @Query("""
-    SELECT *
-    FROM work_history_table
-    WHERE date = :date
-    ORDER BY time DESC
+    SELECT * FROM work_history_table 
+    WHERE year = :year AND month = :month
 """)
-    fun getWorkHistoryByDate(date: String): Flow<List<WorkHistoryData>>
+     fun getWorkHistoryByMonthYear(
+        year: String,
+        month: String
+    ): Flow<List<WorkHistoryData>>
 
     @Query("""
-    SELECT COUNT(*)
-    FROM work_history_table
-    WHERE date = :date
+    SELECT COUNT(*) 
+    FROM work_history_table 
+    WHERE year = :year AND month = :month
 """)
-    fun getWorkHistoryCountForDate(date: String):Int
+    suspend fun getCountByMonthYear(
+        year: String,
+        month: String
+    ): Int
 
-    @Query("""
-    DELETE FROM work_history_table
-    WHERE date = :date AND Refid = :refId
-""")
-    suspend fun deleteByDateAndRefId(
-        date: String,
-        refId: String?
-    )
-
+    @Upsert
+    suspend fun upsertWorkHistory(data: WorkHistoryData)
 
 }

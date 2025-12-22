@@ -13,6 +13,7 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.api.EmployeeApiService
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.ScanQrApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.WorkHistoryApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.network.DumpYardTripApi
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
 import com.appynitty.kotlinsbalibrary.housescanify.api.EmpDutyApi
 import com.appynitty.kotlinsbalibrary.housescanify.api.EmpGcApi
 import com.appynitty.kotlinsbalibrary.housescanify.api.EmpWorkHistoryApi
@@ -75,7 +76,10 @@ object AppModule {
     fun provideGarbageCollectionDao(db: SbaDatabase) = db.garbageCollectionDao()
 
     @Provides
-    fun provideworkHistoryDao(db: SbaDatabase) = db.workHistoryDao()
+    fun provideWorkHistoryDetailsDao(db: SbaDatabase) = db.workHistoryDetailsDao()
+
+    @Provides
+    fun provideWorkHistoryDao(db: SbaDatabase) = db.workHistoryDao()
 
     @Provides
     fun provideLocationDao(db: SbaDatabase) = db.locationDao()

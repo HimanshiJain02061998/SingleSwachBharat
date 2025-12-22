@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryDetailsData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.WorkHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +26,8 @@ private const val TAG = "WorkHistoryViewModel"
 class WorkHistoryViewModel @Inject constructor(
     private val workHistoryRepository: WorkHistoryRepository,
     private val userDataStore: UserDataStore,
+    private val insertWorkHistoryDataUseCases: InsertWorkHistoryDataUseCases,
+    private val workHistoryDao: WorkHistoryDao
 ) : ViewModel() {
 
     val workHistoryResponseResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryResponse>>> =
@@ -29,6 +35,12 @@ class WorkHistoryViewModel @Inject constructor(
 
     private val _isOfflineUi = MutableLiveData(false)
     val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
+
+    private val _workHistoryLiveData =
+        MutableLiveData<List<WorkHistoryResponse>>()
+
+    val workHistoryLiveData: LiveData<List<WorkHistoryResponse>> =
+        _workHistoryLiveData
 
     init {
         loadOfflineModeOnce()
@@ -41,6 +53,30 @@ class WorkHistoryViewModel @Inject constructor(
             Log.d("checkStatus", "status is $value")
         }
     }
+
+
+    fun getWorkHistoryDetailList(year: String,
+                                 month: String,) {
+        viewModelScope.launch {
+            workHistoryDao.getWorkHistoryByMonthYear(year,month)
+                .collect { list ->
+                    _workHistoryLiveData.postValue(
+                        list.map { it.toResponse() }
+                    )
+                }
+        }
+    }
+
+    fun WorkHistoryData.toResponse() = WorkHistoryResponse(
+        date = date,
+        houseCollection = houseCollection,
+        LiquidCollection = LiquidCollection,
+        StreetCollection = StreetCollection,
+        DumpYardCollection = DumpYardCollection,
+        DumpYardPlantCollection = DumpYardPlantCollection
+    )
+
+
     fun getWorkHistoryList(
         appId: String,
         userId: String,
@@ -53,7 +89,8 @@ class WorkHistoryViewModel @Inject constructor(
         try {
             val response =
                 workHistoryRepository.getWorkHistoryList(appId, userId, year, month, empType)
-            workHistoryResponseResponseLiveData.postValue(handleWorkHistoryResponse(response))
+//            workHistoryResponseResponseLiveData.postValue(handleWorkHistoryResponse(response))
+            insertWorkHistoryDataUseCases.invoke(response,year,month)
 
         } catch (t: Throwable) {
             when (t) {
