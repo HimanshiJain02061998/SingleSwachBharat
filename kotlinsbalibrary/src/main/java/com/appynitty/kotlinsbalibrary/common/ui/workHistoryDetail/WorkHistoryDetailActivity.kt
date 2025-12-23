@@ -136,7 +136,7 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
         val snackBar = Snackbar
             .make(binding.parent, "No Internet Connection", Snackbar.LENGTH_INDEFINITE)
-
+        fDate?.let {viewModel.getWorkHistoryDetailList(it)}
 
         internetConnectivity.observe(this) {
             isInternetOn = it
@@ -245,7 +245,7 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
         if (userId != null && fDate != null) {
             if (userType == 0) {
-                fDate?.let {viewModel.getWorkHistoryDetailList(it)}
+
                 viewModel.getWorkHistoryDetailList(
                     CommonUtils.APP_ID,
                     userId!!,

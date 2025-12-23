@@ -33,8 +33,7 @@ class WorkHistoryViewModel @Inject constructor(
     val workHistoryResponseResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryResponse>>> =
         MutableLiveData()
 
-    private val _isOfflineUi = MutableLiveData(false)
-    val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
+
 
     private val _workHistoryLiveData =
         MutableLiveData<List<WorkHistoryResponse>>()
@@ -42,17 +41,7 @@ class WorkHistoryViewModel @Inject constructor(
     val workHistoryLiveData: LiveData<List<WorkHistoryResponse>> =
         _workHistoryLiveData
 
-    init {
-        loadOfflineModeOnce()
-    }
 
-    fun loadOfflineModeOnce() {
-        viewModelScope.launch {
-            val value = userDataStore.getIsOfflineMode.first()
-            _isOfflineUi.value = value
-            Log.d("checkStatus", "status is $value")
-        }
-    }
 
 
     fun getWorkHistoryDetailList(year: String,

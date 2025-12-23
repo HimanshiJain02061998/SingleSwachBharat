@@ -60,7 +60,7 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     private var isInternetOn = false
     private var isInternetOnAndCanFetch = false
 
-    private var isOfflineMode = false
+
     private lateinit var internetConnectivity: ConnectivityStatus
 
     //multi language functionality
@@ -168,12 +168,12 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     }
 
     private fun getHistoryFromApi(month: String, year: String) {
-
-        if (isInternetOnAndCanFetch && !isOfflineMode) {
+        viewModel.getWorkHistoryDetailList(year,month)
+        if (isInternetOnAndCanFetch ) {
             viewModel.getWorkHistoryList(
                 CommonUtils.APP_ID, userId!!, year, month, empType!!
             )
-            viewModel.getWorkHistoryDetailList(year,month)
+
         }
     }
 
@@ -220,9 +220,6 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
 
     private fun subscribeLiveData() {
 
-        viewModel.isOfflineUi.observe(this, Observer {
-            isOfflineMode = it
-        })
 
         viewModel.workHistoryLiveData.observe(this) {
 
