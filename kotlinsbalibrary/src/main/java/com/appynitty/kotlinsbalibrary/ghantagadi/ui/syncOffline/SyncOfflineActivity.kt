@@ -101,7 +101,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     private var isOfflineMode = false
     private var totalGcCount = 0
     //  private var batchCount = 1
-
+    private var dutyOn = false
     private val dateFormat =
         SimpleDateFormat(DateTimeUtils.SYNC_OFFLINE_DATE_FORMAT, Locale.ENGLISH)
     private val serverDateFormat =
@@ -207,6 +207,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             }
         }
         garbageCollectionViewModel.isUserDutyOnFlow.asLiveData().observe(this, Observer {
+            dutyOn = it
           if (it){
               binding.syncOfflineLayout.visibility = View.VISIBLE
           }else{
@@ -265,6 +266,12 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
     private fun subscribeLiveData() {
 
+        val snackBar = Snackbar.make(
+            binding.parent,
+            resources.getString(R.string.no_internet_error),
+            Snackbar.LENGTH_INDEFINITE
+        )
+
         garbageCollectionViewModel.isOfflineUi.observe(this, Observer {
             isOfflineMode = it
             if (it){
@@ -274,6 +281,31 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 binding.lottieView.visibility = View.GONE
                 binding.toggleSyncOffline.isChecked = false
             }
+
+            if (!it && isInternetOn == true) {
+                snackBar.dismiss()
+                Log.i("TotalGcCount", "subscribeLiveData: $totalGcCount")
+                if (totalGcCount > 0 ) {
+                    binding.syncOfflineBtn.visibility = View.VISIBLE
+                } else {
+                    binding.syncOfflineBtn.visibility = View.GONE
+                }
+
+            } else {
+                if(it){
+                    snackBar.setText(
+                        resources.getString(R.string.save_offline_data)
+                    )
+                }else{
+                    snackBar.setText(
+                        resources.getString(R.string.no_internet_error)
+                    )
+                }
+                snackBar.show()
+                binding.syncOfflineBtn.visibility = View.GONE
+            }
+
+
         })
 
         garbageCollectionViewModel.isSyncingOnLiveData.observe(this) {
@@ -285,11 +317,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             }
         }
 
-        val snackBar = Snackbar.make(
-            binding.parent,
-            resources.getString(R.string.no_internet_error),
-            Snackbar.LENGTH_INDEFINITE
-        )
+
 
         val internetConnectivity = ConnectivityStatus(this)
 
