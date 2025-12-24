@@ -256,7 +256,7 @@
     <string name="please_select_at_least_one_member">Please select at least one member</string>
     <string name="selected_team_members">Selected Team Members</string>
     <string name="note_team_setting_is_on">(Note: Team setting is on)</string>
-    <string name="save_offline_data">Save Offline Data</string>
+    <string name="save_offline_data">Saved Offline Data</string>
     <string name="offline_mode">Offline Mode</string>
     <string name="offline_scanning">Offline Scanning</string>
 </resources>
