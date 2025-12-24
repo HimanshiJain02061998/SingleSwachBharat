@@ -9,6 +9,7 @@ import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.model.response.UserDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.repository.UserDetailsRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -29,20 +30,25 @@ private const val TAG = "UserDetailsViewModel"
 @HiltViewModel
 class UserDetailsViewModel @Inject constructor(
     private val userDetailsRepository: UserDetailsRepository,
-    private val userDetailsDao: UserDetailsDao
+    private val userDetailsDao: UserDetailsDao,
+    private val userDataStore: UserDataStore,
 ) : ViewModel() {
 
     val userDetailsLiveData: MutableLiveData<ApiResponseListener<UserDetailsResponse>> =
         MutableLiveData()
 
+    fun saveBaseUrl(url: String) {
+        viewModelScope.launch {
+            userDataStore.saveUrl(url)
+        }
+    }
 
     fun getUserDetails(
         appId: String, content_type: String, userId: String, typeId: String, empType: String
     ) = viewModelScope.launch {
-
         userDetailsLiveData.postValue(ApiResponseListener.Loading())
-
         try {
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
             val response = userDetailsRepository.getUserDetails(appId, content_type, userId, typeId)
             userDetailsLiveData.postValue(handleUserDetailResult(response, userId, typeId, empType))
 
@@ -65,7 +71,8 @@ class UserDetailsViewModel @Inject constructor(
     ): ApiResponseListener<UserDetailsResponse> {
         if (response.isSuccessful) {
             response.body()?.let {
-
+                CommonUtils.BASE_URL = it.baseUrl ?: CommonUtils.TEMP_URL
+                saveBaseUrl(CommonUtils.BASE_URL)
                 Log.d(TAG, "handleUserDetailResult: $it")
                 val userData = UserData(
                     userId,
@@ -83,11 +90,9 @@ class UserDetailsViewModel @Inject constructor(
                 )
 
                 Log.d(TAG, "handleUserDetailResult: $userData")
-
                 viewModelScope.launch {
                     userDetailsDao.insertUser(userData)
                 }
-
                 return ApiResponseListener.Success(it)
             }
         }
@@ -101,8 +106,6 @@ class UserDetailsViewModel @Inject constructor(
         userDetailsDao.deleteAllUserData()
     }
 
-
-
     fun getUserDetailsUpdate(
         appId: String,
         content_type: String,
@@ -112,10 +115,9 @@ class UserDetailsViewModel @Inject constructor(
         userFullName: String,
         userPartnerNameValue: String
     ) = viewModelScope.launch {
-
         userDetailsLiveData.postValue(ApiResponseListener.Loading())
-
         try {
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
             val response = userDetailsRepository.getUserDetails(appId, content_type, userId, typeId)
             userDetailsLiveData.postValue(handleUserDetailResultUpdate(response, userId, typeId, empType,userFullName,userPartnerNameValue))
 
@@ -129,11 +131,7 @@ class UserDetailsViewModel @Inject constructor(
                 else -> userDetailsLiveData.postValue(ApiResponseListener.Failure("Conversion Error"))
             }
         }
-
-
     }
-
-
 
     private suspend fun handleUserDetailResultUpdate(
         response: Response<UserDetailsResponse>,
@@ -144,10 +142,11 @@ class UserDetailsViewModel @Inject constructor(
         userPartnerNameValue: String
     ): ApiResponseListener<UserDetailsResponse> {
         if (response.isSuccessful) {
+            CommonUtils.BASE_URL = response.body()?.baseUrl ?: CommonUtils.BASE_URL
+            saveBaseUrl(CommonUtils.BASE_URL)
             response.body()?.let {
                 if (!userFullName.trim().lowercase(getDefault()).equals(it.name?.trim()
                         ?.lowercase(getDefault()))) {
-                    CommonUtils.BASE_URL = it.baseUrl ?: CommonUtils.BASE_URL
                     Log.d(TAG, "handleUserDetailResult: $it")
                     val userData = UserData(
                         userId,
@@ -163,21 +162,14 @@ class UserDetailsViewModel @Inject constructor(
                         it.partnerName,
                         it.partnerCode
                     )
-
                     Log.d(TAG, "handleUserDetailResult: $userData")
-
-                   var job = viewModelScope.launch {
+                   val job = viewModelScope.launch {
                         userDetailsDao.insertUser(userData)
                     }
-
                     job.join()
-
-
                     return ApiResponseListener.Success(it)
-
                 }else if (!userPartnerNameValue.trim().lowercase(getDefault()).equals(it.partnerName?.trim()
                         ?.lowercase(getDefault()))){
-
                     if (!userPartnerNameValue.equals("null")) {
                         val userData = UserData(
                             userId,
@@ -193,25 +185,17 @@ class UserDetailsViewModel @Inject constructor(
                             it.partnerName,
                             it.partnerCode
                         )
-
                         Log.d(TAG, "handleUserDetailResult: $userData")
 
-                       var job = viewModelScope.launch {
-
+                       val job = viewModelScope.launch {
                             userDetailsDao.insertUser(userData)
                         }
-
                         job.join()
-
-
                        return ApiResponseListener.Success(it)
-
                     }
-
                 }
             }
         }
-
         return ApiResponseListener.Failure(response.message())
     }
 

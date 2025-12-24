@@ -87,6 +87,12 @@ class DashboardViewModel @Inject constructor(
         getBaseUrl()
     }
 
+    fun saveBaseUrl(url: String) {
+        viewModelScope.launch {
+            userDataStore.saveUrl(url)
+        }
+    }
+
     /**
      *  METHOD TO GET VEHICLE TYPES FROM API
      */
@@ -97,7 +103,6 @@ class DashboardViewModel @Inject constructor(
 
         val tempId = tempUser.userId
         val userId = user.userId
-
         // Return true if IDs are same OR either is empty/null
         return tempId.isNullOrEmpty() || tempId == userId
     }
@@ -327,6 +332,10 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
             } else {
+                if(response.code() == 404){
+                    CommonUtils.BASE_URL = CommonUtils.TEMP_URL
+                    saveBaseUrl(CommonUtils.TEMP_URL)
+                }
                 dashboardEventChannel.send(
                     DashboardEvent.ShowFailureMessage(
                         response.code().toString()
@@ -427,9 +436,7 @@ class DashboardViewModel @Inject constructor(
     ) = viewModelScope.launch {
         dashboardEventChannel.send(DashboardEvent.ShowProgressBar)
         val trailId = sessionDataStore.getGisTrailId.first()
-
         try {
-
             val userDetails = userDataStore.getUserEssentials.first()
             if (userDetails.employeeType == "D") {
                 val vehicleDetails = userDataStore.getUserVehicleDetails.first()
@@ -444,7 +451,6 @@ class DashboardViewModel @Inject constructor(
                 is IOException -> DashboardEvent.ShowFailureMessage(
                     "Connection Timeout"
                 )
-
                 else -> DashboardEvent.ShowFailureMessage(
                     "Conversion Error"
                 )
@@ -491,7 +497,12 @@ class DashboardViewModel @Inject constructor(
                 }
             }
 
-        } else if (response.code() == 422) {
+        }
+        else if(response.code() == 404){
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
+            saveBaseUrl(CommonUtils.TEMP_URL)
+        }
+        else if (response.code() == 422) {
 
             dashboardEventChannel.send(
                 DashboardEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No")
@@ -928,6 +939,7 @@ class DashboardViewModel @Inject constructor(
             userTravelLocDao.deleteAllUserTravelLatLongs()
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
+            tempUserDataStore.clearUserDatastore()
         }
     }
 

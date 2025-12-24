@@ -48,7 +48,6 @@ private const val TAG = "LoginActivity"
 class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialogCallbacks {
 
     private val viewModel: LoginViewModel by viewModels()
-
     private lateinit var binding: ActivityLoginBinding
     private var loginRequest: LoginRequest? = null
     private lateinit var languageDataStore: LanguageDataStore
@@ -95,11 +94,9 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
                 )
             )
         }
-
     }
 
     private fun showPermissionRequestDialog(permission: String) {
-
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, permission
             )
@@ -116,7 +113,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
 
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -131,7 +127,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
         onBack()
     }
 
-
     private fun onBack() {
         binding.btnBack?.setOnClickListener {
 
@@ -140,6 +135,7 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
             finish()
         }
     }
+
     override fun onBackPressed() {
         super.onBackPressed()
         lifecycleScope.launch {
@@ -165,7 +161,6 @@ class LoginActivity : AppCompatActivity(), LanguageBottomSheetFrag.LanguageDialo
                     LoginViewModel.LoginEvent.NavigateToDashboard -> {
                         val intent = Intent(this@LoginActivity, DashboardActivity::class.java)
                         val appId = intent.getStringExtra(userDataStore.getAppId.toString())
-
                         if (!appId.isNullOrEmpty()) {
                             CustomToast.showSuccessToast(
                                 this@LoginActivity,

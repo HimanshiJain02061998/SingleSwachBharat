@@ -1141,10 +1141,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         if (!isSyncingOn) {
             lifecycleScope.launch {
-
                 if (viewModel.checkSameUserLogin()) {
                     Log.d("tempId", "Temp id is ${viewModel.checkSameUserLogin()}")
-
                     val gcCount = garbageCollectionViewModel.getGcCount()
                     if (gcCount > 0) {
                         userTypeId?.let {

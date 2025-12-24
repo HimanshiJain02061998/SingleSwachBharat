@@ -82,7 +82,6 @@ class GarbageCollectionViewModel(
         batteryStatus: Int,
         contentType: String,
     ) = viewModelScope.launch {
-
         val garbageCollectionDataList: List<GarbageCollectionData> =
             garbageCollectionDao.getGarbageCollectionDataByLimit(10, 0)
 
@@ -214,10 +213,7 @@ class GarbageCollectionViewModel(
 
                         if (garbageCollectionResponse.status == CommonUtils.STATUS_SUCCESS) {
 
-                            //TODO - should be taken care of
-
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
-
                             val archivedData = ArchivedData(
                                 0,
                                 garbageCollectionResponse.referenceID,
@@ -225,7 +221,6 @@ class GarbageCollectionViewModel(
                                 garbageCollectionResponse.messageMar
                             )
                             archivedDao.insertArchivedData(archivedData)
-
                         }
                         garbageCollectionResponse.offlineId?.let { it1 ->
                             if (garbageCollectionResponse.referenceID != null)

@@ -86,14 +86,13 @@ class LoginViewModel @Inject constructor(
                     val it = response.body()
 
                     if (it?.status == CommonUtils.STATUS_SUCCESS) {
-
+                        BASE_URL = ""
+                        BASE_URL = it.baseUrl
+                        saveBaseUrl(it.baseUrl)
                         saveUserLoginSession()
                         val userEssentials = UserEssentials(it.userId, it.EmpType, it.typeId)
                         userDataStore.saveUserEssentials(userEssentials)
                         getUserDetails(appId, contentType, it)
-                        BASE_URL = ""
-                        BASE_URL = it.baseUrl
-                        saveBaseUrl(it.baseUrl)
                         loginEventChannel.send(
                             LoginEvent.ShowResponseSuccessMessage(
                                 it.message,
@@ -127,8 +126,8 @@ class LoginViewModel @Inject constructor(
     private fun getUserDetails(
         appId: String, content_type: String, loginResponse: LoginResponse
     ) = viewModelScope.launch {
-
         try {
+            BASE_URL = CommonUtils.TEMP_URL
             val response = userDetailsRepository.getUserDetails(
                 appId,
                 content_type,
@@ -152,8 +151,9 @@ class LoginViewModel @Inject constructor(
     ) = viewModelScope.launch {
 
         if (response.isSuccessful) {
+            BASE_URL = response.body()?.baseUrl ?: BASE_URL
+            saveBaseUrl(BASE_URL)
             response.body()?.let {
-
                 val userData = UserData(
                     loginResponse.userId,
                     loginResponse.typeId,
