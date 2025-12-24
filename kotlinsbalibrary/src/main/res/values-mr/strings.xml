@@ -219,4 +219,5 @@
     <string name="note_team_setting_is_on">(नोंद: टीम सेटिंग सुरू आहे)</string>
     <string name="save_offline_data">ऑफलाइन डेटा जतन करा</string>
     <string name="offline_mode">ऑफलाइन मोड</string>
+    <string name="offline_scanning">ऑफलाइन स्कॅनिंग</string>
 </resources>

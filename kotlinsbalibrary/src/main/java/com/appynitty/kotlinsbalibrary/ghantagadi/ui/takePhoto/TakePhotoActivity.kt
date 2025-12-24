@@ -7,8 +7,11 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraActivity
@@ -63,10 +66,14 @@ class TakePhotoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityTakePhotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.parent)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         initVars()
         initToolbar()
         clickEvents()

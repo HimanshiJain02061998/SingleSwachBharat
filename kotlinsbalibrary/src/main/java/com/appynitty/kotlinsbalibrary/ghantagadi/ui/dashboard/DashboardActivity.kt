@@ -28,11 +28,15 @@ import android.widget.Spinner
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -330,9 +334,14 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityDashboardBinding.inflate(layoutInflater)
+        enableEdgeToEdge()
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.parentLayout)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         initVars()
         initToolBar()
@@ -846,6 +855,10 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         viewModel.isOfflineUi.observe(this, Observer {
            if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
+        })
+
+        viewModel.isOffline.observe(this, Observer {
+            if (it) binding.lottieView?.visibility = View.VISIBLE else binding.lottieView?.visibility = View.GONE
         })
 
         viewModel.isBifurcationOnLiveData.observe(this, Observer {

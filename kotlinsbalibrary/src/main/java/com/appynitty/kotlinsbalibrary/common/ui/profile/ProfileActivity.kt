@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.common.model.UserData
 import com.appynitty.kotlinsbalibrary.common.utils.BackBtnPressedUtil
@@ -32,10 +35,14 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityProfileBinding.inflate(layoutInflater)
+        enableEdgeToEdge()
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.parent)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         initToolbar()
 
         userData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

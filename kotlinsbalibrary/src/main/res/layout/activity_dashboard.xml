@@ -247,16 +247,29 @@
 
                     <TextView
                         android:id="@+id/tvSyncOffline"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/save_offline_data"
+                        android:text="@string/offline_scanning"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:gravity="center_vertical"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/toggleSyncOffline"/>
+                        />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieView"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        app:lottie_fileName="green_flashing_circle_icon.json"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        android:layout_marginStart="8dp"
+                        app:layout_constraintStart_toEndOf="@+id/tvSyncOffline"
+                        app:layout_constraintTop_toTopOf="@+id/tvSyncOffline"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvSyncOffline"
+                        />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/toggleSyncOffline"

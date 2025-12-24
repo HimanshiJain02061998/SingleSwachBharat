@@ -95,6 +95,8 @@ class DashboardViewModel @Inject constructor(
     val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
     private val _isOffline = MutableLiveData(false)
 
+    val isOffline: LiveData<Boolean> get() = _isOffline
+
 
     init {
         getTeam()

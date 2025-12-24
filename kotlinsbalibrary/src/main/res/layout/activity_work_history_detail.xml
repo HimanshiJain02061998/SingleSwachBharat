@@ -5,7 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ghantagadi.ui.workHistory.WorkHistoryDetailActivity">
+    tools:context=".common.ui.workHistoryDetail.WorkHistoryDetailActivity">
 
 
     <com.google.android.material.appbar.AppBarLayout
