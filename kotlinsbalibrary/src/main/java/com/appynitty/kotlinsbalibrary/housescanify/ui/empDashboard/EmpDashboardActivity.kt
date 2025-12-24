@@ -227,7 +227,7 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
 
     private fun initToolBar() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_action_icon)
-        binding.toolbar.title = resources.getString(R.string.app_name)
+        binding.toolbar.title = MyApplication.ULB_NAME
         setSupportActionBar(binding.toolbar)
     }
 
@@ -287,7 +287,6 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
     }
 
     private fun setUserDataToWidgets(userData: UserData) {
-
         val fullName = userData.userName
         val maxLength = 20
 
@@ -301,7 +300,6 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
 
         binding.userFullName.text = fullName
 
-
         try {
 
             binding.userEmpCodeValue.text = userData.employeeId
@@ -313,7 +311,6 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
     }
 
     private fun getUserDetailsFromApi() {
-
         lifecycleScope.launch {
             val userEssentials = viewModel.userEssentialsFlow.first()
             userDetailsViewModel.getUserDetails(
