@@ -69,6 +69,7 @@ class GarbageCollectionViewModel(
     private val _isOfflineUi = MutableLiveData(false)
     val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
 
+    val isUserDutyOnFlow = sessionDataStore.getIsUserDutyOn
 
     init {
 
@@ -90,6 +91,12 @@ class GarbageCollectionViewModel(
         }
     }
 
+    fun saveIsOfflineMode(mode: Boolean){
+        Log.d("checkStatus","status is $mode")
+        viewModelScope.launch {
+            userDataStore.saveIsOfflineMode(mode)
+        }
+    }
     private fun deleteDataFromTempGarbage(){
         Log.d("checkStatus","delete gc called")
         viewModelScope.launch(Dispatchers.IO) {

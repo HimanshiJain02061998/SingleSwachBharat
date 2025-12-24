@@ -206,6 +206,13 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 }
             }
         }
+        garbageCollectionViewModel.isUserDutyOnFlow.asLiveData().observe(this, Observer {
+          if (it){
+              binding.syncOfflineLayout.visibility = View.VISIBLE
+          }else{
+              binding.syncOfflineLayout.visibility = View.GONE
+          }
+        })
     }
 
     private fun registerClickEvents() {
@@ -239,6 +246,10 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 )
             }
         }
+
+        binding.toggleSyncOffline.setOnCheckedChangeListener { _, isChecked ->
+            garbageCollectionViewModel.saveIsOfflineMode(isChecked)
+        }
     }
 
     private fun showCountDialog() {
@@ -256,6 +267,13 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
         garbageCollectionViewModel.isOfflineUi.observe(this, Observer {
             isOfflineMode = it
+            if (it){
+                binding.lottieView.visibility = View.VISIBLE
+                binding.toggleSyncOffline.isChecked = true
+            } else {
+                binding.lottieView.visibility = View.GONE
+                binding.toggleSyncOffline.isChecked = false
+            }
         })
 
         garbageCollectionViewModel.isSyncingOnLiveData.observe(this) {

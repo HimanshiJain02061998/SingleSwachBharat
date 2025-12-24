@@ -240,6 +240,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/dim_12_dp"
                     android:paddingVertical="@dimen/_5sdp"
+                    android:visibility="gone"
                     android:background="@android:color/transparent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

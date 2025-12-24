@@ -149,7 +149,7 @@ class DashboardViewModel @Inject constructor(
      fun saveIsOfflineMode(mode: Boolean){
          Log.d("checkStatus","status is $mode")
          viewModelScope.launch {
-             userDataStore.saveIsOfflineMode(mode)
+                 userDataStore.saveIsOfflineMode(mode)
          }
     }
 

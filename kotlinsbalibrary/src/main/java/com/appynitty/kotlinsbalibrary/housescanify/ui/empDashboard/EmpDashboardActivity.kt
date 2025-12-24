@@ -234,7 +234,7 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
 
     private fun initToolBar() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_action_icon)
-        binding.toolbar.title = resources.getString(R.string.app_name)
+        binding.toolbar.title = MyApplication.ULB_NAME
         setSupportActionBar(binding.toolbar)
     }
 

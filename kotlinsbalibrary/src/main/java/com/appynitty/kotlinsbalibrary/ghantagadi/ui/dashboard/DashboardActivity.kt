@@ -35,7 +35,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -853,12 +852,19 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     private fun subscribeLiveData() {
 
-        viewModel.isOfflineUi.observe(this, Observer {
-           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
-        })
+//        viewModel.isOfflineUi.observe(this, Observer {
+//           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
+//        })
 
         viewModel.isOffline.observe(this, Observer {
-            if (it) binding.lottieView?.visibility = View.VISIBLE else binding.lottieView?.visibility = View.GONE
+            Log.d("toggle","toggle status ${it}")
+            if (it){
+                binding.toggleSyncOffline.isChecked = true
+                binding.lottieView?.visibility = View.VISIBLE
+            } else {
+                binding.toggleSyncOffline.isChecked = false
+                binding.lottieView?.visibility = View.GONE
+            }
         })
 
         viewModel.isBifurcationOnLiveData.observe(this, Observer {
@@ -948,6 +954,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             binding.userAttendanceToggle.isChecked = it
 
             if (isDutyOn) {
+               binding.syncOfflineLayout.visibility = View.VISIBLE
                 binding.userAttendanceStatus.setTextColor(
                     resources.getColor(
                         R.color.colorONDutyGreen, null
@@ -957,6 +964,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     resources.getString(R.string.status_on_duty)
                 binding.userVehicleType.visibility = View.VISIBLE
             } else {
+                binding.syncOfflineLayout.visibility = View.GONE
                 binding.userAttendanceStatus.setTextColor(
                     resources.getColor(
                         R.color.colorOFFDutyRed, null
