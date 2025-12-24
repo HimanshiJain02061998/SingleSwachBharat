@@ -76,6 +76,7 @@ class BackgroundTaskHelper @Inject constructor(private val archivedDao: Archived
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
             garbageCollectionDaoTemp.deleteAllGarbageCollection()
+            tempUserDataStore.clearUserDatastore()
     }
 
     private fun getUserDetailsFromRoom() {

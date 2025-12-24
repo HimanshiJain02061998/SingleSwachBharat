@@ -60,6 +60,7 @@ class SplashActivity : AppCompatActivity() {
 
         setupVersionText()
         observeSplashEvents()
+        viewModel.checkWhereToNavigate()
     }
 
     private fun setupVersionText() {
