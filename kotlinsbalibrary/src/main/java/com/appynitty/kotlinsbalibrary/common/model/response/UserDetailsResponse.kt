@@ -14,8 +14,8 @@ data class UserDetailsResponse(
     val mobileNumber: String?,
     val nameMar: String?,
     val bloodGroup: String?,
-
     val partnerName: String?,
-    val partnerCode: String?
+    val partnerCode: String?,
+    val baseUrl: String?
 
 )

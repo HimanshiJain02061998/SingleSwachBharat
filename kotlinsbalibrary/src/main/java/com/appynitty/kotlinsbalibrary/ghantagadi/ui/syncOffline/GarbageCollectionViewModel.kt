@@ -255,7 +255,6 @@ class GarbageCollectionViewModel(
 
                             //TODO - should be taken care of
 
-
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
 
                             val archivedData = ArchivedData(
@@ -268,10 +267,8 @@ class GarbageCollectionViewModel(
 
                         }
                         garbageCollectionResponse.offlineId?.let { it1 ->
-                            if (garbageCollectionResponse.referenceID != null){
+                            if (garbageCollectionResponse.referenceID != null)
                                 deleteGcById(it1)
-
-                            }
                         }
                     }
                     deleteUploadedImages()

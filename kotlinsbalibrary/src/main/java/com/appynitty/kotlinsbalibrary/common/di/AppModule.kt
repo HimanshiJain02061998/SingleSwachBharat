@@ -162,13 +162,16 @@ object AppModule {
     @Singleton
     @Named("Authorize")
     fun provideRetrofitAuthorize(
-        @Named("Authorize") client: OkHttpClient, converterFactory: Converter.Factory,
+        @Named("Authorize") client: OkHttpClient,
+        converterFactory: Converter.Factory,
         scalarsConverterFactory: ScalarsConverterFactory
     ): Retrofit =
-        Retrofit.Builder().baseUrl(CommonUtils.BASE_URL)
+        Retrofit.Builder()
+            .baseUrl("https://dummy.com/") // REQUIRED by Retrofit
             .addConverterFactory(scalarsConverterFactory)
             .addConverterFactory(converterFactory)
-            .client(client).build()
+            .client(client)
+            .build()
 
     @Provides
     @Singleton
@@ -177,8 +180,10 @@ object AppModule {
         @Named("Normal") interceptor: HttpLoggingInterceptor,
         interceptorWithToken: Interceptor,
         authAuthenticator: AppAuthenticator,
+        baseUrlInterceptor: BaseUrlInterceptor
     ): OkHttpClient = OkHttpClient.Builder().connectTimeout(3600L, TimeUnit.SECONDS)
         .writeTimeout(3600L, TimeUnit.SECONDS).readTimeout(3600L, TimeUnit.SECONDS)
+        .addInterceptor(baseUrlInterceptor)
         .addInterceptor(interceptor)
         .addInterceptor(interceptorWithToken)
         .authenticator(authAuthenticator)

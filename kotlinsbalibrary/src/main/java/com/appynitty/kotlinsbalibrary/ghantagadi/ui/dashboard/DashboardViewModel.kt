@@ -78,6 +78,11 @@ class DashboardViewModel @Inject constructor(
     private val _isTeamSelected = MutableLiveData(false)
     val isTeamSelected: LiveData<Boolean> get() = _isTeamSelected
 
+    private val _baseUrl = MutableLiveData(CommonUtils.BASE_URL)
+    val baseUrl: LiveData<String>
+        get() =
+            _baseUrl
+
     private val _teamMembersSelected = MutableLiveData(emptyList<AvailableEmpItem>())
     val teamMembersSelected: LiveData<List<AvailableEmpItem>>
         get() =
@@ -96,6 +101,13 @@ class DashboardViewModel @Inject constructor(
         getSelectedTeam()
         getIsOfflineMode()
         loadOfflineModeOnce()
+        getBaseUrl()
+    }
+
+    fun saveBaseUrl(url: String) {
+        viewModelScope.launch {
+            userDataStore.saveUrl(url)
+        }
     }
 
 
@@ -125,6 +137,8 @@ class DashboardViewModel @Inject constructor(
         WorkManager.getInstance(context)
             .cancelUniqueWork("offline_sync_work")
     }
+
+
 
     /**
      *  METHOD TO GET VEHICLE TYPES FROM API
@@ -405,6 +419,10 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
             } else {
+                if(response.code() == 404){
+                    CommonUtils.BASE_URL = CommonUtils.TEMP_URL
+                    saveBaseUrl(CommonUtils.TEMP_URL)
+                }
                 dashboardEventChannel.send(
                     DashboardEvent.ShowFailureMessage(
                         response.code().toString()
@@ -430,7 +448,6 @@ class DashboardViewModel @Inject constructor(
                         DashboardEvent.ShowResponseSuccessMessage(body.message, body.messageMar)
                     )
                     dashboardEventChannel.trySend(DashboardEvent.StartLocationTracking)
-//                    startPeriodicSync(appContext)
 
                     if (userVehicleDetails == null) {
                         dashboardEventChannel.trySend(DashboardEvent.SaveVehicleDetails)
@@ -477,6 +494,15 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             userDataStore.getVewTeam.collect { value ->
                 _isTeamSelected.value = value
+            }
+        }
+    }
+
+    fun getBaseUrl() {
+        viewModelScope.launch {
+            userDataStore.getUrl.collect { value ->
+                _baseUrl.value = value
+                CommonUtils.BASE_URL = value
             }
         }
     }
@@ -564,7 +590,12 @@ class DashboardViewModel @Inject constructor(
                 }
             }
 
-        } else if (response.code() == 422) {
+        }
+        else if(response.code() == 404){
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
+            saveBaseUrl(CommonUtils.TEMP_URL)
+        }
+        else if (response.code() == 422) {
 
             dashboardEventChannel.send(
                 DashboardEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No")
@@ -919,7 +950,7 @@ class DashboardViewModel @Inject constructor(
                     dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.off_duty_warning))
                     dashboardEventChannel.send(DashboardEvent.DismissAlertDialogFrag)
                 } else {
-
+                    CommonUtils.BASE_URL = CommonUtils.TEMP_URL
                     userDataStore.clearUserDatastore()
                     sessionDataStore.clearSessionDatastore()
                     archivedDao.deleteAllArchivedData()
@@ -990,6 +1021,7 @@ class DashboardViewModel @Inject constructor(
                     userDetails.userTypeId
                 )
             )
+            CommonUtils.BASE_URL = CommonUtils.TEMP_URL
             userDataStore.clearUserDatastore()
             sessionDataStore.clearSessionDatastore()
             dashboardEventChannel.send(DashboardEvent.StopLocationTracking)
@@ -1004,6 +1036,7 @@ class DashboardViewModel @Inject constructor(
             nearestLatLngDao.deleteAllNearestHouses()
             garbageCollectionDao.deleteAllGarbageCollection()
             garbageCollectionDaoTemp.deleteAllGarbageCollection()
+            tempUserDataStore.clearUserDatastore()
         }
     }
 

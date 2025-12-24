@@ -25,49 +25,85 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private val viewModel: SplashViewModel by viewModels()
+    private lateinit var versionCodeTv: TextView
 
     companion object {
         private const val UPDATE_REQUEST_CODE = 1001
+        private const val SPLASH_DELAY = 2000L
     }
-    private val viewModel: SplashViewModel by viewModels()
-    private lateinit var versionCodeTv: TextView
-    private var versionCode: String = ""
 
-    //setting app language ( by default it will be marathi if user doesn't change language )
+    private val appUpdateManager by lazy {
+        AppUpdateManagerFactory.create(this)
+    }
+
+    // Language setup
     override fun attachBaseContext(newBase: Context?) {
-        var context: Context? = newBase
-        if (newBase != null) {
-            val languageDataStore = LanguageDataStore(newBase.applicationContext)
+        var context = newBase
+        newBase?.let {
+            val languageDataStore = LanguageDataStore(it.applicationContext)
             val appLanguage = languageDataStore.currentLanguage
-            context = newBase.let { LanguageConfig.changeLanguage(it, appLanguage.languageId) }
+            context = LanguageConfig.changeLanguage(it, appLanguage.languageId)
         }
         super.attachBaseContext(context)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        versionCode = CommonUtils.VERSION_CODE
-        val versionName = "$versionCode"
 
+        setupVersionText()
+        observeSplashEvents()
+    }
+
+    private fun setupVersionText() {
         versionCodeTv = findViewById(R.id.versionCodeTv)
-        versionCodeTv.text = buildString {
-            append("Version : ")
-            append(versionName)
-        }
-        checkForImmediateUpdate()
-        viewModel.checkWhereToNavigate()
-        // listening to events sent by viewModel
-        lifecycleScope.launchWhenStarted {
-            viewModel.splashEventsFlow.collect { event ->
+        versionCodeTv.text = "Version : ${CommonUtils.VERSION_CODE}"
+    }
 
+    // In-app update check
+    private fun checkForImmediateUpdate() {
+        try {
+            appUpdateManager.appUpdateInfo
+                .addOnSuccessListener { appUpdateInfo ->
+                    if (appUpdateInfo.updateAvailability() ==
+                        UpdateAvailability.UPDATE_AVAILABLE &&
+                        appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                    ) {
+                        val options = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
+                            .setAllowAssetPackDeletion(true)
+                            .build()
+
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            this,
+                            options,
+                            UPDATE_REQUEST_CODE
+                        )
+                    } else {
+                        // No update → navigate
+                        viewModel.checkWhereToNavigate()
+                    }
+                }
+                .addOnFailureListener {
+                 //   viewModel.checkWhereToNavigate()
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+          //  viewModel.checkWhereToNavigate()
+        }
+    }
+
+    // Events observer (UNCHANGED events)
+    private fun observeSplashEvents() {
+        lifecycleScope.launch {
+            viewModel.splashEventsFlow.collect { event ->
                 when (event) {
                     SplashViewModel.SplashEvent.NavigateToDashboardScreen -> {
                         navigateToDashboardScreen()
@@ -82,7 +118,10 @@ class SplashActivity : AppCompatActivity() {
                     }
 
                     is SplashViewModel.SplashEvent.ShowErrorMsg -> {
-                        CustomToast.showErrorToast(this@SplashActivity, event.msg)
+                        CustomToast.showErrorToast(
+                            this@SplashActivity,
+                            event.msg
+                        )
                     }
                 }
             }
@@ -90,84 +129,42 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun navigateToEmpDashboardScreen() {
-        val intent = Intent(this, EmpDashboardActivity::class.java)
-        startAnotherActivity(intent)
+        startAnotherActivity(Intent(this, EmpDashboardActivity::class.java))
     }
 
     private fun navigateToDashboardScreen() {
-        val intent = Intent(this, DashboardActivity::class.java)
-        startAnotherActivity(intent)
+        startAnotherActivity(Intent(this, DashboardActivity::class.java))
     }
 
     private fun navigateToLoginScreen() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startAnotherActivity(intent)
+        startAnotherActivity(Intent(this, LoginActivity::class.java))
     }
 
     private fun navigateToSelectUlbScreen() {
-        val intent = Intent(this, AddUlbActivity::class.java)
-        startAnotherActivity(intent)
+        startAnotherActivity(Intent(this, AddUlbActivity::class.java))
     }
 
     private fun startAnotherActivity(intent: Intent) {
-        Handler(Looper.myLooper()!!).postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             startActivity(intent)
             overridePendingTransition(
-                R.anim.slide_in_right, R.anim.slide_out_left
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
             )
             finish()
-        }, 2000)
-
-    }
-
-    private fun checkForImmediateUpdate() {
-        try {
-            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-                when {
-                    appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                            appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
-
-                        val options = AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE)
-                            .setAllowAssetPackDeletion(true)
-                            .build()
-
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            this,
-                            options,
-                            UPDATE_REQUEST_CODE
-                        )
-                    }
-
-                    appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            this,
-                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                            UPDATE_REQUEST_CODE
-                        )
-                    }
-                }
-            }
-        } catch (e: Exception) {
-        }
+        }, SPLASH_DELAY)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == UPDATE_REQUEST_CODE) {
-            if (resultCode != Activity.RESULT_OK) {
-                finishAffinity()
-            }
+        if (requestCode == UPDATE_REQUEST_CODE && resultCode != Activity.RESULT_OK) {
+            finishAffinity()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Resume update if already in progress
+        // Resume update if interrupted
         checkForImmediateUpdate()
     }
 }

@@ -12,11 +12,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollection
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
 
-
 class CommonUtils {
-
     companion object {
-
         val APP_ID: String
             get() = MyApplication.APP_ID
         val ULB_NAME: String
@@ -27,11 +24,9 @@ class CommonUtils {
         val PACKAGE_NAME = MyApplication.PACKAGE_NAME
 
         //const val BASE_URL = "http://202.65.157.254:7570/"
-        const val BASE_URL = "https://testapi.ictsbm.com/"
-//
-
-        //"https://testapi.ictsbm.com"
-//        const val BASE_URL = "https://testapi.ictsbm.com"
+        //const val BASE_URL = "https://ictcoreapi.ictsbm.com/"//"https://testapi.ictsbm.com"
+         var BASE_URL = "https://ictcoreapi.ictsbm.com/"
+        var TEMP_URL = "https://ictcoreapi.ictsbm.com/"
         //  const val BASE_URL = "http://124.153.94.110:1010/"
         // const val BASE_URL = "http://202.65.157.254:7570/"
         //  const val BASE_URL = "http://103.241.147.9:1010"

@@ -13,6 +13,7 @@ import com.appynitty.kotlinsbalibrary.common.model.response.UserDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.repository.LoginRepository
 import com.appynitty.kotlinsbalibrary.common.repository.UserDetailsRepository
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.BASE_URL
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
@@ -41,6 +42,12 @@ class LoginViewModel @Inject constructor(
 
     private val _iconUrl = MutableLiveData<String>()
     val iconUrl: LiveData<String> get() = _iconUrl
+
+    fun saveBaseUrl(url: String) {
+        viewModelScope.launch {
+            userDataStore.saveUrl(url)
+        }
+    }
 
     fun saveLoginDetails(
         appId: String,
@@ -79,18 +86,20 @@ class LoginViewModel @Inject constructor(
                     val it = response.body()
 
                     if (it?.status == CommonUtils.STATUS_SUCCESS) {
-
+                        BASE_URL = ""
+                        BASE_URL = it.baseUrl
+                        saveBaseUrl(it.baseUrl)
                         saveUserLoginSession()
                         val userEssentials = UserEssentials(it.userId, it.EmpType, it.typeId)
                         userDataStore.saveUserEssentials(userEssentials)
                         getUserDetails(appId, contentType, it)
-
                         loginEventChannel.send(
                             LoginEvent.ShowResponseSuccessMessage(
                                 it.message,
                                 it.messageMar
                             )
                         )
+
 
                     } else if (it?.status == CommonUtils.STATUS_ERROR) {
                         loginEventChannel.send(LoginEvent.EnableLoginButton)
@@ -117,8 +126,8 @@ class LoginViewModel @Inject constructor(
     private fun getUserDetails(
         appId: String, content_type: String, loginResponse: LoginResponse
     ) = viewModelScope.launch {
-
         try {
+            BASE_URL = CommonUtils.TEMP_URL
             val response = userDetailsRepository.getUserDetails(
                 appId,
                 content_type,
@@ -142,8 +151,9 @@ class LoginViewModel @Inject constructor(
     ) = viewModelScope.launch {
 
         if (response.isSuccessful) {
+            BASE_URL = response.body()?.baseUrl ?: BASE_URL
+            saveBaseUrl(BASE_URL)
             response.body()?.let {
-
                 val userData = UserData(
                     loginResponse.userId,
                     loginResponse.typeId,
