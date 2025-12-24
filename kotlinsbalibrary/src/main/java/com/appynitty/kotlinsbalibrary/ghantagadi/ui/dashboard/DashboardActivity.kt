@@ -134,7 +134,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     lateinit var tripRepository: TripRepository
     @Inject
     lateinit var sessionDataStore : SessionDataStore
-
     @Inject
     lateinit var userDataStore : UserDataStore
 
@@ -206,6 +205,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 enableDutyToggle()
             }
         }
+
     private val selectMembersLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
@@ -246,7 +246,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 enableDutyToggle()
             }
         }
-
 
     private fun useTheResult(liquidQr: String?) {
 
@@ -313,7 +312,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     override fun onResume() {
         super.onResume()
-
         isDutyOnToggleClicked = false
         viewModel.checkIsDateChanged()
         setUpGridRecyclerView()
@@ -353,10 +351,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         handleBackBtnInDashboard()
     }
 
-
-
     private fun subscribeChannelEvents() {
-
         /// getting channel events from viewModel ( single time events )
         lifecycleScope.launchWhenStarted {
             viewModel.dashboardEventsFlow.collect { event ->
@@ -1140,7 +1135,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun turnDutyOff() {
-
         if (latitude == null && longitude == null) {
             CustomToast.showWarningToast(this, "Couldn't find location")
         } else {
@@ -1172,11 +1166,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun submitOfflineData() {
-
         //sync dump yard trip blockchain
 //        if (isInternetOn)
 //            garbageCollectionViewModel.syncDumpYardTrip()
-
         if (!isSyncingOn) {
             lifecycleScope.launch {
                 if (viewModel.checkSameUserLogin()) {
@@ -1277,9 +1269,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
     /// to handle if there is no data in room db get it from server
     private fun getUserDetailsFromApi() {
-
         lifecycleScope.launch {
-
             val userEssentials = viewModel.userEssentialsFlow.first()
             userDetailsViewModel.getUserDetails(
                 CommonUtils.APP_ID,
@@ -1294,9 +1284,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun getUserDetailsUpdateFromApi() {
-
         lifecycleScope.launch {
-
             val userEssentials = viewModel.userEssentialsFlow.first()
             userDetailsViewModel.getUserDetailsUpdate(
                 CommonUtils.APP_ID,
@@ -1349,11 +1337,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             settingsTeamBottomSheet.setIsTeamsOn(isTeamSelected)
             settingsTeamBottomSheet.setListener(this)
         }
-
     }
 
     private fun showChangeLanguageBottomSheet() {
-
         if (!languageBottomSheet.isAdded) {
             languageBottomSheet.setListener(this)
             languageBottomSheet.show(
@@ -1363,19 +1349,16 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             if (selectedLanguage != null) languageBottomSheet.setPreferredLang(
                 selectedLanguage!!
             )
-
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun expandFab() {
-
         binding.fabLanguageText.isClickable = true
         binding.fabLogoutText.isClickable = true
         binding.fabSettingText.isClickable = true
         binding.fabPrivacyPolicyText.isClickable = true
         binding.fabSettingTeamText.isClickable = true
-
         binding.fabLanguage.isClickable = true
         binding.fabLogout.isClickable = true
         binding.fabSetting.isClickable = true
@@ -1383,7 +1366,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         binding.fabSettingTeam.isClickable = true
 
         lifecycleScope.launch(Dispatchers.IO) {
-
             val userDataFlow = userDetailsViewModel.getUserDetailsFromRoom()
             val userData1 = userDataFlow.first()
             val employeeType1 = userData1?.employeeType
@@ -1392,7 +1374,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 binding.addFab.startAnimation(
                     fabClockAnim
                 )
-
                 binding.fabLanguage.startAnimation(
                     fabOpenAnim
                 )
@@ -1449,7 +1430,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun shrinkFab() {
-
         binding.fabLanguageText.isClickable = false
         binding.fabLogoutText.isClickable = false
         binding.fabSettingText.isClickable = false
@@ -1542,7 +1522,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun setUpMenuList(mList: ArrayList<DashboardMenu>) {
-
         lifecycleScope.launch(Dispatchers.IO) {
 
             val userDataFlow = userDetailsViewModel.getUserDetailsFromRoom()
@@ -1587,6 +1566,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 )
                 mList.add(
                     DashboardMenu(
+
                         resources.getString(R.string.title_activity_my_location),
                         R.drawable.live_location
                     )
@@ -1601,7 +1581,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     override fun onMenuItemClicked(menuItem: DashboardMenu) {
-
         when (menuItem.menuName) {
 
             resources.getString(R.string.title_activity_qrcode_scanner) -> {
@@ -1640,7 +1619,6 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     override fun onVehicleDialogSubmitBtnClicked(
         vehicleId: String, vehicleTypeName: String, vehicleNumber: String
     ) {
-
         userVehicleDetailsTemp =
             UserVehicleDetails(vehicleId, vehicleTypeName, vehicleNumber)
 
