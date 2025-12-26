@@ -886,7 +886,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         ConnectivityStatus(this).observe(this, Observer {
             isInternetOn = it
             if (isInternetOn) {
-//                if(!isOfflineMode) submitOfflineData()
+                if(!isOfflineMode) submitOfflineData()
             }
         })
 
