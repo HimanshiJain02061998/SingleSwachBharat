@@ -366,6 +366,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 }
                 snackBar.show()
                 binding.syncOfflineBtn.visibility = View.GONE
+                garbageCollectionViewModel.saveIsOfflineMode(true)
             }
         }
 

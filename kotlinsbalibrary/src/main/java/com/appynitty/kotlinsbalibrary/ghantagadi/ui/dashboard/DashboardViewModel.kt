@@ -88,19 +88,11 @@ class DashboardViewModel @Inject constructor(
         get() =
             _teamMembersSelected
 
-
     private var deviceIdCon: String? = null
-
-
-//    private val _isOffline = MutableLiveData(false)
-//
-//    val isOffline: LiveData<Boolean> get() = _isOffline
-
 
     init {
         getTeam()
         getSelectedTeam()
-//        getIsOfflineMode()
         getBaseUrl()
     }
 
@@ -144,34 +136,6 @@ class DashboardViewModel @Inject constructor(
      *  METHOD TO GET VEHICLE TYPES FROM API
      */
 
-     fun saveIsOfflineMode(mode: Boolean){
-         Log.d("checkStatus","status is $mode")
-         viewModelScope.launch {
-                 userDataStore.saveIsOfflineMode(mode)
-         }
-    }
-
-
-//    fun getIsOfflineMode() {
-//        viewModelScope.launch {
-//            Log.d("checkStatus","status is ${userDataStore.getIsOfflineMode.first()}")
-//            userDataStore.getIsOfflineMode.collect { value ->
-//                _isOffline.value = value
-//                if(!value) deleteDataFromTempGarbage()
-//            }
-//        }
-//    }
-//    private fun deleteDataFromTempGarbage(){
-//        Log.d("checkStatus","delete gc called")
-//        viewModelScope.launch(Dispatchers.IO) {
-//           val garbageCollectionList = garbageCollectionDaoTemp.getGarbageCollectionData().first()
-//            garbageCollectionList
-//                .filter { it.isUploaded == true }
-//                .forEach {
-//                    garbageCollectionDaoTemp.deleteGCById(it.offlineId.toString())
-//                }
-//        }
-//    }
 
     suspend fun checkSameUserLogin(): Boolean {
         val tempUser = tempUserDataStore.getUserEssentials.first()

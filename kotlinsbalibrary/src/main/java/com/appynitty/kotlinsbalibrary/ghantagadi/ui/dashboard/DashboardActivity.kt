@@ -885,8 +885,11 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         })
         ConnectivityStatus(this).observe(this, Observer {
             isInternetOn = it
+
             if (isInternetOn) {
                 if(!isOfflineMode) submitOfflineData()
+            }else{
+                garbageCollectionViewModel.saveIsOfflineMode(true)
             }
         })
 
@@ -1132,7 +1135,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             showSelectedTeamDialog()
         }
         binding.toggleSyncOffline.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.saveIsOfflineMode(isChecked)
+            garbageCollectionViewModel.saveIsOfflineMode(isChecked)
         }
     }
 
