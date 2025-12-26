@@ -172,6 +172,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private lateinit var locationPermission: LocationPermission
     private lateinit var syncSnackBar: Snackbar
     private var isSyncingOn = false
+    private var isOfflineMode = false
     private lateinit var alertMessageDialogFrag: AlertMessageDialogFrag
     private var isDutyOnToggleClicked = false
     private lateinit var selectedEmployeeSpinner: Spinner
@@ -851,8 +852,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 //           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
 //        })
 
-        viewModel.isOffline.observe(this, Observer {
+        garbageCollectionViewModel.isOfflineUi.observe(this, Observer {
             Log.d("toggle","toggle status ${it}")
+            isOfflineMode = it
             if (it){
                 binding.toggleSyncOffline.isChecked = true
                 binding.lottieView?.visibility = View.VISIBLE
@@ -884,7 +886,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         ConnectivityStatus(this).observe(this, Observer {
             isInternetOn = it
             if (isInternetOn) {
-//                submitOfflineData()
+//                if(!isOfflineMode) submitOfflineData()
             }
         })
 

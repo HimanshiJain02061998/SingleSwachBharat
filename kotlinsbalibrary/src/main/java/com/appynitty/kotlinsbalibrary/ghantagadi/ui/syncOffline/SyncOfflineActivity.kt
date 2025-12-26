@@ -102,6 +102,9 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
     private var totalGcCount = 0
     //  private var batchCount = 1
     private var dutyOn = false
+
+    private var selectedLanguage: String? = null
+    private var selectedLanguageId: String? = null
     private val dateFormat =
         SimpleDateFormat(DateTimeUtils.SYNC_OFFLINE_DATE_FORMAT, Locale.ENGLISH)
     private val serverDateFormat =
@@ -114,6 +117,8 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         if (newBase != null) {
             val languageDataStore = LanguageDataStore(newBase.applicationContext)
             val appLanguage = languageDataStore.currentLanguage
+            selectedLanguage = appLanguage.languageName
+            selectedLanguageId = appLanguage.languageId
             context = newBase.let { LanguageConfig.changeLanguage(it, appLanguage.languageId) }
         }
         super.attachBaseContext(context)
@@ -198,10 +203,11 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
                 when (event) {
                     GarbageCollectionViewModel.LogoutEvent.PerformForcefullyLogout -> {
 //                        garbageCollectionViewModel.performForcefullyLogout()
+                        alertDialog!!.dismiss()
                     }
 
                     is GarbageCollectionViewModel.LogoutEvent.ShowResponseErrorMessage -> {
-
+                        showApiErrorMessage(event.msg, event.msgMr)
                     }
                 }
             }
@@ -215,6 +221,19 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
           }
         })
     }
+
+    private fun showApiErrorMessage(msg: String?, msgMr: String?) {
+        if (selectedLanguageId == "mr") {
+            msgMr?.let {
+                CustomToast.showErrorToast(this, msgMr)
+            }
+        } else {
+            msg?.let {
+                CustomToast.showErrorToast(this, msg)
+            }
+        }
+    }
+
 
     private fun registerClickEvents() {
         alertDialog!!.setOnCancelListener {
@@ -252,6 +271,7 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             garbageCollectionViewModel.saveIsOfflineMode(isChecked)
         }
     }
+
 
     private fun showCountDialog() {
         val stringBuffer = StringBuffer()
@@ -450,6 +470,10 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             }
         }
     }
+
+
+
+
 
     //searching by date
     private fun prepareData(mList: List<GarbageCollectionData>) {

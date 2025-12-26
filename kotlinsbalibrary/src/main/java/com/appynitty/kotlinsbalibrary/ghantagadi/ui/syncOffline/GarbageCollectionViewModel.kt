@@ -15,7 +15,9 @@ import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.TempUserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssentials
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.model.TripResponse
@@ -50,7 +52,7 @@ class GarbageCollectionViewModel(
     private val archivedDao: ArchivedDao,
     private val tripRepository: TripRepository,
     private val sessionDataStore: SessionDataStore,
-    private val userDataStore: UserDataStore,
+    private val userDataStore: UserDataStore
 ) : AndroidViewModel(application) {
 
     val garbageCollectionResponseLiveData: MutableLiveData<ApiResponseListener<List<GarbageCollectionResponse>>?> =
@@ -72,14 +74,23 @@ class GarbageCollectionViewModel(
     val isUserDutyOnFlow = sessionDataStore.getIsUserDutyOn
 
     init {
-
         viewModelScope.launch {
             isDumpTripSyncFlow.collect {
                 isDumpTripSyncOn = it
             }
         }
-       // loadOfflineModeOnce()
         getIsOfflineMode()
+        checkGarbageRealTimeData()
+    }
+
+    private fun checkGarbageRealTimeData(){
+        viewModelScope.launch(Dispatchers.IO) {
+            garbageCollectionDao.getRowCountLive().collect {
+                if (it==0){
+                    if(_isOfflineUi.value == false) deleteDataFromTempGarbage()
+                }
+            }
+        }
     }
 
     fun getIsOfflineMode() {
@@ -112,14 +123,6 @@ class GarbageCollectionViewModel(
     fun setSyncingLiveDataToNull() {
         garbageCollectionResponseLiveData.postValue(null)
         isSyncingOnLiveData.postValue(false)
-    }
-
-    fun loadOfflineModeOnce() {
-        viewModelScope.launch {
-            val value = userDataStore.getIsOfflineMode.first()
-            _isOfflineUi.value = value
-            Log.d("checkStatus", "status is $value")
-        }
     }
 
     fun saveGarbageCollectionOfflineDataToApi(
@@ -191,13 +194,11 @@ class GarbageCollectionViewModel(
             garbageCollectionDataList.forEach {
                 if ((it.gpBeforeImage != null && it.gpBeforeImage != "") || (it.gpAfterImage != null && it.gpAfterImage != "")) {
 
-                    val serverDateFormat =
-                        SimpleDateFormat(
+                    val serverDateFormat = SimpleDateFormat(
                             DateTimeUtils.SERVER_DATE_TIME_FORMAT_LOCAL,
                             Locale.ENGLISH
                         )
-                    val dateFormat =
-                        SimpleDateFormat(DateTimeUtils.SIMPLE_DATE_FORMAT, Locale.ENGLISH)
+                    val dateFormat = SimpleDateFormat(DateTimeUtils.SIMPLE_DATE_FORMAT, Locale.ENGLISH)
 
                     val gcDate: String = serverDateFormat.parse(it.gcDate)
                         ?.let { it1 ->
@@ -260,7 +261,7 @@ class GarbageCollectionViewModel(
 
                         if (garbageCollectionResponse.status == CommonUtils.STATUS_SUCCESS) {
 
-                            //TODO - should be taken care of
+
 
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
 

@@ -40,4 +40,18 @@ interface GarbageCollectionDaoTemp {
     @Query("DELETE FROM garbage_collection_table_temp")
     suspend fun deleteAllGarbageCollection()
 
+    @Query("""
+    SELECT EXISTS(
+        SELECT 1 FROM garbage_collection_table_temp 
+        WHERE referenceId = :referenceId
+    )
+""")
+    suspend fun isIDPresent(referenceId: String): Boolean
+
+    @Query("""
+    DELETE FROM garbage_collection_table_temp
+    WHERE referenceId = :referenceId
+""")
+    suspend fun deleteByReferenceId(referenceId: String): Int
+
 }

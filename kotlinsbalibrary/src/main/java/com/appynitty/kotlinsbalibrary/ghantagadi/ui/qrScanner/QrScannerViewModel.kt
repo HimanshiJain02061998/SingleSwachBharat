@@ -330,7 +330,7 @@ class QrScannerViewModel @Inject constructor(
 
 
     fun saveGarbageCollectionOffline(garbageCollectionData: GarbageCollectionData) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
 
             val tempList = garbageCollectionDao.getGarbageCollectionData().first()
             if (tempList.isNotEmpty()) {
@@ -343,7 +343,13 @@ class QrScannerViewModel @Inject constructor(
             }
            val garbageCollectionDataTemp =  garbageCollectionData.toTempEntity()
             garbageCollectionDao.insertGarbageCollection(garbageCollectionData)
-            garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
+            if (garbageCollectionDaoTemp.isIDPresent(garbageCollectionData.referenceId)){
+                garbageCollectionDaoTemp.deleteByReferenceId(garbageCollectionData.referenceId)
+                garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
+                }else{
+                garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
+            }
+
             qrScannerEventChannel.send(QrScannerEvent.ShowSuccessToast(R.string.saved_offline))
             qrScannerEventChannel.send(
                 QrScannerEvent.FinishActivity
