@@ -22,7 +22,13 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.UserTravelLoc
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryDetailsData
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryNewDataTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
 import com.appynitty.kotlinsbalibrary.housescanify.dao.EmpGcDao
@@ -43,7 +49,11 @@ import com.appynitty.kotlinsbalibrary.housescanify.model.response.PropertyType
         NearestLatLng::class,
         PropertyType::class,
         UserTravelLoc::class,
-        GarbageCollectionDataTemp::class,    ],
+        GarbageCollectionDataTemp::class,
+        WorkHistoryNewDataTemp::class,
+        WorkHistoryData::class,
+        WorkHistoryDetailsData::class
+               ],
     version = 6,
     exportSchema = false
 )
@@ -62,6 +72,9 @@ abstract class SbaDatabase : RoomDatabase() {
     abstract fun empGcDao(): EmpGcDao
     abstract fun empHouseOnMapDao(): EmpHouseOnMapDao
     abstract fun propertyTypeDao(): PropertyTypeDao
+    abstract fun workHistoryDetailsDao(): WorkHistoryDetailsDao
+    abstract fun workHistoryDao(): WorkHistoryDao
+    abstract fun workHistoryNotSyncedDao(): WorkHistoryNotSyncedDao
 
 }
 

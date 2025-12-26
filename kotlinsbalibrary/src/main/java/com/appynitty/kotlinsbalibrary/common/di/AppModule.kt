@@ -75,6 +75,14 @@ object AppModule {
     fun provideGarbageCollectionDaoTemp(db: SbaDatabase) = db.garbageCollectionDaoTemp()
 
     @Provides
+    fun provideWorkHistoryDetailsDao(db: SbaDatabase) = db.workHistoryDetailsDao()
+
+    @Provides
+    fun provideWorkHistoryDao(db: SbaDatabase) = db.workHistoryDao()
+
+    @Provides
+    fun provideWorkHistoryNotSyncedDao(db: SbaDatabase) = db.workHistoryNotSyncedDao()
+    @Provides
     fun provideLocationDao(db: SbaDatabase) = db.locationDao()
 
     @Provides

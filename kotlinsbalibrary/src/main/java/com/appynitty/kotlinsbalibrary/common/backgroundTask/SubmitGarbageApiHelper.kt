@@ -13,6 +13,8 @@ import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryNewDataTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -27,7 +29,8 @@ class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionD
                                                   private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
                                                   private val garbageCollectionRepo: GarbageCollectionRepo,
                                                   private val archivedDao: ArchivedDao,
-                                                  @ApplicationContext private val appContext: Context
+                                                  @ApplicationContext private val appContext: Context,
+                                                  private val workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
     ) {
 
     private val deleteImageList = ArrayList<String>()
@@ -101,7 +104,12 @@ class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionD
 
                         if (garbageCollectionResponse.status == CommonUtils.STATUS_SUCCESS) {
 
-                            //TODO - should be taken care of
+                            workHistoryNotSyncedDao.insertWorkHistoryNotSynced(
+                                WorkHistoryNewDataTemp(
+                                    id = 0,
+                                    Refid = garbageCollectionResponse.referenceID
+                                )
+                            )
 
                         } else if (garbageCollectionResponse.status == CommonUtils.STATUS_ERROR) {
 

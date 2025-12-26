@@ -41,6 +41,7 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
@@ -85,6 +86,9 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
     @Inject
     lateinit var garbageCollectionRepo: GarbageCollectionRepo
+
+    @Inject
+    lateinit var workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
     private lateinit var garbageCollectionViewModel: GarbageCollectionViewModel
 
     private var totalOfflineCount: Int? = null
@@ -168,7 +172,8 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             archivedDao,
             tripRepository,
             sessionDataStore,
-            userDataStore
+            userDataStore,
+            workHistoryNotSyncedDao
         )
 
         garbageCollectionViewModel = ViewModelProvider(

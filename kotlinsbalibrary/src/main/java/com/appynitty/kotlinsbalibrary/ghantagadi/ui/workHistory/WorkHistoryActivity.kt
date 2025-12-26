@@ -175,7 +175,7 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     }
 
     private fun getHistoryFromApi(month: String, year: String) {
-
+        viewModel.getWorkHistoryDetailList(year,month)
         if (isInternetOnAndCanFetch && !isOfflineMode)
             viewModel.getWorkHistoryList(
                 CommonUtils.APP_ID, userId!!, year, month, empType!!
@@ -229,6 +229,21 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
             isOfflineMode = it
         })
 
+        viewModel.workHistoryLiveData.observe(this) {
+
+
+            if (it.isEmpty() == true) {
+                binding.noHistoryFound.visibility = View.VISIBLE
+
+            } else {
+                binding.noHistoryFound.visibility = View.GONE
+
+            }
+            it.let { it1 -> setAdapterList(it1) }
+
+            binding.historyProgressBar.visibility = View.GONE
+        }
+
 
         val snackBar = Snackbar
             .make(
@@ -262,18 +277,18 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
                 }
 
                 is ApiResponseListener.Success -> {
-                    Log.d(TAG, "subscribeLiveData: $it")
-
-                    if (it.data?.isEmpty() == true) {
-                        binding.noHistoryFound.visibility = View.VISIBLE
-
-                    } else {
-                        binding.noHistoryFound.visibility = View.GONE
-
-                    }
-                    it.data?.let { it1 -> setAdapterList(it1) }
-
-                    binding.historyProgressBar.visibility = View.GONE
+//                    Log.d(TAG, "subscribeLiveData: $it")
+//
+//                    if (it.data?.isEmpty() == true) {
+//                        binding.noHistoryFound.visibility = View.VISIBLE
+//
+//                    } else {
+//                        binding.noHistoryFound.visibility = View.GONE
+//
+//                    }
+//                    it.data?.let { it1 -> setAdapterList(it1) }
+//
+//                    binding.historyProgressBar.visibility = View.GONE
 
                 }
 

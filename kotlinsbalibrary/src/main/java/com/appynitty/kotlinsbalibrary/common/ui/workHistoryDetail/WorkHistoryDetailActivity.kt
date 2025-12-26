@@ -143,7 +143,7 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
         val snackBar = Snackbar
             .make(binding.parent, "No Internet Connection", Snackbar.LENGTH_INDEFINITE)
-
+        fDate?.let {viewModel.getWorkHistoryDetailList(it)}
 
         internetConnectivity.observe(this) {
             isInternetOn = it
@@ -167,17 +167,29 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
                     }
 
                     is ApiResponseListener.Success -> {
-                        if (it.data != null) {
-                            if (it.data.isNotEmpty()) {
-                                binding.recyclerView.layoutAnimation = controller
-                                adapter.submitList(it.data)
-                                binding.progressBar.visibility = View.GONE
-                                binding.lineView.visibility = View.VISIBLE
-                            }
-                        }
+//                        if (it.data != null) {
+//                            if (it.data.isNotEmpty()) {
+//                                binding.recyclerView.layoutAnimation = controller
+//                                adapter.submitList(it.data)
+//                                binding.progressBar.visibility = View.GONE
+//                                binding.lineView.visibility = View.VISIBLE
+//                            }
+//                        }
                     }
                 }
             }
+
+
+            viewModel.workHistoryDetailsLiveData.observe(this) {
+                if (it.isNotEmpty()) {
+                    binding.recyclerView.layoutAnimation = controller
+                    adapter.submitList(it)
+                    binding.progressBar.visibility = View.GONE
+                    binding.lineView.visibility = View.VISIBLE
+                }
+            }
+
+
         } else if (userType == 1) {
             viewModel.empWorkHistoryDetailsResponseLiveData.observe(this) {
 

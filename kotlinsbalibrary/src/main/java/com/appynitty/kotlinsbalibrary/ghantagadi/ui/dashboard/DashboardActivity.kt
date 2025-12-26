@@ -78,6 +78,7 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.TripRepository
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
@@ -136,6 +137,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     lateinit var sessionDataStore : SessionDataStore
     @Inject
     lateinit var userDataStore : UserDataStore
+
+    @Inject
+    lateinit var workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
 
     @Inject
     lateinit var garbageCollectionRepo: GarbageCollectionRepo
@@ -1051,7 +1055,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             archivedDao,
             tripRepository,
             sessionDataStore,
-            userDataStore
+            userDataStore,
+            workHistoryNotSyncedDao
         )
 
         garbageCollectionViewModel = ViewModelProvider(

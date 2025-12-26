@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.WorkHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,8 @@ private const val TAG = "WorkHistoryViewModel"
 class WorkHistoryViewModel @Inject constructor(
     private val workHistoryRepository: WorkHistoryRepository,
     private val userDataStore: UserDataStore,
+    private val insertWorkHistoryDataUseCases: InsertWorkHistoryDataUseCases,
+    private val workHistoryDao: WorkHistoryDao
 ) : ViewModel() {
 
     val workHistoryResponseResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryResponse>>> =
@@ -30,10 +34,38 @@ class WorkHistoryViewModel @Inject constructor(
     private val _isOfflineUi = MutableLiveData(false)
     val isOfflineUi: LiveData<Boolean> get() = _isOfflineUi
 
+    private val _workHistoryLiveData =
+        MutableLiveData<List<WorkHistoryResponse>>()
+
+    val workHistoryLiveData: LiveData<List<WorkHistoryResponse>> =
+        _workHistoryLiveData
+
     init {
         loadOfflineModeOnce()
     }
 
+
+    fun getWorkHistoryDetailList(year: String,
+                                 month: String,) {
+        viewModelScope.launch {
+            workHistoryDao.getWorkHistoryByMonthYear(year,month)
+                .collect { list ->
+                    _workHistoryLiveData.postValue(
+                        list.map { it.toResponse() }
+                    )
+                }
+        }
+    }
+
+
+    fun WorkHistoryData.toResponse() = WorkHistoryResponse(
+        date = date,
+        houseCollection = houseCollection,
+        LiquidCollection = LiquidCollection,
+        StreetCollection = StreetCollection,
+        DumpYardCollection = DumpYardCollection,
+        DumpYardPlantCollection = DumpYardPlantCollection
+    )
     fun loadOfflineModeOnce() {
         viewModelScope.launch {
             val value = userDataStore.getIsOfflineMode.first()
@@ -53,7 +85,8 @@ class WorkHistoryViewModel @Inject constructor(
         try {
             val response =
                 workHistoryRepository.getWorkHistoryList(appId, userId, year, month, empType)
-            workHistoryResponseResponseLiveData.postValue(handleWorkHistoryResponse(response))
+//            workHistoryResponseResponseLiveData.postValue(handleWorkHistoryResponse(response))
+            insertWorkHistoryDataUseCases.invoke(response,year,month)
 
         } catch (t: Throwable) {
             when (t) {
@@ -73,9 +106,22 @@ class WorkHistoryViewModel @Inject constructor(
                 return ApiResponseListener.Success(it)
             }
         }
+
         return ApiResponseListener.Failure(response.message())
     }
 
 
 }
 
+val dbList = listOf(  GarbageData(1,2,3,4,0),
+    GarbageData(2,0,3,5,0),
+    GarbageData(3,3,3,6,0))
+
+val apiresponseList = listOf(  GarbageData(1,4,3,4,6),
+    GarbageData(2,0,3,5,0),
+    GarbageData(3,3,3,6,0),
+    GarbageData(4,3,3,6,0),
+            GarbageData(5,3,3,6,0)
+    )
+
+data class GarbageData(val id:Int,val streetCount:Int,val houseCount:Int,val liquidCount:Int,val masterPlateCount:Int)

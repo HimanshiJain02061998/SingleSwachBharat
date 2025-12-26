@@ -1,14 +1,19 @@
 package com.appynitty.kotlinsbalibrary.common.ui.workHistoryDetail
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appynitty.kotlinsbalibrary.common.utils.retrofit.ApiResponseListener
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryDetailsData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.WorkHistoryRepository
 import com.appynitty.kotlinsbalibrary.housescanify.model.response.EmpHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.housescanify.repository.EmpWorkHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
@@ -17,8 +22,11 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkHistoryDetailViewModel @Inject constructor(
     private val workHistoryRepository: WorkHistoryRepository,
-    private val empWorkHistoryRepository: EmpWorkHistoryRepository
+    private val empWorkHistoryRepository: EmpWorkHistoryRepository,
+    private val insertWorkHistoryDetailsUseCases: InsertWorkHistoryDetailsUseCases,
+    private val workHistoryDao: WorkHistoryDetailsDao
 ) : ViewModel() {
+
 
     val workHistoryDetailsResponseLiveData: MutableLiveData<ApiResponseListener<List<WorkHistoryDetailsResponse>>> =
         MutableLiveData()
@@ -26,20 +34,47 @@ class WorkHistoryDetailViewModel @Inject constructor(
     val empWorkHistoryDetailsResponseLiveData: MutableLiveData<ApiResponseListener<List<EmpHistoryDetailsResponse>>> =
         MutableLiveData()
 
+    private val _workHistoryDetailsLiveData =
+        MutableLiveData<List<WorkHistoryDetailsResponse>>()
+
+    val workHistoryDetailsLiveData: LiveData<List<WorkHistoryDetailsResponse>> =
+        _workHistoryDetailsLiveData
+
+
+    fun getWorkHistoryDetailList(date: String) {
+        viewModelScope.launch {
+            workHistoryDao.getWorkHistoryDetailsByDate(date)
+                .collect { list ->
+                    _workHistoryDetailsLiveData.postValue(
+                        list.map { it.toResponse() }
+                    )
+                }
+        }
+    }
+    fun WorkHistoryDetailsData.toResponse() = WorkHistoryDetailsResponse(
+        time = time,
+        Refid = Refid,
+        name = name,
+        vehicleNumber = vehicleNumber,
+        areaName = areaName,
+        type = type
+    )
+
 
     fun getWorkHistoryDetailList(
         appId: String,
         userId: String,
         fDate: String,
         languageId: String
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch(Dispatchers.IO) {
 
         workHistoryDetailsResponseLiveData.postValue(ApiResponseListener.Loading())
 
         try {
             val response =
                 workHistoryRepository.getWorkHistoryDetailList(appId, userId, fDate, languageId)
-            workHistoryDetailsResponseLiveData.postValue(handleWorkHistoryDetailsResponse(response))
+//            workHistoryDetailsResponseLiveData.postValue(handleWorkHistoryDetailsResponse(response))
+            insertWorkHistoryDetailsUseCases.invoke(response,fDate)
 
         } catch (t: Throwable) {
             when (t) {
@@ -60,6 +95,7 @@ class WorkHistoryDetailViewModel @Inject constructor(
         fDate: String,
     ) = viewModelScope.launch {
 
+        Log.d("fdate","f date is $fDate")
         empWorkHistoryDetailsResponseLiveData.postValue(ApiResponseListener.Loading())
 
         try {
