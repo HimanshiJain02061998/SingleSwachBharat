@@ -259,7 +259,7 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
 
 
         internetConnectivity.observe(this) {
-            Log.i("InternetCheck", "subscribeLiveData: $it")
+
             isInternetOnAndCanFetch = it
             if (it) {
                 snackBar.dismiss()

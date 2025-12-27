@@ -35,6 +35,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
@@ -70,6 +72,8 @@ class DashboardViewModel @Inject constructor(
     private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tempUserDataStore: TempUserDataStore,
     @ApplicationContext private val appContext: Context,
+    private val workHistoryDetailsDao: WorkHistoryDetailsDao,
+    private val workHistoryDao: WorkHistoryDao,
 ) : ViewModel() {
 
     private val dashboardEventChannel = Channel<DashboardEvent>(Channel.BUFFERED)
@@ -912,6 +916,8 @@ class DashboardViewModel @Inject constructor(
                     userDataStore.clearUserDatastore()
                     sessionDataStore.clearSessionDatastore()
                     archivedDao.deleteAllArchivedData()
+                    workHistoryDetailsDao.deleteAllWorkHistoryDetails()
+                    workHistoryDao.deleteAllWorkHistory()
                     dashboardEventChannel.send(DashboardEvent.NavigateToSelectUlbScreen)
 
                 }
@@ -995,6 +1001,8 @@ class DashboardViewModel @Inject constructor(
             garbageCollectionDao.deleteAllGarbageCollection()
             garbageCollectionDaoTemp.deleteAllGarbageCollection()
             tempUserDataStore.clearUserDatastore()
+            workHistoryDetailsDao.deleteAllWorkHistoryDetails()
+            workHistoryDao.deleteAllWorkHistory()
         }
     }
 

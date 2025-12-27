@@ -11,6 +11,8 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDao
+import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryDetailsDao
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +30,8 @@ class BackgroundTaskHelper @Inject constructor(private val archivedDao: Archived
                                                private val userDetailsDao: UserDetailsDao,
                                                private val submitGarbageApiHelper: SubmitGarbageApiHelper,
                                                @ApplicationContext private val appContext: Context,
+                                               private val workHistoryDetailsDao: WorkHistoryDetailsDao,
+                                               private val workHistoryDao: WorkHistoryDao
     ) {
 
     private var userTypeId: String? = null
@@ -77,6 +81,8 @@ class BackgroundTaskHelper @Inject constructor(private val archivedDao: Archived
             garbageCollectionDao.deleteAllGarbageCollection()
             garbageCollectionDaoTemp.deleteAllGarbageCollection()
             tempUserDataStore.clearUserDatastore()
+            workHistoryDetailsDao.deleteAllWorkHistoryDetails()
+            workHistoryDao.deleteAllWorkHistory()
     }
 
     private fun getUserDetailsFromRoom() {

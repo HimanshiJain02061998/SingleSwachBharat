@@ -861,11 +861,18 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
 
         garbageCollectionViewModel.archivedCount.observe(this) { count ->
+
+            if (dashboardList.isEmpty()) return@observe
+
             val index = dashboardList.indexOfFirst {
-                it.menuName == resources.getString(R.string.title_activity_sync_offline)
+                it.menuName == getString(R.string.title_activity_sync_offline)
             }
-            Log.d("toggle","index no is   ${count}")
-            dashboardList[index].archivedCount = count
+
+            if (index == -1) return@observe
+
+            dashboardList[index] =
+                dashboardList[index].copy(archivedCount = count)
+
             dashboardAdapter.notifyItemChanged(index)
         }
 
