@@ -142,7 +142,7 @@ class GisLocationService : LifecycleService(), SensorEventListener {
         50 // change this sample size as you want, higher is more precise but slow measure.
     private val threshold = 0.2 // change this threshold as you want, higher is more spike movement
 
-    private var offlineGarbageSubmit = (1000 * 60 * 3   //for 2 minutes
+    private var offlineGarbageSubmit = (1000 * 60 * 1   //for 2 minutes
             ).toLong()
 
 

@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/archiveIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_baseline_archive_24" />
+</FrameLayout>

@@ -1,11 +1,14 @@
 package com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard
 
+import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.appynitty.kotlinsbalibrary.R
 import com.appynitty.kotlinsbalibrary.databinding.DashboarEachItemBinding
 
-class DashboardAdapter(private val mList: List<DashboardMenu>) :
+class DashboardAdapter(private val mList: List<DashboardMenu>,val context: Context) :
     RecyclerView.Adapter<DashboardAdapter.DashboardViewHolder>() {
 
     //listener variable and setter
@@ -15,6 +18,7 @@ class DashboardAdapter(private val mList: List<DashboardMenu>) :
     }
 
     private var isClickable = true
+
     fun setClickable(isClickable: Boolean) {
         this.isClickable = isClickable
     }
@@ -38,6 +42,14 @@ class DashboardAdapter(private val mList: List<DashboardMenu>) :
             with(mList[position]) {
                 binding.menuIcon.setImageResource(this.menuImage)
                 binding.menuTitle.text = this.menuName
+
+                    if (mList[position].archivedCount>0){
+                        binding.badgeText.visibility = View.VISIBLE
+                        binding.badgeText.text = mList[position].archivedCount.toString()
+                    }else{
+                        binding.badgeText.visibility = View.GONE
+                    }
+
 
                 holder.itemView.setOnClickListener {
                     menuItemClickedInterface?.onMenuItemClicked(this)

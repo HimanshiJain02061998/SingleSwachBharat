@@ -10,6 +10,8 @@ import com.appynitty.kotlinsbalibrary.common.ui.archived.ArchivedData
 import com.appynitty.kotlinsbalibrary.common.ui.camera.CameraUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.common.utils.datastore.UserDataStore
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.ArchivedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
@@ -19,18 +21,20 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollection
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import retrofit2.Response
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
-class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionDao: GarbageCollectionDao,
-                                                  private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
-                                                  private val garbageCollectionRepo: GarbageCollectionRepo,
-                                                  private val archivedDao: ArchivedDao,
-                                                  @ApplicationContext private val appContext: Context,
-                                                  private val workHistoryNotSyncedDao: WorkHistoryNotSyncedDao
+class SubmitGarbageApiHelper @Inject constructor(private val garbageCollectionDao: GarbageCollectionDao,
+                                                 private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
+                                                 private val garbageCollectionRepo: GarbageCollectionRepo,
+                                                 private val archivedDao: ArchivedDao,
+                                                 @ApplicationContext private val appContext: Context,
+                                                 private val workHistoryNotSyncedDao: WorkHistoryNotSyncedDao,
+                                                 private val userDataStore: UserDataStore
     ) {
 
     private val deleteImageList = ArrayList<String>()
@@ -95,7 +99,7 @@ class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionD
     ) {
 
         if (response.isSuccessful) {
-
+          var archivedCount = userDataStore.getArchivedDataCount.first()
             response.body()?.let {
 
 
@@ -120,7 +124,7 @@ class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionD
                                 garbageCollectionResponse.messageMar
                             )
                             archivedDao.insertArchivedData(archivedData)
-
+                            archivedCount++
                         }
                         garbageCollectionResponse.offlineId?.let { it1 ->
                             if (garbageCollectionResponse.referenceID != null)
@@ -129,10 +133,8 @@ class SubmitGarbageApiHelper @Inject constructor( private val garbageCollectionD
                     }
                     deleteUploadedImages()
                     saveGarbageCollectionOfflineDataToApi(appId, typeId, batteryStatus, contentType)
-
-
-
             }
+            userDataStore.saveArchivedDataCount(archivedCount)
         } else if(response.code()==422){
             updateImeiChange(true)
 //                garbageCollectionChannel.send(LogoutEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No"))

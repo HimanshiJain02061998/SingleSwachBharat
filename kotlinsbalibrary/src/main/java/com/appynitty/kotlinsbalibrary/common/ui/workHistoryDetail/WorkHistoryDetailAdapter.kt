@@ -14,12 +14,19 @@ class WorkHistoryDetailAdapter :
     ListAdapter<WorkHistoryDetailsResponse, WorkHistoryDetailAdapter.WorkHistoryDetailViewHolder>(
         DiffCallback()
     ) {
-
+    private var date: String? = null
     private lateinit var listener: WorkHistoryDetailsClickListener
     fun setListener(listener: WorkHistoryDetailsClickListener) {
         this.listener = listener
     }
 
+    fun setDate(date: String?){
+        this.date = date
+    }
+
+    init {
+        setHasStableIds(true)
+    }
     class WorkHistoryDetailViewHolder(val binding: EachHistoryDetailItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -138,6 +145,11 @@ class WorkHistoryDetailAdapter :
                 listener.onTimeBtnClicked(currentItem.time)
             }
         }
+    }
+
+    override fun getItemId(position: Int): Long {
+        val item = getItem(position)
+        return "${date}_${item.Refid}".hashCode().toLong()
     }
 }
 

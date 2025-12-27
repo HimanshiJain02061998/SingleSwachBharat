@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.WorkHistoryDetailsData
 import kotlinx.coroutines.flow.Flow
 
@@ -44,5 +46,7 @@ interface WorkHistoryDetailsDao {
         refId: String?
     )
 
+    @Upsert
+    suspend fun upsertWorkHistoryDetails(list: List<WorkHistoryDetailsData>)
 
 }

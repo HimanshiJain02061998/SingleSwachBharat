@@ -76,6 +76,9 @@ class GarbageCollectionViewModel(
 
     val isUserDutyOnFlow = sessionDataStore.getIsUserDutyOn
 
+    private val _archivedCount = MutableLiveData<Int>()
+    val archivedCount: LiveData<Int> = _archivedCount
+
     init {
         viewModelScope.launch {
             isDumpTripSyncFlow.collect {
@@ -84,6 +87,17 @@ class GarbageCollectionViewModel(
         }
         getIsOfflineMode()
         checkGarbageRealTimeData()
+        getArchivedDataCount()
+    }
+
+    private fun getArchivedDataCount(){
+        viewModelScope.launch {
+            userDataStore.getArchivedDataCount.collect {
+                    count ->
+                _archivedCount.postValue(count)
+
+            }
+        }
     }
 
     private fun checkGarbageRealTimeData(){
@@ -133,7 +147,7 @@ class GarbageCollectionViewModel(
         typeId: String,
         batteryStatus: Int,
         contentType: String,
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch(Dispatchers.IO) {
 
         val garbageCollectionDataList: List<GarbageCollectionData> =
             garbageCollectionDao.getGarbageCollectionDataByLimit(10, 0)
@@ -249,13 +263,13 @@ class GarbageCollectionViewModel(
 
     }
 
-    private fun handleGarbageCollectionResponse(
+    private suspend fun handleGarbageCollectionResponse(
         appId: String, typeId: String, batteryStatus: Int, contentType: String,
         response: Response<List<GarbageCollectionResponse>>
     ) {
 
         if (response.isSuccessful) {
-
+            var archivedCount = userDataStore.getArchivedDataCount.first()
             response.body()?.let {
 
                 viewModelScope.launch {
@@ -280,7 +294,7 @@ class GarbageCollectionViewModel(
                                 garbageCollectionResponse.messageMar
                             )
                             archivedDao.insertArchivedData(archivedData)
-
+                            archivedCount++
                         }
                         garbageCollectionResponse.offlineId?.let { it1 ->
                             if (garbageCollectionResponse.referenceID != null)
@@ -293,6 +307,7 @@ class GarbageCollectionViewModel(
                 }
                 garbageCollectionResponseLiveData.postValue(ApiResponseListener.Success(it))
             }
+            userDataStore.saveArchivedDataCount(archivedCount)
         } else if(response.code()==422){
             viewModelScope.launch {
                 garbageCollectionChannel.send(LogoutEvent.ShowResponseErrorMessage("Invalid IMEI No", "अवैध IMEI No"))

@@ -47,6 +47,8 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
     private lateinit var internetConnectivity: ConnectivityStatus
     private lateinit var controller: LayoutAnimationController
 
+    private var isFirstLoad = true
+
     //multi language functionality
     override fun attachBaseContext(newBase: Context?) {
         var context: Context? = newBase
@@ -82,6 +84,7 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
         adapter = WorkHistoryDetailAdapter()
         adapter.setListener(this)
         val date = intent.getStringExtra("fdate")
+        adapter.setDate(date)
         if (date != null) {
             val nDate = date.replace("-", " ")
             Log.d(TAG, "initVars: $nDate")
@@ -103,7 +106,6 @@ class WorkHistoryDetailActivity : AppCompatActivity(), WorkHistoryDetailsClickLi
 
             val gcDate = date?.let { requiredDateFormat.parse(it) }
             fDate = gcDate?.let { dateFormat.format(it).toString() }
-
             userId = intent.getStringExtra("userId")
             userType = intent.getIntExtra("userType", 0)
 

@@ -56,7 +56,20 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
 
         private val OFFLINE_MODE = booleanPreferencesKey(name = "is_offline_mode")
 
+        private val ARCHIVED_DATA_COUNT = intPreferencesKey(name = "archived_data_count")
+
     }
+
+    suspend fun saveArchivedDataCount(count: Int) {
+        userDataStore.edit { preferences ->
+            preferences[ARCHIVED_DATA_COUNT] = count
+        }
+    }
+
+    val getArchivedDataCount: Flow<Int> = userDataStore.data
+        .map { preferences ->
+            preferences[ARCHIVED_DATA_COUNT] ?: 0
+        }
 
     suspend fun saveUrl(url: String) {
         userDataStore.edit { preferences ->

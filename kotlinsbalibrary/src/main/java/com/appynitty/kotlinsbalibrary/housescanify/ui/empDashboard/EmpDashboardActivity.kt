@@ -782,7 +782,7 @@ class EmpDashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClick
         val mList = ArrayList<DashboardMenu>()
         setUpMenuList(mList)
 
-        dashboardAdapter = DashboardAdapter(mList)
+        dashboardAdapter = DashboardAdapter(mList,this@EmpDashboardActivity)
         dashboardAdapter.setListener(this)
         binding.dashboardRecyclerView.adapter = dashboardAdapter
 

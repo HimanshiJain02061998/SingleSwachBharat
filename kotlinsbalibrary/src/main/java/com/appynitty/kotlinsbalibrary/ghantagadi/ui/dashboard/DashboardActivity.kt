@@ -182,6 +182,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private lateinit var selectedEmployeeSpinner: Spinner
     private var selectedTeamMembers: List<AvailableEmpItem>? = null
 
+    val dashboardList = ArrayList<DashboardMenu>()
+
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra("message")
@@ -319,7 +321,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         super.onResume()
         isDutyOnToggleClicked = false
         viewModel.checkIsDateChanged()
-        setUpGridRecyclerView()
+
     }
 
     //checking if service is running or not
@@ -347,6 +349,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 
         initVars()
         initToolBar()
+        setUpGridRecyclerView()
         getInstantLocation()
         getUserDetailsFromRoom()
         subscribeLiveData()
@@ -855,6 +858,16 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
 //        viewModel.isOfflineUi.observe(this, Observer {
 //           if (it) binding.toggleSyncOffline.isChecked = true else binding.toggleSyncOffline.isChecked = false
 //        })
+
+
+        garbageCollectionViewModel.archivedCount.observe(this) { count ->
+            val index = dashboardList.indexOfFirst {
+                it.menuName == resources.getString(R.string.title_activity_sync_offline)
+            }
+            Log.d("toggle","index no is   ${count}")
+            dashboardList[index].archivedCount = count
+            dashboardAdapter.notifyItemChanged(index)
+        }
 
         garbageCollectionViewModel.isOfflineUi.observe(this, Observer {
             Log.d("toggle","toggle status ${it}")
@@ -1526,20 +1539,20 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         binding.dashboardRecyclerView.setHasFixedSize(true)
         binding.dashboardRecyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        val mList = ArrayList<DashboardMenu>()
-        setUpMenuList(mList)
+
+        setUpMenuList()
 
     }
 
-    private fun setUpMenuList(mList: ArrayList<DashboardMenu>) {
+    private fun setUpMenuList() {
         lifecycleScope.launch(Dispatchers.IO) {
 
             val userDataFlow = userDetailsViewModel.getUserDetailsFromRoom()
             val userData1 = userDataFlow.first()
             val employeeType1 = userData1?.employeeType
-
+            dashboardList.clear()
             withContext(Dispatchers.Main) {
-                mList.add(
+                dashboardList.add(
                     DashboardMenu(
                         resources.getString(R.string.title_activity_qrcode_scanner),
                         R.drawable.ic_qr_code
@@ -1547,34 +1560,34 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 )
 
                 if (employeeType1 != "D")
-                    mList.add(
+                    dashboardList.add(
                         DashboardMenu(
                             resources.getString(R.string.title_activity_take_photo),
                             R.drawable.ic_photograph
                         )
                     )
 
-                mList.add(
+                dashboardList.add(
                     DashboardMenu(
                         resources.getString(R.string.title_activity_history_page),
                         R.drawable.ic_history
                     )
                 )
 
-                mList.add(
+                dashboardList.add(
                     DashboardMenu(
                         resources.getString(R.string.title_activity_sync_offline),
                         R.drawable.ic_sync
                     )
                 )
 
-                mList.add(
+                dashboardList.add(
                     DashboardMenu(
                         resources.getString(R.string.title_activity_profile_page),
                         R.drawable.ic_id_card
                     )
                 )
-                mList.add(
+                dashboardList.add(
                     DashboardMenu(
 
                         resources.getString(R.string.title_activity_my_location),
@@ -1582,7 +1595,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     )
                 )
 
-                dashboardAdapter = DashboardAdapter(mList)
+                dashboardAdapter = DashboardAdapter(dashboardList,this@DashboardActivity)
                 dashboardAdapter.setListener(this@DashboardActivity)
                 binding.dashboardRecyclerView.adapter = dashboardAdapter
             }

@@ -10,8 +10,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -45,6 +47,9 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.WorkHistoryNotSyncedDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WorkHistoryDetailsResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +69,9 @@ private const val TAG = "SyncOfflineActivity"
 class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
 
     private lateinit var binding: ActivitySyncOfflineBinding
+
+    private var archiveBadge: BadgeDrawable? = null
+    private var archiveIconView: ImageView? = null
 
     //garbage viewModel has an application scope as it is used for syncing functionality
     //it is required in two activities dashboard and sync offline
@@ -557,8 +565,32 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    @OptIn(ExperimentalBadgeUtils::class)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.archived_menu, menu)
+
+        val menuItem = menu.findItem(R.id.action_archived)
+        val actionView = layoutInflater.inflate(R.layout.menu_archive_badge, null)
+        menuItem.actionView = actionView
+
+        archiveIconView = actionView.findViewById<ImageView>(R.id.archiveIcon)
+
+        archiveBadge = BadgeDrawable.create(this).apply {
+            backgroundColor = getColor(R.color.colorPinkDark)
+            badgeGravity = BadgeDrawable.TOP_END
+            horizontalOffset = 8
+            verticalOffset = 4
+        }
+
+        // 🔥 WAIT until layout pass
+        archiveIconView?.post {
+            BadgeUtils.attachBadgeDrawable(archiveBadge!!, archiveIconView!!)
+        }
+
+        actionView.setOnClickListener {
+            onOptionsItemSelected(menuItem)
+        }
+        observeBadgeCount()
         return true
     }
 
@@ -617,6 +649,15 @@ class SyncOfflineActivity : AppCompatActivity(), HistoryClickListener {
             intent.putParcelableArrayListExtra("houseDetailsList", houseDetailsList)
             intent.putExtra("fdate", date)
             startActivity(intent)
+        }
+    }
+
+    private fun observeBadgeCount() {
+        garbageCollectionViewModel.archivedCount.observe(this) { count ->
+            archiveBadge?.apply {
+                isVisible = count > 0
+                number = count
+            }
         }
     }
 

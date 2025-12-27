@@ -66,6 +66,8 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
     private var isOfflineMode = false
     private lateinit var internetConnectivity: ConnectivityStatus
 
+    private var isFirstLoad = true
+
     //multi language functionality
     override fun attachBaseContext(newBase: Context?) {
 
@@ -212,14 +214,17 @@ class WorkHistoryActivity : AppCompatActivity(), HistoryClickListener {
         }
 
         adapter.empType = empType
-        adapter.submitList(null)
-        adapter.submitList(modifiedHistoryList) {
+        if (isFirstLoad) {
             val controller = AnimationUtils.loadLayoutAnimation(
-                this@WorkHistoryActivity,
+                this,
                 R.anim.layout_animation
             )
             binding.workHistoryRecyclerView.layoutAnimation = controller
+            isFirstLoad = false
         }
+
+        // ✅ SINGLE submit — DiffUtil works now
+        adapter.submitList(modifiedHistoryList)
 
     }
 

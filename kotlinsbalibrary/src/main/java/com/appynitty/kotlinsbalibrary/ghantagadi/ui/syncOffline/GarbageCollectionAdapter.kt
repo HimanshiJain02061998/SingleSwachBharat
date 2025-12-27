@@ -22,6 +22,7 @@ class GarbageCollectionAdapter :
     ListAdapter<SyncOfflineData, GarbageCollectionAdapter.GCViewHolder>(DiffCallback()) {
 
     var empType: String? = null
+
     private var historyClickListener: HistoryClickListener? = null
     fun setHistoryCardClickListener(historyClickListener: HistoryClickListener) {
         this.historyClickListener = historyClickListener
@@ -31,6 +32,12 @@ class GarbageCollectionAdapter :
 //    fun setSyncOfflineClickListener(syncOfflineCardClickedListener: SyncOfflineCardClickedListener){
 //        this.syncOfflineClickListener = syncOfflineClickListener
 //    }
+
+
+
+    init {
+        setHasStableIds(true)
+    }
 
     class GCViewHolder(private val binding: EachGcLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -198,6 +205,9 @@ class GarbageCollectionAdapter :
 //            }
 //        }
     }
+
+    override fun getItemId(position: Int): Long =
+        getItem(position).date.hashCode().toLong()
 }
 
 private class DiffCallback : DiffUtil.ItemCallback<SyncOfflineData>() {
