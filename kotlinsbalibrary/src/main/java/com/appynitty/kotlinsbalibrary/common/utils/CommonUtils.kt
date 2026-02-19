@@ -102,14 +102,12 @@ class CommonUtils {
             return Base64.encodeToString(data, Base64.NO_WRAP)
         }
 
-
         fun isAirplaneModeOn(context: Context): Boolean {
             return Settings.Global.getInt(
                 context.contentResolver,
                 Settings.Global.AIRPLANE_MODE_ON, 0
             ) != 0
         }
-
 
         fun GarbageCollectionData.toTempEntity(): GarbageCollectionDataTemp {
             return GarbageCollectionDataTemp(

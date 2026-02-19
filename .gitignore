@@ -1,0 +1,13 @@
+*.jks
+*.keystore
+/keystore.properties
+*.dex
+*.class
+gen/
+out/
+**/generated/
+# Gradle
+.gradle/
+build/
+.gradle/
+local.properties
