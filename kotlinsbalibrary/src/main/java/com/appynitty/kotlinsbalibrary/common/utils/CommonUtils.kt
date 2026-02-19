@@ -165,6 +165,5 @@ class CommonUtils {
         fun List<GarbageCollectionDataTemp>.toMainList(): List<GarbageCollectionData> {
             return this.map { it.toMainEntity() }
         }
-
     }
 }
