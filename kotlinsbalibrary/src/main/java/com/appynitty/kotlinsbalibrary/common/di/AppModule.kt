@@ -8,9 +8,18 @@ import com.appynitty.kotlinsbalibrary.common.api.*
 import com.appynitty.kotlinsbalibrary.common.database.SbaDatabase
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.AboutCoinsWebService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.DealsCategoriesWebService
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.DutyApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.EmployeeApiService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.EmployeeWalletLogin
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.GetOffersDetailsWebService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.ModuleAccessWebService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.RedeemWebService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.RewardsEmpRegistration
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.ScanQrApi
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.TransactionHistoryWebService
+import com.appynitty.kotlinsbalibrary.ghantagadi.api.VouchersWebService
 import com.appynitty.kotlinsbalibrary.ghantagadi.api.WorkHistoryApi
 import com.appynitty.kotlinsbalibrary.ghantagadi.blockchain.network.DumpYardTripApi
 import com.appynitty.kotlinsbalibrary.housescanify.api.EmpDutyApi
@@ -289,8 +298,54 @@ object AppModule {
     fun provideGetUlbDetailsApi(@Named("Authorize") retrofit: Retrofit): GetUlbDetails {
         return retrofit.create(GetUlbDetails::class.java)
     }
+    @Provides
+    fun proviModuleAccessApiService(@Named("Authorize") retrofit: Retrofit): ModuleAccessWebService {
+        return retrofit.create(ModuleAccessWebService::class.java)
+    }
 
-}
+            @Provides
+            fun provideRewardsEmpRegistrationApi(@Named("Authorize")retrofit: Retrofit): RewardsEmpRegistration {
+                return retrofit.create(RewardsEmpRegistration::class.java)
+
+        }
+
+
+    @Provides
+    fun provideWalletLoginWebService(@Named("Authorize")retrofit: Retrofit): EmployeeWalletLogin {
+        return retrofit.create(EmployeeWalletLogin::class.java)
+    }
+
+    @Provides
+    fun provideDealsCategoriesWebService(@Named("Authorize")retrofit: Retrofit): DealsCategoriesWebService {
+        return retrofit.create(DealsCategoriesWebService::class.java)
+    }
+
+    @Provides
+    fun provideOffersDetailsWebService(@Named("Authorize")retrofit: Retrofit): GetOffersDetailsWebService {
+        return retrofit.create(GetOffersDetailsWebService::class.java)
+    }
+
+    @Provides
+    fun provideRedeemOfferWebService(@Named("Authorize")retrofit: Retrofit): RedeemWebService {
+        return retrofit.create(RedeemWebService::class.java)
+    }
+
+    @Provides
+    fun provideTransactionHistoryWebService(@Named("Authorize")retrofit: Retrofit): TransactionHistoryWebService {
+        return retrofit.create(TransactionHistoryWebService::class.java)
+    }
+
+    @Provides
+    fun provideVouchersWebService(@Named("Authorize")retrofit: Retrofit): VouchersWebService {
+        return retrofit.create(VouchersWebService::class.java)
+    }
+
+    @Provides
+    fun provideAboutCoinsWebService(@Named("Authorize")retrofit: Retrofit): AboutCoinsWebService {
+        return retrofit.create(AboutCoinsWebService::class.java)
+    }
+    }
+
 
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier

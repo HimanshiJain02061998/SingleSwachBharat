@@ -34,7 +34,7 @@
     <string name="title_activity_sync_offline">ऑफ़लाइन समन्वयित करें</string>
     <string name="title_activity_archived">आज का अस्वीकृत डेटा</string>
     <string name="title_activity_my_location">लोकेशन जांचें</string>
-
+    <string name="title_activity_rewards">रिवॉर्ड्स</string>
 
     <string name="emp_id_full">कर्मचारी आईडी :</string>
     <string name="employee_type">कर्मचारी प्रकार :</string>
@@ -213,6 +213,45 @@
     <string name="please_select_at_least_one_member">कृपया कम से कम एक सदस्य चुनें</string>
     <string name="selected_team_members">चयनित टीम सदस्य</string>
     <string name="team_setting_on_note">(नोट: टीम सेटिंग चालू है)</string>
+    <string name="no_offers">कोई ऑफर नहीं मिला!</string>
     <string name="save_offline_data">ऑफ़लाइन डेटा सहेजें</string>
+    <string name="store">स्टोअर</string>
+    <string name="rewards">पुरस्कार</string>
+    <string name="deals">सौदे</string>
+    <string name="deal">सौदा</string>
+    <string name="details">विवरण</string>
+    <string name="redeem_now">अभी रिडीम करें</string>
+    <string name="already_redeemed">रिडीम किया है!</string>
+    <string name="no_data_found">डाटा प्राप्त नहीं हुआ</string>
     <string name="offline_mode">ऑफ़लाइन मोड</string>
+    <string name="about_coins">सिक्कों के बारे में</string>
+    <string name="my_vouchers">मेरे वाउचर</string>
+    <string name="validTill">%1$s तक वैध.</string>
+    <string name="expired">खत्म हो चुका</string>
+    <string name="active">सक्रिय</string>
+    <string name="claimed">दावा किया</string>
+    <string name="your_coupon_code">आपका कूपन कोड</string>
+    <string name="copy_code">कोड कॉपी करें</string>
+    <string name="claimed_successfully">सफलतापूर्वक दावा किया गया</string>
+    <string name="valid_till">तक मान्य</string>
+    <string name="avail_for">%d के लिए उपलब्ध</string>
+    <string name="txt_confirm_coupon_purchase">कृपया पुष्टि करें कि क्या आप यह कूपन खरीदना चाहेंगे।</string>
+    <string name="how_to_redeem">कैसे रिडीम करें</string>
+    <string name="terms_and_conditions">नियम और शर्तें</string>
+    <string name="voucher_collected_successfully">वाउचर सफलतापूर्वक एकत्रित किया गया</string>
+    <string name="close">बंद करें</string>
+    <string name="desc_use_your_coins">शीर्ष ब्रांडों से रोमांचक छूट, ऑफ़र और वाउचर पाने के लिए अपने सिक्कों का उपयोग करें</string>
+    <string name="Registration">पंजीकरण</string>
+    <string name="first_name">पहला नाम</string>
+    <string name="last_name">उपनाम</string>
+    <string name="middle_name">मध्य नाम</string>
+    <string name="mobile_number">मोबाईल नंबर</string>
+    <string name="email_id">ईमेल एड्रेस</string>
+    <string name="address">पता</string>
+    <string name="register">"रजिस्टर "</string>
+    <string name="category">वर्ग</string>
+    <string name="put_your_earning_to_use">अपनी कमाई का उपयोग करें</string>
+    <string name="see_all">सभी देखें</string>
+    <string name="transaction_history">ट्रांजेक्शन इतिहास</string>
+    <string name="view_all">सभी को देखें</string>
 </resources>

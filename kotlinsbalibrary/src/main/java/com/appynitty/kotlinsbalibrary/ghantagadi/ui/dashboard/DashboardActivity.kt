@@ -79,11 +79,15 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.DumpYardIds
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.ModuleAccessResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.repository.ModuleAccessRepo
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.EmployeeViewModel
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.dashboard.addMemberModule.SelectMembers
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.qrScanner.QRScannerActivity
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.rewards.registration.WalletRegistrationActivity
+import com.appynitty.kotlinsbalibrary.ghantagadi.ui.rewards.rewardScreen.RewardsActivity
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline.GarbageCollectionViewModel
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline.GarbageCollectionViewModelFactory
 import com.appynitty.kotlinsbalibrary.ghantagadi.ui.syncOffline.SyncOfflineActivity
@@ -138,7 +142,8 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     @Inject
     lateinit var garbageCollectionRepo: GarbageCollectionRepo
     private lateinit var garbageCollectionViewModel: GarbageCollectionViewModel
-
+    @Inject
+    lateinit var moduleAccessRepo:ModuleAccessRepo
     private lateinit var binding: ActivityDashboardBinding
 
     private lateinit var dialog: PopUpDialogFragment
@@ -174,6 +179,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     private var isDutyOnToggleClicked = false
     private lateinit var selectedEmployeeSpinner: Spinner
     private var selectedTeamMembers: List<AvailableEmpItem>? = null
+    var moduleAccessResponse: ModuleAccessResponse? = null
 
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -541,7 +547,18 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                         getUserDetailsUpdateFromApi()
 
                     }
+                    DashboardViewModel.DashboardEvent.NavigateToRewardsScreen -> {
+                        startActivity(Intent(this@DashboardActivity, RewardsActivity::class.java))
+                    }
 
+                    DashboardViewModel.DashboardEvent.NavigateToRewardsRegistrationScreen -> {
+                        startActivity(
+                            Intent(
+                                this@DashboardActivity,
+                                WalletRegistrationActivity::class.java
+                            )
+                        )
+                    }
                     DashboardViewModel.DashboardEvent.ShowLiquidEmployeeDialog -> {
                      //   showSelectTypeDialog()
                         val mapsIntent =
@@ -943,6 +960,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                 binding.userAttendanceStatus.text =
                     resources.getString(R.string.status_on_duty)
                 binding.userVehicleType.visibility = View.VISIBLE
+                rewardsOrweightShow()
             } else {
                 binding.userAttendanceStatus.setTextColor(
                     resources.getColor(
@@ -953,6 +971,7 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
                     resources.getString(R.string.status_off_duty)
                 binding.userVehicleType.text = ""
                 binding.userVehicleType.visibility = View.INVISIBLE
+                rewardsOrweightShow()
             }
         })
 
@@ -1511,9 +1530,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
         binding.toolbar.title = MyApplication.ULB_NAME
         setSupportActionBar(binding.toolbar)
     }
-
+    val mList = ArrayList<DashboardMenu>()
     private fun setUpGridRecyclerView() {
-
+        mList.clear()
         binding.dashboardRecyclerView.setHasFixedSize(true)
         binding.dashboardRecyclerView.layoutManager = GridLayoutManager(this, 2)
 
@@ -1523,64 +1542,63 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
     }
 
     private fun setUpMenuList(mList: ArrayList<DashboardMenu>) {
-
         lifecycleScope.launch(Dispatchers.IO) {
-
             val userDataFlow = userDetailsViewModel.getUserDetailsFromRoom()
             val userData1 = userDataFlow.first()
             val employeeType1 = userData1?.employeeType
+            val appId = CommonUtils.APP_ID
+
+            // Fetch API response
+            moduleAccessResponse = employeeType1?.let { moduleAccessRepo.getModuleAccessData(appId, it) }
 
             withContext(Dispatchers.Main) {
-                mList.add(
-                    DashboardMenu(
-                        resources.getString(R.string.title_activity_qrcode_scanner),
-                        R.drawable.ic_qr_code
-                    )
-                )
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_qrcode_scanner), R.drawable.ic_qr_code))
 
-                if (employeeType1 != "D")
-                    mList.add(
-                        DashboardMenu(
-                            resources.getString(R.string.title_activity_take_photo),
-                            R.drawable.ic_photograph
-                        )
-                    )
+                if (employeeType1 != "D") {
+                    mList.add(DashboardMenu(resources.getString(R.string.title_activity_take_photo), R.drawable.ic_photograph))
+                }
 
-                mList.add(
-                    DashboardMenu(
-                        resources.getString(R.string.title_activity_history_page),
-                        R.drawable.ic_history
-                    )
-                )
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_history_page), R.drawable.ic_history))
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_sync_offline), R.drawable.ic_sync))
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_profile_page), R.drawable.ic_id_card))
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_my_location), R.drawable.live_location))
 
-                mList.add(
-                    DashboardMenu(
-                        resources.getString(R.string.title_activity_sync_offline),
-                        R.drawable.ic_sync
-                    )
-                )
 
-                mList.add(
-                    DashboardMenu(
-                        resources.getString(R.string.title_activity_profile_page),
-                        R.drawable.ic_id_card
-                    )
-                )
-                mList.add(
-                    DashboardMenu(
-                        resources.getString(R.string.title_activity_my_location),
-                        R.drawable.live_location
-                    )
-                )
-
+//                // Set adapter
                 dashboardAdapter = DashboardAdapter(mList)
                 dashboardAdapter.setListener(this@DashboardActivity)
                 binding.dashboardRecyclerView.adapter = dashboardAdapter
+                rewardsOrweightShow()
             }
         }
-
     }
+    private fun rewardsOrweightShow(){
 
+        if (isDutyOn) {
+            if (moduleAccessResponse?.isRewards == true && !mList.contains(DashboardMenu(resources.getString(R.string.title_activity_rewards), R.drawable.icn_rewards)) ) {
+                mList.add(DashboardMenu(resources.getString(R.string.title_activity_rewards), R.drawable.icn_rewards))
+            }
+
+//            if (moduleAccessResponse?.isWeightCollection == true && !mList.contains(DashboardMenu(resources.getString(R.string.title_activity_garbageWeight_collection), R.drawable.icn_weighing_scale_qr))) {
+//                mList.add(DashboardMenu(resources.getString(R.string.title_activity_garbageWeight_collection), R.drawable.icn_weighing_scale_qr))
+//            }
+            if (::dashboardAdapter.isInitialized) {
+                dashboardAdapter?.notifyDataSetChanged()
+            }
+
+        }else{
+            if (mList.contains(DashboardMenu(resources.getString(R.string.title_activity_rewards), R.drawable.icn_rewards))){
+                mList.remove(DashboardMenu(resources.getString(R.string.title_activity_rewards), R.drawable.icn_rewards))
+            }
+
+//            if (mList.contains(DashboardMenu(resources.getString(R.string.title_activity_garbageWeight_collection), R.drawable.icn_weighing_scale_qr))){
+//                mList.remove(DashboardMenu(resources.getString(R.string.title_activity_garbageWeight_collection), R.drawable.icn_weighing_scale_qr))
+//            }
+            if (::dashboardAdapter.isInitialized) {
+                dashboardAdapter?.notifyDataSetChanged()
+            }
+        }
+    }
     override fun onMenuItemClicked(menuItem: DashboardMenu) {
 
         when (menuItem.menuName) {
@@ -1613,6 +1631,9 @@ class DashboardActivity : AppCompatActivity(), DashboardAdapter.MenuItemClickedI
             resources.getString(R.string.title_activity_my_location) -> {
 
                 viewModel.onMyLocationMenuClicked(isDutyOn)
+            }
+            resources.getString(R.string.title_activity_rewards) -> {
+                viewModel.onRewardsMenuClicked()
             }
         }
 

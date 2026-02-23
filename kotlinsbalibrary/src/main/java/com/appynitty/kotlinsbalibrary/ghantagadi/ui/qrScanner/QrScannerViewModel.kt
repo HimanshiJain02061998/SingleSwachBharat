@@ -28,7 +28,9 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.GarbageCollectionResponse
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.ModuleAccessResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.GarbageCollectionRepo
+import com.appynitty.kotlinsbalibrary.ghantagadi.repository.ModuleAccessRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +55,9 @@ class QrScannerViewModel @Inject constructor(
     private val sessionDataStore: SessionDataStore,
     private val userDataStore: UserDataStore,
     private val archivedDao: ArchivedDao,
-    private val userTravelLocDao: UserTravelLocDao
+    private val userTravelLocDao: UserTravelLocDao,
+    private val moduleAccessRepo: ModuleAccessRepo
+
 ) : ViewModel() {
 
     @Inject
@@ -68,7 +72,9 @@ class QrScannerViewModel @Inject constructor(
 
     private val qrScannerEventChannel = Channel<QrScannerEvent>()
     val qrScannerEventsFlow = qrScannerEventChannel.receiveAsFlow()
-
+    private val _moduleAccessLiveData = MutableLiveData<ModuleAccessResponse>()
+    val moduleAccessLiveData: LiveData<ModuleAccessResponse>
+        get() = _moduleAccessLiveData
     var gcType = ""
     var referenceId = ""
     var isGtFeatureOn: Boolean = false
@@ -80,7 +86,7 @@ class QrScannerViewModel @Inject constructor(
     private val _isOffline = MutableLiveData(false)
     val isOffline: LiveData<Boolean> get() = _isOffline
 
-
+    private var isDumpWeightEnabled: Boolean = false
 
     init {
         getIsOfflineMode()
@@ -91,6 +97,17 @@ class QrScannerViewModel @Inject constructor(
             Log.d("checkStatus","status is ${userDataStore.getIsOfflineMode.first()}")
             userDataStore.getIsOfflineMode.collect { value ->
                 _isOffline.value = value
+            }
+        }
+    }
+    fun loadModuleAccess(appId: String, empType: String?) {
+        viewModelScope.launch {
+            val response = moduleAccessRepo.getModuleAccessData(appId, empType)
+
+            if (response != null) {
+                _moduleAccessLiveData.postValue(response)
+            } else {
+
             }
         }
     }
@@ -105,13 +122,19 @@ class QrScannerViewModel @Inject constructor(
                     gcType = "3"
                     submitDialogTitleText = "Dump yard Id"
 
-                    // qrScannerEventChannel.send(QrScannerEvent.OpenDumpYardWeightActivityForResults)
-                    qrScannerEventChannel.send(
-                        QrScannerEvent.SubmitScanQrData(
-                            null, null, true
+                    if (isDumpWeightEnabled) {
+                        qrScannerEventChannel.send(
+                            QrScannerEvent.OpenDumpYardWeightActivityForResults
                         )
-                    )
-
+                    } else {
+                        qrScannerEventChannel.send(
+                            QrScannerEvent.SubmitScanQrData(
+                                null,
+                                null,
+                                true
+                            )
+                        )
+                    }
 
                 } else {
                     //handle if emp type (d) functionality needs to implement
@@ -229,7 +252,10 @@ class QrScannerViewModel @Inject constructor(
             qrScannerEventChannel.send(QrScannerEvent.ResumeScanner)
         }
     }
-
+    fun setModuleAccessResponse(response: ModuleAccessResponse) {
+        isDumpWeightEnabled = response.isDumpWeight
+        Log.d("ModuleAccess", "isDumpWeight = $isDumpWeightEnabled")
+    }
     fun garbageTypeDialogSubmitClicked(garbageType: String?, note: String?) =
         viewModelScope.launch {
             if (garbageType == null) {
@@ -341,7 +367,7 @@ class QrScannerViewModel @Inject constructor(
                     }
                 }
             }
-           val garbageCollectionDataTemp =  garbageCollectionData.toTempEntity()
+            val garbageCollectionDataTemp =  garbageCollectionData.toTempEntity()
             garbageCollectionDao.insertGarbageCollection(garbageCollectionData)
             garbageCollectionDaoTemp.insertGarbageCollection(garbageCollectionDataTemp)
             qrScannerEventChannel.send(QrScannerEvent.ShowSuccessToast(R.string.saved_offline))

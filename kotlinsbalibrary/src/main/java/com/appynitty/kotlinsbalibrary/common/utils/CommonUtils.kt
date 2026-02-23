@@ -6,9 +6,11 @@ import android.content.Context
 import android.os.BatteryManager
 import android.provider.Settings
 import android.util.Base64
+import android.view.Gravity
 import com.appynitty.kotlinsbalibrary.common.MyApplication
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionData
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.GarbageCollectionDataTemp
+import com.shashank.sony.fancytoastlib.FancyToast
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
 
@@ -43,7 +45,8 @@ class CommonUtils {
 
         const val CONFIRM_LOGOUT_DIALOG = "confirmLogout"
         const val CONFIRM_OFF_DUTY_DIALOG = "confirmOffDuty"
-
+        const val STATUS_SUCCESS_CAPS = "Success"
+        const val STATUS_ERROR_CAPE = "Error"
         @SuppressLint("HardwareIds")
         fun getAndroidId(context: Context): String? {
             return Settings.Secure.getString(
@@ -165,5 +168,6 @@ class CommonUtils {
         fun List<GarbageCollectionDataTemp>.toMainList(): List<GarbageCollectionData> {
             return this.map { it.toMainEntity() }
         }
+
     }
 }

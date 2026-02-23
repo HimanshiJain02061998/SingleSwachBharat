@@ -442,7 +442,7 @@ class EmpDashboardViewModel @Inject constructor(
     fun performForcefullyLogout(){
         viewModelScope.launch {
             val userDetails = userDataStore.getUserEssentials.first()
-            tempUserDataStore.saveUserEssentials(UserEssentials(userDetails.userId,userDetails.employeeType,userDetails.userTypeId))
+            tempUserDataStore.saveUserEssentials(UserEssentials(userDetails.userId,userDetails.employeeType,userDetails.userTypeId,userDetails.userLoginId))
             userDataStore.clearUserDatastore()
             sessionDataStore.clearSessionDatastore()
 //            archivedDao.deleteAllArchivedData()

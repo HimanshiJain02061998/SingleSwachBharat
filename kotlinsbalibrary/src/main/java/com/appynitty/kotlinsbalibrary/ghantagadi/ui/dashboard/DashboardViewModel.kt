@@ -22,6 +22,7 @@ import com.appynitty.kotlinsbalibrary.common.model.response.AttendanceResponse
 import com.appynitty.kotlinsbalibrary.common.model.response.VehicleQrDetailsResponse
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils
 import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.STATUS_SUCCESS
+import com.appynitty.kotlinsbalibrary.common.utils.CommonUtils.Companion.STATUS_SUCCESS_CAPS
 import com.appynitty.kotlinsbalibrary.common.utils.DateTimeUtils
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.LanguageDataStore
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.SessionDataStore
@@ -37,11 +38,15 @@ import com.appynitty.kotlinsbalibrary.ghantagadi.dao.GarbageCollectionDaoTemp
 import com.appynitty.kotlinsbalibrary.ghantagadi.dao.UserTravelLocDao
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.InPunchRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.OutPunchRequest
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.request.WalletLoginRequest
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.DumpYardIds
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.EmpRewardSysInfo
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleNumberResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.VehicleTypeResponse
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.WalletLoginResponse
 import com.appynitty.kotlinsbalibrary.ghantagadi.repository.DutyRepository
+import com.appynitty.kotlinsbalibrary.ghantagadi.repository.RewardsWalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +55,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import timber.log.Timber
 import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -70,6 +76,7 @@ class DashboardViewModel @Inject constructor(
     private val garbageCollectionDaoTemp: GarbageCollectionDaoTemp,
     private val tempUserDataStore: TempUserDataStore,
     @ApplicationContext private val appContext: Context,
+    private val rewardsWalletRepository: RewardsWalletRepository,
 ) : ViewModel() {
 
     private val dashboardEventChannel = Channel<DashboardEvent>(Channel.BUFFERED)
@@ -730,7 +737,9 @@ class DashboardViewModel @Inject constructor(
         //     dashboardEventChannel.send(DashboardEvent.ShowWarningMessage(R.string.be_no_duty))
         //  }
     }
-
+    fun onRewardsMenuClicked() = viewModelScope.launch {
+        checkIfEmployeeIsRegisteredForRewards()
+    }
     fun onWorkHistoryMenuClicked() = viewModelScope.launch {
         dashboardEventChannel.send(DashboardEvent.NavigateToWorkHistoryScreen)
     }
@@ -774,6 +783,67 @@ class DashboardViewModel @Inject constructor(
 
     fun updateSelectedMemberIds(ids: List<AvailableEmpItem>) {
         _memberIds.value = ids
+    }
+    private fun checkIfEmployeeIsRegisteredForRewards() = viewModelScope.launch {
+        dashboardEventChannel.send(DashboardEvent.ShowProgressBar)
+        try {
+            val userLoginId = userDataStore.getUserEssentials.first().userLoginId
+            val appId = CommonUtils.APP_ID
+            val userInfo = WalletLoginRequest(appId.toInt(), userLoginId)
+            val response = rewardsWalletRepository.isEmployeeRegistered(userInfo)
+            handleCheckRegistrationResponse(response)
+        } catch (t: Throwable) {
+            dashboardEventChannel.send(DashboardEvent.HideProgressBar)
+
+            when (t) {
+                is IOException -> DashboardEvent.ShowFailureMessage(
+                    "Connection Timeout"
+                )
+
+                else -> DashboardEvent.ShowFailureMessage(
+                    "Conversion Error"
+                )
+            }
+        }
+    }
+    private fun handleCheckRegistrationResponse(response: Response<WalletLoginResponse>) =
+        viewModelScope.launch {
+            dashboardEventChannel.send(DashboardEvent.HideProgressBar)
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    if (it.status == STATUS_SUCCESS_CAPS) {
+                        saveEmpRewardsInfo(it)
+                        Timber.d("EmpRewardsInfo saved successfully!")
+                        dashboardEventChannel.send(DashboardEvent.NavigateToRewardsScreen)
+                    } else {
+                        if (it.code == 404) {
+                            dashboardEventChannel.send(DashboardEvent.NavigateToRewardsRegistrationScreen)
+                        } else {
+                            dashboardEventChannel.send(DashboardEvent.ShowFailureMessage(it.message))
+                        }
+                    }
+                }
+            } else {
+                dashboardEventChannel.send(DashboardEvent.ShowFailureMessage(response.message()))
+            }
+        }
+
+
+
+    private suspend fun saveEmpRewardsInfo(walletLoginResponse: WalletLoginResponse) {
+        val data = walletLoginResponse.empWalletDetails
+        val empRewardSysInfo = EmpRewardSysInfo(
+            data.balCoins,
+            data.eId,
+            data.emailId,
+            data.firstName,
+            data.lastName,
+            data.mobileNo,
+            data.username,
+            data.wallet_Id
+        )
+        userDataStore.saveEmpRewardSysInfo(empRewardSysInfo)
     }
 
     fun onDutyToggleClicked(
@@ -987,7 +1057,8 @@ class DashboardViewModel @Inject constructor(
                 UserEssentials(
                     userDetails.userId,
                     userDetails.employeeType,
-                    userDetails.userTypeId
+                    userDetails.userTypeId,
+                            userDetails.userLoginId
                 )
             )
             userDataStore.clearUserDatastore()
@@ -1030,6 +1101,8 @@ class DashboardViewModel @Inject constructor(
         object NavigateToPrivacyPolicyScreen : DashboardEvent()
         object NavigateToLoginScreen : DashboardEvent()
         object NavigateToSelectUlbScreen : DashboardEvent()
+        object NavigateToRewardsScreen : DashboardEvent()
+        object NavigateToRewardsRegistrationScreen : DashboardEvent()
         object ShowSettingScreen : DashboardEvent()
         object ShowSettingTeamScreen : DashboardEvent()
         object ShowChangeLanguageScreen : DashboardEvent()

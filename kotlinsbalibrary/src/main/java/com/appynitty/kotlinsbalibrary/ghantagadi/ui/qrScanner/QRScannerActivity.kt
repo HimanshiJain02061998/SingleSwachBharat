@@ -95,7 +95,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     private var distance = "0"
     private var isDialogVisible = false
     private var isOfflineMode = false
-
+    private var isModuleAccessLoaded = false
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -132,7 +132,6 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
         subscribeLiveData()
         subscribeChannelEvents()
         BackBtnPressedUtil.handleBackBtnPressed(this, this, this)
-
     }
 
     private fun subscribeChannelEvents() {
@@ -323,6 +322,7 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
 
         receiver = AirplaneModeChangeReceiver()
         viewModel.getDeviceId(this)
+        viewModel.loadModuleAccess(CommonUtils.APP_ID, empType)
     }
 
 
@@ -472,6 +472,12 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
             else
                 it.distance
 
+        }
+        viewModel.moduleAccessLiveData.observe(this) { response ->
+            response?.let {
+                viewModel.setModuleAccessResponse(it)
+                isModuleAccessLoaded = true
+            }
         }
     }
 
@@ -652,7 +658,10 @@ class QRScannerActivity : AppCompatActivity(), GarbageTypeDialogFragment.Garbage
     }
 
     fun handleQrResult(result: BarcodeResult) {
-
+        if (!isModuleAccessLoaded) {
+            CustomToast.showWarningToast(this, "Please wait...")
+            return
+        }
         vibrateDevice(this)
 
         if (isAttendanceRequest) {

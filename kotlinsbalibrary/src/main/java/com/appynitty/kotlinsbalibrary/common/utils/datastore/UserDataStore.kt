@@ -10,6 +10,7 @@ import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserEssential
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserLatLong
 import com.appynitty.kotlinsbalibrary.common.utils.datastore.model.UserVehicleDetails
 import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.AvailableEmpItem
+import com.appynitty.kotlinsbalibrary.ghantagadi.model.response.EmpRewardSysInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,6 +31,7 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
 
         //it is use to identify user is from house scanify or ghanta gadi
         private val USER_TYPE_ID = stringPreferencesKey(name = "user_type_id_key")
+        private val USER_LOGIN_ID = stringPreferencesKey(name = "user_login_id")
         private val EMP_TYPE_KEY = stringPreferencesKey(name = "employee_type_key")
         private val LAST_LATITUDE_KEY = stringPreferencesKey(name = "last_known_lat_key")
         private val LAST_LONGITUDE_KEY = stringPreferencesKey(name = "last_known_long_key")
@@ -53,6 +55,15 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
         private val SELECTED_MEMBERS = stringPreferencesKey("selected_members")
 
         private val OFFLINE_MODE = booleanPreferencesKey(name = "is_offline_mode")
+
+        private val USER_NAME_KEY = stringPreferencesKey(name = "user_name_key")
+        private val WALLET_ID_KEY = stringPreferencesKey(name = "wallet_id_key")
+        private val E_ID_KEY = intPreferencesKey(name = "e_id_key")
+        private val EMAIL_ID_KEY = stringPreferencesKey(name = "email_id_key")
+        private val FIRST_NAME_KEY = stringPreferencesKey(name = "first_name_key")
+        private val LAST_NAME_KEY = stringPreferencesKey(name = "last_name_key")
+        private val MOBILE_NO_KEY = stringPreferencesKey(name = "mobile_no_key")
+        private val BAL_COINS_KEY = intPreferencesKey(name = "bal_coins_key")
 
     }
     suspend fun saveVewTeam(isBifurcationOn: Boolean) {
@@ -184,6 +195,7 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
             preferences[USER_ID_KEY] = userEssentials.userId
             preferences[EMP_TYPE_KEY] = userEssentials.employeeType
             preferences[USER_TYPE_ID] = userEssentials.userTypeId
+            preferences[USER_LOGIN_ID] = userEssentials.userLoginId
 
         }
     }
@@ -194,11 +206,35 @@ class UserDataStore @Inject constructor(@ApplicationContext context: Context) {
                 preferences[USER_ID_KEY] ?: "",
                 preferences[EMP_TYPE_KEY] ?: "",
                 preferences[USER_TYPE_ID] ?: "",
+                preferences[USER_LOGIN_ID] ?: "",
 
             )
         }
 
+    suspend fun saveEmpRewardSysInfo(empRewardSysInfo: EmpRewardSysInfo) {
+        userDataStore.edit { preferences ->
+            preferences[USER_NAME_KEY] = empRewardSysInfo.firstName
+            preferences[WALLET_ID_KEY] = empRewardSysInfo.walletId
+            preferences[E_ID_KEY] = empRewardSysInfo.eId
+            preferences[EMAIL_ID_KEY] = empRewardSysInfo.emailId
+            preferences[FIRST_NAME_KEY] = empRewardSysInfo.firstName
+            preferences[LAST_NAME_KEY] = empRewardSysInfo.lastName
+            preferences[MOBILE_NO_KEY] = empRewardSysInfo.mobileNo
+            preferences[BAL_COINS_KEY] = empRewardSysInfo.balCoins
+        }
+    }
 
+    val getEmpRewardSysInfo: Flow<EmpRewardSysInfo> = userDataStore.data
+        .map { preferences ->
+            EmpRewardSysInfo(preferences[BAL_COINS_KEY] ?: 0,
+                preferences[E_ID_KEY]?:0,
+                preferences[EMAIL_ID_KEY]?:"",
+                preferences[FIRST_NAME_KEY]?:"",
+                preferences[LAST_NAME_KEY]?:"",
+                preferences[MOBILE_NO_KEY]?:"",
+                preferences[USER_NAME_KEY]?:"",
+                preferences[WALLET_ID_KEY]?:"")
+        }
     suspend fun saveUserLatLong(userLatLong: UserLatLong) {
         userDataStore.edit { preferences ->
             preferences[LAST_LATITUDE_KEY] = userLatLong.latitude

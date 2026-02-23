@@ -60,4 +60,6 @@
     <dimen name="dimen_30_sp">30sp</dimen>
     <dimen name="dim_40_sp">40sp</dimen>
     <dimen name="dim_25_dp">25dp</dimen>
+    <dimen name="recycler_view_item_spacing">10dp</dimen>
+    <dimen name="_0_1dp">0.5dp</dimen>
 </resources>

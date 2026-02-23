@@ -47,5 +47,16 @@ class CustomToast {
             fancyToast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 50)
             fancyToast.show()
         }
+        fun showInfoToast(context: Context, message: String) {
+            val fancyToast = FancyToast.makeText(
+                context,
+                message,
+                FancyToast.LENGTH_SHORT,
+                FancyToast.INFO,
+                false
+            )
+            fancyToast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 50)
+            fancyToast.show()
+        }
     }
 }

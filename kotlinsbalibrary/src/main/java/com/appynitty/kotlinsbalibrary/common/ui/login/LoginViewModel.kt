@@ -50,9 +50,9 @@ class LoginViewModel @Inject constructor(
         loginEventChannel.send(LoginEvent.ShowProgressBar)
         loginEventChannel.send(LoginEvent.DisableLoginButton)
         try {
-
+            val userLoginId = loginRequest.userLoginId
             val response = loginRepository.saveLoginDetails(appId, contentType, loginRequest)
-            handleLoginResponse(response, appId, contentType)
+            handleLoginResponse(response, appId, contentType,userLoginId)
 
         } catch (t: Throwable) {
             loginEventChannel.send(LoginEvent.HideProgressBar)
@@ -69,7 +69,8 @@ class LoginViewModel @Inject constructor(
     private fun handleLoginResponse(
         response: Response<LoginResponse>,
         appId: String,
-        contentType: String
+        contentType: String,
+        userLoginId: String
     ) =
         viewModelScope.launch {
 
@@ -81,7 +82,7 @@ class LoginViewModel @Inject constructor(
                     if (it?.status == CommonUtils.STATUS_SUCCESS) {
 
                         saveUserLoginSession()
-                        val userEssentials = UserEssentials(it.userId, it.EmpType, it.typeId)
+                        val userEssentials = UserEssentials(it.userId, it.EmpType, it.typeId,userLoginId)
                         userDataStore.saveUserEssentials(userEssentials)
                         getUserDetails(appId, contentType, it)
 

@@ -23,6 +23,7 @@ class TempUserDataStore @Inject constructor(@ApplicationContext context: Context
         //it is use to identify user is from house scanify or ghanta gadi
         private val USER_TYPE_ID = stringPreferencesKey(name = "user_type_id_key")
         private val EMP_TYPE_KEY = stringPreferencesKey(name = "employee_type_key")
+        private val USER_LOGIN_ID = stringPreferencesKey(name = "user_login_id")
 
     }
 
@@ -32,6 +33,7 @@ class TempUserDataStore @Inject constructor(@ApplicationContext context: Context
             preferences[USER_ID_KEY] = userEssentials.userId
             preferences[EMP_TYPE_KEY] = userEssentials.employeeType
             preferences[USER_TYPE_ID] = userEssentials.userTypeId
+            preferences[USER_LOGIN_ID] = userEssentials.userLoginId
 
         }
     }
@@ -42,6 +44,7 @@ class TempUserDataStore @Inject constructor(@ApplicationContext context: Context
                 preferences[USER_ID_KEY] ?: "",
                 preferences[EMP_TYPE_KEY] ?: "",
                 preferences[USER_TYPE_ID] ?: "",
+                preferences[USER_LOGIN_ID] ?: "",
 
                 )
         }
